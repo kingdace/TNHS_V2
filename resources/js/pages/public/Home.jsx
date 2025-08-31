@@ -29,11 +29,11 @@ import {
 const Home = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
 
-    // Auto-advance slides every 10 seconds
+    // Auto-advance slides every 5 seconds
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-        }, 10000);
+        }, 5000);
 
         return () => clearInterval(interval);
     }, []);
@@ -185,8 +185,8 @@ const Home = () => {
                                 alt={slide.title}
                                 className="h-full w-full object-cover"
                             />
-                            {/* Dark overlay for better text readability */}
-                            <div className="absolute inset-0 bg-black/40"></div>
+                            {/* Lighter overlay for better text readability */}
+                            <div className="absolute inset-0 bg-black/20"></div>
                         </div>
                     ))}
                 </div>
@@ -194,36 +194,69 @@ const Home = () => {
                 {/* Content Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center text-white px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+                        {/* School Logo */}
+                        <div className="mb-8 flex justify-center">
+                            <div className="h-36 w-36 bg-white rounded-full flex items-center justify-center shadow-2xl border-4 border-white/30 backdrop-blur-sm">
+                                <img
+                                    src="/images/Logo.jpg"
+                                    alt="TNHS Logo"
+                                    className="h-full w-full object-cover rounded-full"
+                                />
+                            </div>
+                        </div>
+
                         {/* Welcome Text */}
-                        <div className="mb-5">
-                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 text-shadow-lg">
-                                Welcome to TNHS
+                        <div className="mb-6">
+                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-3">
+                                <span className="text-3d-shadow-welcome font-extrabold tracking-wider">
+                                    Welcome to{" "}
+                                </span>
+                            </h1>
+                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
+                                <span className="text-3d-shadow font-extrabold tracking-wider">
+                                    TAFT NATIONAL HIGH SCHOOL
+                                </span>
                             </h1>
                         </div>
 
                         {/* Mission Statement */}
-                        <div className="mb-8">
-                            <p className="text-lg sm:text-xl lg:text-2xl text-blue-100 leading-relaxed max-w-3xl mx-auto text-shadow-md">
+                        <div className="mb-10">
+                            <p className="text-3d-shadow-mission text-lg sm:text-xl lg:text-2xl leading-relaxed max-w-3xl mx-auto font-medium">
                                 Empowering students with quality education,
-                                fostering academic excellence, and building
-                                character for a brighter future in Eastern
-                                Samar.
+                                fostering excellence, and building character for
+                                a brighter future...
                             </p>
                         </div>
 
-                        {/* CTA Button */}
-                        <div>
+                        {/* CTA Buttons */}
+                        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                            {/* Enrollment Requirements Button */}
                             <Button
                                 asChild
                                 size="lg"
-                                className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-gray-900 font-bold px-10 py-5 text-xl rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0 relative overflow-hidden group"
+                                className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold px-10 py-5 text-xl rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0 relative overflow-hidden group"
                             >
-                                <Link to="/about">
-                                    <span className="relative z-10">
-                                        Learn More
+                                <Link to="/admissions">
+                                    <span className="relative z-10 flex items-center">
+                                        Enrollment Requirements
+                                        <ArrowRight className="ml-3 h-6 w-6" />
                                     </span>
                                     {/* Shine effect */}
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                                </Link>
+                            </Button>
+
+                            {/* Learn More Button */}
+                            <Button
+                                asChild
+                                size="lg"
+                                className="bg-white hover:bg-gray-100 text-gray-900 font-bold px-10 py-5 text-xl rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0 relative overflow-hidden group"
+                            >
+                                <Link to="/about">
+                                    <span className="relative z-10 flex items-center">
+                                        Learn More
+                                        <ArrowRight className="ml-3 h-6 w-6" />
+                                    </span>
                                 </Link>
                             </Button>
                         </div>
@@ -284,144 +317,216 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Features Section */}
-            <section className="py-20 bg-gray-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                            Why Choose TNHS?
+            {/* TNHS Core Values Section */}
+            <section className="py-10 bg-gray-100">
+                <div className="max-w-5xl mx-auto px-3 sm:px-5S lg:px-8">
+                    <div className="text-center mb-10">
+                        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
+                            <span className="text-3d-shadow font-extrabold tracking-wider">
+                                MAKA DIOS MAKA TAO MAKALIKASA MAKABANSA.
+                            </span>
                         </h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            We provide a comprehensive educational experience
-                            that prepares students for success in life.
-                        </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {features.map((feature, index) => (
-                            <Card
-                                key={index}
-                                className="text-center hover:shadow-lg transition-shadow duration-300"
+                    {/* Search Bar */}
+                    <div className="mb-8">
+                        <div className="relative max-w-2xl mx-auto">
+                            <input
+                                type="text"
+                                placeholder="Search news and announcements..."
+                                className="w-full pl-12 pr-4 py-4 border-2 border-royal-blue rounded-lg focus:ring-2 focus:ring-royal-blue focus:border-transparent outline-none transition-all duration-300 text-lg"
+                            />
+                            <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-royal-blue">
+                                🔍
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Quick Links */}
+                    <div className="text-center mb-8">
+                        <h3 className="text-2xl font-semibold text-royal-blue mb-6">
+                            QUICK LINKS:
+                        </h3>
+                        <div className="flex flex-wrap justify-center gap-4">
+                            <Button
+                                asChild
+                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 transform flex items-center space-x-2"
                             >
-                                <CardContent className="pt-6">
-                                    <div className="flex justify-center mb-4">
-                                        {feature.icon}
-                                    </div>
-                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                                        {feature.title}
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        {feature.description}
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Upcoming Events Section */}
-            <section className="py-20 bg-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                            Upcoming Events
-                        </h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            Stay updated with important dates and events at
-                            TNHS.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {upcomingEvents.map((event, index) => (
-                            <Card
-                                key={index}
-                                className="hover:shadow-lg transition-shadow duration-300"
+                                <Link to="/admissions">
+                                    <span>🎓</span>
+                                    <span>ENROLLMENT</span>
+                                </Link>
+                            </Button>
+                            <Button
+                                asChild
+                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 transform flex items-center space-x-2"
                             >
-                                <CardHeader>
-                                    <div className="flex items-center space-x-3">
-                                        <div className="p-2 bg-royal-blue rounded-lg text-white">
-                                            {event.icon}
-                                        </div>
-                                        <div>
-                                            <CardTitle className="text-lg">
-                                                {event.title}
-                                            </CardTitle>
-                                            <CardDescription className="text-royal-blue font-medium">
-                                                {event.date}
-                                            </CardDescription>
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-gray-600">
-                                        {event.description}
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Latest News Section */}
-            <section className="py-20 bg-gray-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                            Latest News & Updates
-                        </h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            Stay informed about the latest happenings and
-                            achievements at TNHS.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {newsItems.map((news, index) => (
-                            <Card
-                                key={index}
-                                className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                                <Link to="/academics">
+                                    <span>📚</span>
+                                    <span>ACADEMIC PROGRAMS</span>
+                                </Link>
+                            </Button>
+                            <Button
+                                asChild
+                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 transform flex items-center space-x-2"
                             >
-                                <div className="h-48 overflow-hidden">
+                                <Link to="/about">
+                                    <span>🏫</span>
+                                    <span>ABOUT TNHS</span>
+                                </Link>
+                            </Button>
+                            <Button
+                                asChild
+                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 transform flex items-center space-x-2"
+                            >
+                                <Link to="/contact">
+                                    <span>📞</span>
+                                    <span>CONTACT US</span>
+                                </Link>
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div className="space-y-8">
+                        {/* Featured News - First Card */}
+                        <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden max-w-4xl mx-auto w-full">
+                            <div className="flex flex-col md:flex-row h-full">
+                                {/* Left Section - Image */}
+                                <div className="relative md:w-2/5 h-48 md:h-auto">
                                     <img
-                                        src={news.image}
-                                        alt={news.title}
-                                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                        src={newsItems[0].image}
+                                        alt={newsItems[0].title}
+                                        className="w-full h-full object-cover"
                                     />
+                                    {/* Featured Tag */}
+                                    <div className="absolute top-3 left-3 bg-gradient-to-r from-orange-400 to-yellow-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 shadow-lg">
+                                        <span>★</span>
+                                        <span>FEATURED</span>
+                                    </div>
                                 </div>
-                                <CardHeader>
-                                    <CardTitle className="text-lg line-clamp-2">
-                                        {news.title}
-                                    </CardTitle>
-                                    <CardDescription>
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span>{news.author}</span>
-                                            <span>{news.date}</span>
+
+                                {/* Right Section - Content */}
+                                <div className="md:w-3/5 p-6 flex flex-col justify-between">
+                                    {/* Top Metadata */}
+                                    <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                                        <div className="flex items-center space-x-1">
+                                            <span>📅</span>
+                                            <span>{newsItems[0].date}</span>
                                         </div>
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-gray-600 line-clamp-3">
-                                        {news.excerpt}
+                                        <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
+                                            NEWS
+                                        </div>
+                                    </div>
+
+                                    {/* Title */}
+                                    <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                                        {newsItems[0].title}
+                                    </h3>
+
+                                    {/* Description */}
+                                    <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
+                                        {newsItems[0].excerpt}
                                     </p>
+
+                                    {/* Bottom Metadata */}
+                                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                        <div className="flex items-center space-x-1">
+                                            <span>👤</span>
+                                            <span>{newsItems[0].author}</span>
+                                        </div>
+                                        <div className="flex items-center space-x-1">
+                                            <span>👁️</span>
+                                            <span>2436 views</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Read More Button */}
                                     <Button
                                         asChild
-                                        variant="link"
-                                        className="p-0 h-auto text-royal-blue hover:text-royal-blue-dark mt-2 font-semibold hover:underline transition-all duration-300 group"
+                                        className="bg-gradient-to-r from-orange-400 to-yellow-500 hover:from-orange-500 hover:to-yellow-600 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 transform self-end"
                                     >
                                         <Link
                                             to="/news"
-                                            className="flex items-center"
+                                            className="flex items-center space-x-1"
                                         >
-                                            Read More{" "}
-                                            <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                                            <span>Read More</span>
+                                            <ArrowRight className="h-4 w-4" />
                                         </Link>
                                     </Button>
-                                </CardContent>
-                            </Card>
-                        ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Additional News Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+                            {newsItems.slice(1, 3).map((news, index) => (
+                                <div
+                                    key={index + 1}
+                                    className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+                                >
+                                    <div className="h-48 overflow-hidden">
+                                        <img
+                                            src={news.image}
+                                            alt={news.title}
+                                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                        />
+                                    </div>
+                                    <div className="p-6">
+                                        {/* Top Metadata */}
+                                        <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                                            <div className="flex items-center space-x-1">
+                                                <span>📅</span>
+                                                <span>{news.date}</span>
+                                            </div>
+                                            <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+                                                NEWS
+                                            </div>
+                                        </div>
+
+                                        {/* Title */}
+                                        <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2">
+                                            {news.title}
+                                        </h3>
+
+                                        {/* Description */}
+                                        <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2">
+                                            {news.excerpt}
+                                        </p>
+
+                                        {/* Bottom Metadata */}
+                                        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                            <div className="flex items-center space-x-1">
+                                                <span>👤</span>
+                                                <span>{news.author}</span>
+                                            </div>
+                                            <div className="flex items-center space-x-1">
+                                                <span>👁️</span>
+                                                <span>
+                                                    {Math.floor(
+                                                        Math.random() * 2000
+                                                    ) + 500}{" "}
+                                                    views
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Read More Button */}
+                                        <Button
+                                            asChild
+                                            className="w-full bg-gradient-to-r from-royal-blue to-blue-600 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 transform"
+                                        >
+                                            <Link
+                                                to="/news"
+                                                className="flex items-center justify-center space-x-1"
+                                            >
+                                                <span>Read More</span>
+                                                <ArrowRight className="h-4 w-4" />
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
