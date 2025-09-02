@@ -1,72 +1,71 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "../../components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "../../components/ui/card";
-import { BookOpen, Users, Award, Calendar } from "lucide-react";
 
 const Academics = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     return (
-        <div className="min-h-screen py-20">
+        <div className="min-h-screen bg-gray-50 pt-24 pb-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-16">
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                {/* Header */}
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-bold text-gray-900 mb-4">
                         Academic Programs
                     </h1>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Comprehensive curriculum designed to prepare students
-                        for higher education and future careers.
+                        Discover our comprehensive academic curriculum designed
+                        to prepare students for success
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>
-                                Junior High School (Grades 7-10)
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <CardDescription>
-                                Core subjects including Mathematics, Science,
-                                English, Filipino, Social Studies, and Values
-                                Education.
-                            </CardDescription>
-                        </CardContent>
-                    </Card>
+                {/* Content */}
+                <div className="grid md:grid-cols-2 gap-8 mb-12">
+                    <div className="bg-white rounded-lg shadow-lg p-8">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                            Junior High School
+                        </h2>
+                        <p className="text-gray-600 mb-4">
+                            Our Junior High School program (Grades 7-10)
+                            provides a strong foundation in core subjects
+                            including Mathematics, Science, English, Filipino,
+                            Social Studies, and Technology.
+                        </p>
+                        <ul className="space-y-2 text-gray-600">
+                            <li>• Comprehensive core curriculum</li>
+                            <li>• Technology integration</li>
+                            <li>• Character education</li>
+                            <li>• Extracurricular activities</li>
+                        </ul>
+                    </div>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>
-                                Senior High School (Grades 11-12)
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <CardDescription>
-                                Academic, Technical-Vocational, and Sports
-                                tracks with specialized subjects and career
-                                guidance.
-                            </CardDescription>
-                        </CardContent>
-                    </Card>
+                    <div className="bg-white rounded-lg shadow-lg p-8">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                            Senior High School
+                        </h2>
+                        <p className="text-gray-600 mb-4">
+                            Our Senior High School program (Grades 11-12) offers
+                            specialized tracks to prepare students for college
+                            and career success.
+                        </p>
+                        <ul className="space-y-2 text-gray-600">
+                            <li>• Academic Track</li>
+                            <li>• Technical-Vocational Track</li>
+                            <li>• College preparation</li>
+                            <li>• Career guidance</li>
+                        </ul>
+                    </div>
+                </div>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Special Programs</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <CardDescription>
-                                Advanced Mathematics, Science and Technology,
-                                Arts and Culture, and Sports Development
-                                programs.
-                            </CardDescription>
-                        </CardContent>
-                    </Card>
+                {/* Back to Home */}
+                <div className="text-center">
+                    <Link
+                        to="/"
+                        className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-300"
+                    >
+                        ← Back to Home
+                    </Link>
                 </div>
             </div>
         </div>

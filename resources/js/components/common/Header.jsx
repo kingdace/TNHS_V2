@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronUp, ChevronRight } from "lucide-react";
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -57,9 +57,17 @@ const Header = () => {
             href: "/faculty",
             hasDropdown: true,
             submenu: [
-                { name: "Teaching Staff", href: "/faculty/teachers" },
-                { name: "Administrative Staff", href: "/faculty/admin" },
-                { name: "Support Staff", href: "/faculty/support" },
+                { name: "Principal", href: "/faculty/principal" },
+                {
+                    name: "Assistant Principal",
+                    href: "/faculty/assistant-principal",
+                },
+                { name: "Teaching Staff", href: "/faculty/teaching-staff" },
+                {
+                    name: "Administrative Staff",
+                    href: "/faculty/administrative-staff",
+                },
+                { name: "Support Staff", href: "/faculty/support-staff" },
             ],
         },
         {
@@ -155,7 +163,12 @@ const Header = () => {
                                 {/* Dropdown Menu */}
                                 {item.hasDropdown &&
                                     openDropdown === item.name && (
-                                        <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                                        <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                                            <div className="px-3 py-2 border-b border-gray-100 mb-1">
+                                                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                                    {item.name} Menu
+                                                </span>
+                                            </div>
                                             {item.submenu.map((subItem) => (
                                                 <Link
                                                     key={subItem.name}

@@ -1,145 +1,98 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "../../components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "../../components/ui/card";
-import { Mail, Phone, MapPin, Clock } from "lucide-react";
 
 const Contact = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     return (
-        <div className="min-h-screen py-20">
+        <div className="min-h-screen bg-gray-50 pt-24 pb-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-16">
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                {/* Header */}
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-bold text-gray-900 mb-4">
                         Contact Us
                     </h1>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Get in touch with us. We're here to help and answer any
-                        questions you may have.
+                        Get in touch with us for any inquiries or information
+                        about TNHS
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    {/* Contact Information */}
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                            Get in Touch
+                {/* Content */}
+                <div className="grid md:grid-cols-2 gap-12 mb-12">
+                    <div className="bg-white rounded-lg shadow-lg p-8">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                            Contact Information
                         </h2>
-                        <div className="space-y-6">
-                            <div className="flex items-start space-x-4">
-                                <MapPin className="h-6 w-6 text-blue-600 mt-1" />
-                                <div>
-                                    <h3 className="font-semibold text-gray-900">
-                                        Address
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        Taft, Eastern Samar, Philippines
-                                    </p>
-                                </div>
+                        <div className="space-y-4">
+                            <div>
+                                <h3 className="font-semibold text-gray-800">
+                                    Address
+                                </h3>
+                                <p className="text-gray-600">
+                                    Taft National High School
+                                    <br />
+                                    Taft, Eastern Samar
+                                    <br />
+                                    Philippines
+                                </p>
                             </div>
-
-                            <div className="flex items-start space-x-4">
-                                <Phone className="h-6 w-6 text-blue-600 mt-1" />
-                                <div>
-                                    <h3 className="font-semibold text-gray-900">
-                                        Phone
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        +63 XXX XXX XXXX
-                                    </p>
-                                </div>
+                            <div>
+                                <h3 className="font-semibold text-gray-800">
+                                    Phone
+                                </h3>
+                                <p className="text-gray-600">
+                                    +63 912 345 6789
+                                </p>
                             </div>
-
-                            <div className="flex items-start space-x-4">
-                                <Mail className="h-6 w-6 text-blue-600 mt-1" />
-                                <div>
-                                    <h3 className="font-semibold text-gray-900">
-                                        Email
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        info@taftnhs.edu.ph
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="flex items-start space-x-4">
-                                <Clock className="h-6 w-6 text-blue-600 mt-1" />
-                                <div>
-                                    <h3 className="font-semibold text-gray-900">
-                                        Office Hours
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        Monday - Friday: 7:00 AM - 5:00 PM
-                                    </p>
-                                </div>
+                            <div>
+                                <h3 className="font-semibold text-gray-800">
+                                    Email
+                                </h3>
+                                <p className="text-gray-600">
+                                    info@tnhs.edu.ph
+                                </p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Contact Form */}
-                    <div>
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Send us a Message</CardTitle>
-                                <CardDescription>
-                                    Fill out the form below and we'll get back
-                                    to you as soon as possible.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <form className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Name
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Your full name"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Email
-                                        </label>
-                                        <input
-                                            type="email"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="your.email@example.com"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Subject
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="What is this about?"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Message
-                                        </label>
-                                        <textarea
-                                            rows={4}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Your message..."
-                                        />
-                                    </div>
-                                    <Button type="submit" className="w-full">
-                                        Send Message
-                                    </Button>
-                                </form>
-                            </CardContent>
-                        </Card>
+                    <div className="bg-white rounded-lg shadow-lg p-8">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                            Office Hours
+                        </h2>
+                        <div className="space-y-3">
+                            <div className="flex justify-between">
+                                <span className="font-medium">
+                                    Monday - Friday
+                                </span>
+                                <span className="text-gray-600">
+                                    7:00 AM - 5:00 PM
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="font-medium">Saturday</span>
+                                <span className="text-gray-600">
+                                    8:00 AM - 12:00 PM
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="font-medium">Sunday</span>
+                                <span className="text-gray-600">Closed</span>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                {/* Back to Home */}
+                <div className="text-center">
+                    <Link
+                        to="/"
+                        className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-300"
+                    >
+                        ← Back to Home
+                    </Link>
                 </div>
             </div>
         </div>

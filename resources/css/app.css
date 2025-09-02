@@ -75,6 +75,45 @@
     box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
 }
 
+/* Enhanced 2xl Shadow */
+.shadow-2xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.hover\:shadow-2xl:hover {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Backdrop Blur Utilities */
+.backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+}
+
+.backdrop-blur-md {
+    backdrop-filter: blur(12px);
+}
+
+/* Gradient Text Support */
+.bg-clip-text {
+    background-clip: text;
+}
+
+/* Enhanced Transitions */
+.transition-transform {
+    transition-property: transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
+
+/* Hover Transform Effects */
+.hover\:-translate-y-2:hover {
+    transform: translateY(-0.5rem);
+}
+
+.hover\:scale-110:hover {
+    transform: scale(1.1);
+}
+
 /* 3D Text Effect - SHADOW Style */
 .text-3d-shadow {
     color: hsl(41, 93%, 60%);

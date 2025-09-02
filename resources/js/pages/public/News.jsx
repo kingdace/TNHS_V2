@@ -1,79 +1,90 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "../../components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "../../components/ui/card";
-import { Calendar, User } from "lucide-react";
 
 const News = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const newsItems = [
         {
-            title: "Academic Excellence Awards Ceremony 2024",
-            date: "August 25, 2024",
-            author: "School Administration",
+            id: 1,
+            title: "Enrollment for School Year 2024-2025 Now Open",
+            date: "January 15, 2024",
             excerpt:
-                "Celebrating the outstanding achievements of our students in various academic fields...",
+                "We are pleased to announce that enrollment for the upcoming school year is now open. Early registration is encouraged to secure your spot.",
+            category: "Enrollment",
         },
         {
-            title: "New Science Laboratory Facility Opening",
-            date: "August 20, 2024",
-            author: "Facilities Management",
+            id: 2,
+            title: "Annual Sports Festival Scheduled for February",
+            date: "January 10, 2024",
             excerpt:
-                "State-of-the-art science laboratory to enhance hands-on learning experience...",
+                "Get ready for our annual sports festival featuring various athletic competitions, team sports, and individual events.",
+            category: "Events",
         },
         {
-            title: "Sports Festival 2024 Schedule Announced",
-            date: "August 15, 2024",
-            author: "Physical Education Department",
+            id: 3,
+            title: "Academic Excellence Awards Ceremony",
+            date: "January 5, 2024",
             excerpt:
-                "Annual sports festival featuring various athletic competitions and activities...",
+                "Congratulations to all students who achieved academic excellence. The awards ceremony will be held next month.",
+            category: "Academic",
         },
     ];
 
     return (
-        <div className="min-h-screen py-20">
+        <div className="min-h-screen bg-gray-50 pt-24 pb-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-16">
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                        News & Events
+                {/* Header */}
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                        Latest News & Announcements
                     </h1>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Stay updated with the latest news, announcements, and
-                        events from Taft National High School.
+                        Stay updated with the latest happenings, events, and
+                        important announcements from TNHS
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {newsItems.map((item, index) => (
-                        <Card
-                            key={index}
-                            className="hover:shadow-lg transition-shadow"
+                {/* News Grid */}
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                    {newsItems.map((item) => (
+                        <div
+                            key={item.id}
+                            className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
                         >
-                            <CardHeader>
-                                <div className="flex items-center space-x-2 text-sm text-gray-500 mb-2">
-                                    <Calendar className="h-4 w-4" />
-                                    <span>{item.date}</span>
+                            <div className="p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                                        {item.category}
+                                    </span>
+                                    <span className="text-sm text-gray-500">
+                                        {item.date}
+                                    </span>
                                 </div>
-                                <CardTitle className="text-xl">
+                                <h3 className="text-xl font-bold text-gray-800 mb-3">
                                     {item.title}
-                                </CardTitle>
-                                <div className="flex items-center space-x-2 text-sm text-gray-500">
-                                    <User className="h-4 w-4" />
-                                    <span>{item.author}</span>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <CardDescription className="text-base">
+                                </h3>
+                                <p className="text-gray-600 mb-4">
                                     {item.excerpt}
-                                </CardDescription>
-                            </CardContent>
-                        </Card>
+                                </p>
+                                <button className="text-blue-600 font-medium hover:text-blue-800 transition-colors duration-300">
+                                    Read More →
+                                </button>
+                            </div>
+                        </div>
                     ))}
+                </div>
+
+                {/* Back to Home */}
+                <div className="text-center">
+                    <Link
+                        to="/"
+                        className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-300"
+                    >
+                        ← Back to Home
+                    </Link>
                 </div>
             </div>
         </div>
