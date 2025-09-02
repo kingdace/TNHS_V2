@@ -141,254 +141,285 @@ const Principal = () => {
                     </p>
                 </div>
 
-                {/* Main Content Grid */}
-                <div className="grid lg:grid-cols-3 gap-8">
-                    {/* Left Column - Main Content */}
-                    <div className="lg:col-span-2 space-y-8">
-                        {/* About the Principal */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                                About the Principal
-                            </h2>
-
-                            {/* Principal Photo and Info */}
-                            <div className="flex flex-col md:flex-row gap-6 mb-6">
-                                <div className="w-48 h-48 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
-                                    <User className="w-24 h-24 text-white" />
+                {/* Main Content - Enhanced Professional Section */}
+                <div className="bg-gradient-to-br from-white via-gray-50 to-white border-2 border-gray-100 rounded-2xl p-10 shadow-xl hover:shadow-2xl transition-all duration-500">
+                    <div className="grid lg:grid-cols-2 gap-16">
+                        {/* Left Column - Enhanced Principal Profile */}
+                        <div className="space-y-8">
+                            {/* Enhanced Principal Photo */}
+                            <div className="flex justify-center">
+                                <div className="relative w-80 h-96">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-green-400 via-blue-500 to-green-600 rounded-2xl transform rotate-3 shadow-2xl"></div>
+                                    <div className="relative w-full h-full bg-white rounded-2xl flex items-center justify-center border-4 border-white overflow-hidden shadow-xl">
+                                        <img
+                                            src="/images/Principal.jpg"
+                                            alt="Dr. Manuel B. Dayondon - Principal"
+                                            className="w-full h-full object-cover rounded-2xl"
+                                            onError={(e) => {
+                                                e.target.style.display = "none";
+                                                e.target.nextSibling.style.display =
+                                                    "flex";
+                                            }}
+                                        />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-100 to-green-100 rounded-2xl hidden">
+                                            <div className="text-center">
+                                                <div className="w-32 h-32 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                                                    <User className="w-20 h-20 text-white" />
+                                                </div>
+                                                <p className="text-gray-600 text-sm font-medium mb-2">
+                                                    Principal Photo
+                                                </p>
+                                                <p className="text-gray-500 text-xs px-4 bg-white/80 rounded-full py-1">
+                                                    Photo will be updated soon
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="flex-1">
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                                        Dr. Maria Santos
-                                    </h3>
-                                    <p className="text-xl text-blue-600 font-semibold mb-4">
-                                        Principal
-                                    </p>
-                                    <p className="text-gray-600 leading-relaxed">
-                                        Leading TNHS with vision, dedication,
-                                        and an unwavering commitment to
-                                        educational excellence. Transforming
-                                        lives through innovative leadership and
-                                        compassionate guidance.
-                                    </p>
+                            </div>
+
+                            {/* Enhanced Principal Name & Title */}
+                            <div className="text-center space-y-3">
+                                <div className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                                    <h2 className="text-4xl font-black tracking-tight mb-2">
+                                        Dr. Manuel B. Dayondon
+                                    </h2>
+                                </div>
+                                <div className="inline-block">
+                                    <span className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2 rounded-full text-lg font-bold shadow-lg">
+                                        School Principal IV
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-center space-x-2 text-gray-600">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                    <span className="text-sm font-medium">
+                                        Currently Active
+                                    </span>
                                 </div>
                             </div>
 
-                            {/* Principal's Message */}
-                            <div className="bg-gray-50 rounded-lg p-6">
-                                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                                    <MessageSquare className="w-5 h-5 mr-2 text-blue-600" />
-                                    Principal's Message
-                                </h4>
-                                <div className="text-gray-700 leading-relaxed">
-                                    <p className="mb-4">
-                                        <em>
-                                            Dear TNHS Students, Parents, and
-                                            Community,
-                                        </em>
-                                    </p>
-                                    <p className="mb-4">
-                                        As we continue our journey toward
-                                        educational excellence and student
-                                        success, I am honored to lead Taft
-                                        National High School with a renewed
-                                        commitment to providing quality
-                                        education that nurtures both academic
-                                        achievement and character development.
-                                    </p>
-                                    <p className="mb-4">
-                                        Our vision for TNHS is to create a
-                                        learning environment where every student
-                                        can thrive, discover their potential,
-                                        and develop the skills necessary to
-                                        become responsible citizens and future
-                                        leaders. We believe in fostering a
-                                        culture of excellence, integrity, and
-                                        service to others.
-                                    </p>
-                                    <p className="mb-4">
-                                        Together with our dedicated faculty and
-                                        staff, we will continue to implement
-                                        innovative programs, maintain high
-                                        academic standards, and provide
-                                        comprehensive support for our students'
-                                        holistic development.
-                                    </p>
-                                    <p>
-                                        Thank you for your trust and support.
-                                        Let us work together to make TNHS a
-                                        beacon of educational excellence in our
-                                        community.
-                                    </p>
-                                    <p className="mt-6 font-semibold">
-                                        <strong>Dr. Maria Santos, Ph.D.</strong>
-                                        <br />
-                                        Principal
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* School Leadership */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                                School Leadership
-                            </h2>
+                            {/* Enhanced Action Buttons */}
                             <div className="space-y-4">
-                                {leadershipTeam.map((member, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                                    >
-                                        <div>
-                                            <h4 className="font-semibold text-gray-900">
-                                                {member.name}
-                                            </h4>
-                                            <p className="text-gray-600">
-                                                {member.position}
-                                            </p>
-                                            <p className="text-sm text-gray-500">
-                                                {member.department}
-                                            </p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-sm text-blue-600">
-                                                {member.email}
-                                            </p>
-                                        </div>
+                                <button className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2">
+                                    <User className="w-5 h-5" />
+                                    <span>About the Principal</span>
+                                </button>
+                                <Link
+                                    to="/faculty"
+                                    className="w-full bg-white border-2 border-green-600 text-green-600 hover:bg-green-50 font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+                                >
+                                    <Users className="w-5 h-5" />
+                                    <span>View All Faculty</span>
+                                </Link>
+                            </div>
+
+                            {/* Quick Stats */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-gradient-to-br from-blue-50 to-green-50 p-4 rounded-xl text-center border border-blue-200">
+                                    <div className="text-2xl font-bold text-blue-600">
+                                        15+
                                     </div>
-                                ))}
+                                    <div className="text-xs text-gray-600 font-medium">
+                                        Years Experience
+                                    </div>
+                                </div>
+                                <div className="bg-gradient-to-br from-green-50 to-blue-50 p-4 rounded-xl text-center border border-green-200">
+                                    <div className="text-2xl font-bold text-green-600">
+                                        5+
+                                    </div>
+                                    <div className="text-xs text-gray-600 font-medium">
+                                        Schools Led
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Principal's Updates */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                                Principal's Updates
-                            </h2>
+                        {/* Right Column - Enhanced Bio */}
+                        <div className="flex items-center">
                             <div className="space-y-6">
-                                {newsUpdates.map((update, index) => (
-                                    <div
-                                        key={index}
-                                        className="border-b border-gray-200 pb-6 last:border-b-0"
-                                    >
-                                        <div className="flex items-start justify-between mb-2">
-                                            <h4 className="font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
-                                                {update.title}
-                                            </h4>
-                                            <span className="text-sm text-gray-500">
-                                                {update.date}
-                                            </span>
-                                        </div>
-                                        <p className="text-gray-600 text-sm mb-2">
-                                            {update.excerpt}
+                                {/* Bio Header */}
+                                <div className="text-center lg:text-left">
+                                    <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
+                                        <Award className="w-6 h-6 text-green-600 mr-2" />
+                                        Leadership Profile
+                                    </h3>
+                                    <div className="w-20 h-1 bg-gradient-to-r from-green-600 to-blue-600 rounded-full mx-auto lg:mx-0"></div>
+                                </div>
+
+                                {/* Enhanced Bio Content */}
+                                <div className="text-gray-800 leading-relaxed space-y-5">
+                                    <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl border-l-4 border-green-500">
+                                        <p className="text-base font-medium">
+                                            A seasoned leader and true academic
+                                            at heart,{" "}
+                                            <span className="font-bold text-green-700">
+                                                Dr. Manuel B. Dayondon
+                                            </span>{" "}
+                                            now serves as the School Principal
+                                            IV of Taft National High
+                                            School—bringing with him decades of
+                                            experience, wisdom, and a deep
+                                            understanding of the school he once
+                                            called home.
                                         </p>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                                                {update.category}
-                                            </span>
-                                            <button className="text-blue-600 text-sm hover:text-blue-800 flex items-center">
-                                                Read More
-                                                <ExternalLink className="w-3 h-3 ml-1" />
-                                            </button>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div className="flex items-start space-x-3">
+                                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                                            <p className="text-gray-700">
+                                                Before assuming the
+                                                principalship, he served as
+                                                Assistant Principal of Taft NHS,
+                                                and previously led several
+                                                schools with excellence:{" "}
+                                                <span className="font-semibold text-green-700">
+                                                    San Jose National High
+                                                    School
+                                                </span>
+                                                ,{" "}
+                                                <span className="font-semibold text-green-700">
+                                                    Cabrera-Altres National High
+                                                    School
+                                                </span>
+                                                ,{" "}
+                                                <span className="font-semibold text-green-700">
+                                                    Anomar National High School
+                                                </span>
+                                                , and{" "}
+                                                <span className="font-semibold text-green-700">
+                                                    Mat-i National High School
+                                                </span>
+                                                .
+                                            </p>
+                                        </div>
+
+                                        <div className="flex items-start space-x-3">
+                                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                                            <p className="text-gray-700">
+                                                A former teacher of both Taft
+                                                NHS and Surigao City National
+                                                High School, he remains rooted
+                                                in the classroom as a graduate
+                                                school instructor at{" "}
+                                                <span className="font-semibold text-blue-700">
+                                                    St. Paul University Surigao
+                                                </span>
+                                                .
+                                            </p>
+                                        </div>
+
+                                        <div className="bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-xl border border-blue-200">
+                                            <p className="text-gray-800 font-medium text-center">
+                                                <span className="text-green-700 font-bold">
+                                                    Dr. Dayondon
+                                                </span>{" "}
+                                                is not just an administrator—he
+                                                is a{" "}
+                                                <span className="text-blue-700 font-semibold">
+                                                    mentor
+                                                </span>
+                                                ,{" "}
+                                                <span className="text-green-700 font-semibold">
+                                                    scholar
+                                                </span>
+                                                , and{" "}
+                                                <span className="text-blue-700 font-semibold">
+                                                    steady hand
+                                                </span>{" "}
+                                                guiding the entire Taft NHS
+                                                community forward.
+                                            </p>
                                         </div>
                                     </div>
-                                ))}
+                                </div>
+
+                                {/* Contact Quick Access */}
+                                <div className="bg-white border border-gray-200 rounded-xl p-4">
+                                    <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                                        <Mail className="w-4 h-4 text-green-600 mr-2" />
+                                        Quick Contact
+                                    </h4>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex items-center text-gray-600">
+                                            <Mail className="w-4 h-4 mr-2 text-green-600" />
+                                            <span>principal@tnhs.edu.ph</span>
+                                        </div>
+                                        <div className="flex items-center text-gray-600">
+                                            <Phone className="w-4 h-4 mr-2 text-green-600" />
+                                            <span>09123456789</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {/* Right Column - Sidebar */}
-                    <div className="space-y-6">
-                        {/* Contact Information */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                                Contact Information
-                            </h3>
-                            <div className="space-y-3">
-                                <div className="flex items-center">
-                                    <Mail className="w-4 h-4 mr-3 text-blue-600" />
-                                    <span className="text-sm text-gray-700">
-                                        principal@tnhs.edu.ph
-                                    </span>
-                                </div>
-                                <div className="flex items-center">
-                                    <Phone className="w-4 h-4 mr-3 text-blue-600" />
-                                    <span className="text-sm text-gray-700">
-                                        09123456789
-                                    </span>
-                                </div>
-                                <div className="flex items-center">
-                                    <MapPin className="w-4 h-4 mr-3 text-blue-600" />
-                                    <span className="text-sm text-gray-700">
-                                        Principal's Office, Main Building
-                                    </span>
-                                </div>
-                                <div className="flex items-center">
-                                    <Calendar className="w-4 h-4 mr-3 text-blue-600" />
-                                    <span className="text-sm text-gray-700">
-                                        Office Hours: 7:00 AM - 5:00 PM
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                {/* Principal's Corner - Enhanced Design */}
+                <div className="mt-12 bg-white border border-gray-200 rounded-lg p-6">
+                    {/* Header with "See All" Button */}
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-2xl font-bold text-gray-900">
+                            Principal's Corner
+                        </h2>
+                        <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium border border-green-600 hover:border-green-700 transition-colors duration-300 flex items-center">
+                            See All Press Releases
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                        </button>
+                    </div>
 
-                        {/* Directories */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                                Directories
-                            </h3>
-                            <div className="space-y-3">
-                                {directories.map((dir, index) => (
-                                    <div
-                                        key={index}
-                                        className="border-b border-gray-100 pb-3 last:border-b-0"
-                                    >
-                                        <h4 className="font-medium text-gray-900 text-sm">
-                                            {dir.title}
-                                        </h4>
-                                        <p className="text-xs text-blue-600">
-                                            {dir.email}
-                                        </p>
+                    {/* Three-Column Card Layout */}
+                    <div className="grid md:grid-cols-3 gap-6">
+                        {newsUpdates.map((update, index) => (
+                            <div
+                                key={index}
+                                className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                            >
+                                {/* Image Placeholder */}
+                                <div className="h-48 bg-gradient-to-br from-blue-100 to-green-100 flex items-center justify-center">
+                                    <div className="text-center">
+                                        <Image className="w-12 h-12 text-gray-400 mx-auto mb-2" />
                                         <p className="text-xs text-gray-500">
-                                            {dir.phone} (Ext. {dir.extension})
+                                            News Image
                                         </p>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
+                                </div>
 
-                        {/* Quick Links */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                                Quick Links
-                            </h3>
-                            <div className="space-y-2">
-                                <Link
-                                    to="/academics"
-                                    className="block text-sm text-blue-600 hover:text-blue-800 py-1"
-                                >
-                                    Academic Programs
-                                </Link>
-                                <Link
-                                    to="/admissions"
-                                    className="block text-sm text-blue-600 hover:text-blue-800 py-1"
-                                >
-                                    Admission Requirements
-                                </Link>
-                                <Link
-                                    to="/news"
-                                    className="block text-sm text-blue-600 hover:text-blue-800 py-1"
-                                >
-                                    School News & Updates
-                                </Link>
-                                <Link
-                                    to="/contact"
-                                    className="block text-sm text-blue-600 hover:text-blue-800 py-1"
-                                >
-                                    Contact Information
-                                </Link>
+                                {/* Content */}
+                                <div className="p-4">
+                                    {/* Category Badge */}
+                                    <div className="mb-3">
+                                        <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
+                                            Principal's Corner
+                                        </span>
+                                    </div>
+
+                                    {/* Title */}
+                                    <h4 className="font-semibold text-gray-900 mb-2 text-sm leading-tight hover:text-green-600 cursor-pointer">
+                                        {update.title}
+                                    </h4>
+
+                                    {/* Metadata */}
+                                    <div className="flex items-center text-xs text-gray-500 mb-3">
+                                        <span>by TNHS Admin</span>
+                                        <span className="mx-1">•</span>
+                                        <span>{update.date}</span>
+                                    </div>
+
+                                    {/* Description */}
+                                    <p className="text-gray-600 text-xs mb-4 leading-relaxed">
+                                        {update.excerpt}
+                                    </p>
+
+                                    {/* Read More Button */}
+                                    <button className="w-full bg-green-600 hover:bg-green-700 text-white text-xs font-medium py-2 px-3 rounded transition-colors duration-300 flex items-center justify-center">
+                                        Read More
+                                        <ArrowRight className="w-3 h-3 ml-1" />
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
 
