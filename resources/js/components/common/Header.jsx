@@ -29,7 +29,6 @@ const Header = () => {
             submenu: [
                 { name: "Announcements", href: "/news/announcements" },
                 { name: "Events", href: "/news/events" },
-                { name: "School Updates", href: "/news/updates" },
             ],
         },
         {

@@ -15,6 +15,7 @@ import Academics from "../pages/public/Academics";
 import AcademicsJuniorHigh from "../pages/public/AcademicsJuniorHigh";
 import AcademicsSeniorHigh from "../pages/public/AcademicsSeniorHigh";
 import AcademicsSpecialPrograms from "../pages/public/AcademicsSpecialPrograms";
+import AcademicsSpecialProgramDetail from "../pages/public/AcademicsSpecialProgramDetail";
 import Admissions from "../pages/public/Admissions";
 import News from "../pages/public/News";
 import Contact from "../pages/public/Contact";
@@ -79,6 +80,10 @@ function App() {
                     <Route
                         path="academics/special-programs"
                         element={<AcademicsSpecialPrograms />}
+                    />
+                    <Route
+                        path="academics/special-programs/:programId"
+                        element={<AcademicsSpecialProgramDetail />}
                     />
                     <Route path="admissions" element={<Admissions />} />
                     <Route path="news" element={<News />} />
