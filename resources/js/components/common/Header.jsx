@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, ChevronUp, ChevronRight } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [openDropdown, setOpenDropdown] = useState(null);
     const location = useLocation();
 
     const navigation = [
@@ -36,19 +35,11 @@ const Header = () => {
             href: "/about",
             hasDropdown: true,
             submenu: [
+                { name: "School Seal", href: "/about/school-seal" },
+                { name: "Privacy Policy", href: "/about/privacy-policy" },
                 { name: "Our History", href: "/about/history" },
                 { name: "Mission & Vision", href: "/about/mission" },
-                { name: "School Leadership", href: "/about/leadership" },
-            ],
-        },
-        {
-            name: "Contact Us",
-            href: "/contact",
-            hasDropdown: true,
-            submenu: [
-                { name: "General Inquiries", href: "/contact/general" },
-                { name: "Admissions", href: "/contact/admissions" },
-                { name: "Support", href: "/contact/support" },
+                { name: "Quality Policy", href: "/about/quality-policy" },
             ],
         },
         {
@@ -57,16 +48,9 @@ const Header = () => {
             hasDropdown: true,
             submenu: [
                 { name: "Principal", href: "/faculty/principal" },
-                {
-                    name: "Assistant Principal",
-                    href: "/faculty/assistant-principal",
-                },
-                { name: "Teaching Staff", href: "/faculty/teaching-staff" },
-                {
-                    name: "Administrative Staff",
-                    href: "/faculty/administrative-staff",
-                },
-                { name: "Support Staff", href: "/faculty/support-staff" },
+                { name: "Assistant", href: "/faculty/assistant-principal" },
+                { name: "Faculties", href: "/faculty/teaching-staff" },
+                { name: "And Staff", href: "/faculty/administrative-staff" },
             ],
         },
         {
@@ -74,6 +58,7 @@ const Header = () => {
             href: "/more",
             hasDropdown: true,
             submenu: [
+                { name: "Contact Us", href: "/contact" },
                 { name: "Resources", href: "/more/resources" },
                 { name: "Downloads", href: "/more/downloads" },
                 { name: "Links", href: "/more/links" },
@@ -117,27 +102,31 @@ const Header = () => {
                         {navigation.map((item) => (
                             <div key={item.name} className="relative group">
                                 {item.hasDropdown ? (
-                                    <button
-                                        onClick={() =>
-                                            setOpenDropdown(
-                                                openDropdown === item.name
-                                                    ? null
-                                                    : item.name
-                                            )
-                                        }
-                                        className={`px-4 py-2 rounded font-medium transition-all duration-300 flex items-center space-x-1 ${
-                                            isActive(item.href)
-                                                ? "bg-white/20 text-white shadow-lg backdrop-blur-sm border border-white/20"
-                                                : "text-blue-100 hover:bg-white/10 hover:text-white hover:rounded"
-                                        }`}
-                                    >
-                                        <span>{item.name}</span>
-                                        {openDropdown === item.name ? (
-                                            <ChevronUp className="h-4 w-4" />
-                                        ) : (
+                                    item.name === "Academics" ? (
+                                        // Academics: Clickable text (navigate to overview page only)
+                                        <Link
+                                            to={item.href}
+                                            className={`px-4 py-2 rounded font-medium transition-all duration-300 ${
+                                                isActive(item.href)
+                                                    ? "bg-white/20 text-white"
+                                                    : "text-blue-100 hover:bg-white/10 hover:text-white"
+                                            }`}
+                                        >
+                                            {item.name}
+                                        </Link>
+                                    ) : (
+                                        // Other dropdowns: Dropdown only (not clickable to main page)
+                                        <div
+                                            className={`px-4 py-2 rounded font-medium transition-all duration-300 flex items-center space-x-1 ${
+                                                isActive(item.href)
+                                                    ? "bg-white/20 text-white"
+                                                    : "text-blue-100 hover:bg-white/10 hover:text-white hover:rounded"
+                                            }`}
+                                        >
+                                            <span>{item.name}</span>
                                             <ChevronDown className="h-4 w-4" />
-                                        )}
-                                    </button>
+                                        </div>
+                                    )
                                 ) : (
                                     <Link
                                         to={item.href}
@@ -160,28 +149,19 @@ const Header = () => {
                                 )}
 
                                 {/* Dropdown Menu */}
-                                {item.hasDropdown &&
-                                    openDropdown === item.name && (
-                                        <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
-                                            <div className="px-3 py-2 border-b border-gray-100 mb-1">
-                                                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                                                    {item.name} Menu
-                                                </span>
-                                            </div>
-                                            {item.submenu.map((subItem) => (
-                                                <Link
-                                                    key={subItem.name}
-                                                    to={subItem.href}
-                                                    className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
-                                                    onClick={() =>
-                                                        setOpenDropdown(null)
-                                                    }
-                                                >
-                                                    {subItem.name}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    )}
+                                {item.hasDropdown && (
+                                    <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                                        {item.submenu.map((subItem) => (
+                                            <Link
+                                                key={subItem.name}
+                                                to={subItem.href}
+                                                className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                                            >
+                                                {subItem.name}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </nav>
@@ -210,50 +190,32 @@ const Header = () => {
                                 <div key={item.name}>
                                     {item.hasDropdown ? (
                                         <div>
-                                            <button
-                                                onClick={() =>
-                                                    setOpenDropdown(
-                                                        openDropdown ===
-                                                            item.name
-                                                            ? null
-                                                            : item.name
-                                                    )
-                                                }
-                                                className={`w-full text-left px-3 py-2 rounded-lg text-base font-medium transition-all duration-300 flex items-center justify-between ${
-                                                    isActive(item.href)
-                                                        ? "bg-white/20 text-white shadow-md backdrop-blur-sm border border-white/20"
-                                                        : "text-blue-100 hover:bg-white/10 hover:text-white"
-                                                }`}
-                                            >
-                                                <span>{item.name}</span>
-                                                {openDropdown === item.name ? (
-                                                    <ChevronUp className="h-4 w-4" />
-                                                ) : (
+                                            {item.name === "Academics" ? (
+                                                // Academics: Clickable text (no dropdown arrow, but dropdown functionality)
+                                                <Link
+                                                    to={item.href}
+                                                    onClick={() =>
+                                                        setIsMenuOpen(false)
+                                                    }
+                                                    className={`w-full text-left px-3 py-2 rounded-lg text-base font-medium transition-all duration-300 ${
+                                                        isActive(item.href)
+                                                            ? "bg-white/20 text-white"
+                                                            : "text-blue-100 hover:bg-white/10 hover:text-white"
+                                                    }`}
+                                                >
+                                                    {item.name}
+                                                </Link>
+                                            ) : (
+                                                // Other dropdowns: Dropdown only (not clickable to main page)
+                                                <div
+                                                    className={`w-full text-left px-3 py-2 rounded-lg text-base font-medium transition-all duration-300 flex items-center justify-between ${
+                                                        isActive(item.href)
+                                                            ? "bg-white/20 text-white"
+                                                            : "text-blue-100 hover:bg-white/10 hover:text-white"
+                                                    }`}
+                                                >
+                                                    <span>{item.name}</span>
                                                     <ChevronDown className="h-4 w-4" />
-                                                )}
-                                            </button>
-                                            {openDropdown === item.name && (
-                                                <div className="ml-4 mt-1 space-y-1">
-                                                    {item.submenu.map(
-                                                        (subItem) => (
-                                                            <Link
-                                                                key={
-                                                                    subItem.name
-                                                                }
-                                                                to={
-                                                                    subItem.href
-                                                                }
-                                                                onClick={() =>
-                                                                    setIsMenuOpen(
-                                                                        false
-                                                                    )
-                                                                }
-                                                                className="block px-3 py-2 rounded-lg text-sm text-blue-100 hover:bg-white/10 hover:text-white transition-all duration-300"
-                                                            >
-                                                                {subItem.name}
-                                                            </Link>
-                                                        )
-                                                    )}
                                                 </div>
                                             )}
                                         </div>

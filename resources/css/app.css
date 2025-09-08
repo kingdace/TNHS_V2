@@ -145,3 +145,18 @@
         /* Dark gray 3D extrusion */ 3px 3px 0 #333,
         /* Dark gray 3D extrusion */ 4px 4px 0 #333; /* Dark gray 3D extrusion */
 }
+
+/* Floating Animation */
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}

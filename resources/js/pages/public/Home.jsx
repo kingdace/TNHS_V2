@@ -25,9 +25,14 @@ import {
     Phone,
     Mail,
 } from "lucide-react";
+import { announcementService } from "../../services/announcementService";
+import { publicService } from "../../services/publicService";
 
 const Home = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [announcements, setAnnouncements] = useState([]);
+    const [heroSlides, setHeroSlides] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     // Calendar and Exam Schedule States
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -38,14 +43,47 @@ const Home = () => {
     const [showExamModal, setShowExamModal] = useState(false);
     const [examSchedules, setExamSchedules] = useState({});
 
+    // Fetch announcements and hero slides on component mount
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+
+                // Fetch announcements
+                const announcementsData =
+                    await announcementService.getPublicAnnouncements();
+                const transformedAnnouncements = announcementsData.map(
+                    (announcement) =>
+                        announcementService.transformAnnouncement(announcement)
+                );
+                setAnnouncements(transformedAnnouncements);
+
+                // Fetch hero carousel slides
+                const heroData = await publicService.heroCarousel.getActive();
+                setHeroSlides(heroData);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                // Keep empty arrays as fallback
+                setAnnouncements([]);
+                setHeroSlides([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     // Auto-advance slides every 5 seconds
     useEffect(() => {
+        if (heroSlides.length === 0) return;
+
         const interval = setInterval(() => {
             setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
         }, 5000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [heroSlides.length]);
 
     // Calendar Functions
     const getDaysInMonth = (date) => {
@@ -101,55 +139,6 @@ const Home = () => {
     const handleExamBooking = () => {
         alert("Redirecting to exam booking...");
     };
-
-    // Hero Carousel Data - CSU Style with actual images
-    const heroSlides = [
-        {
-            id: 1,
-            title: "Enrollment for School Year 2024-2025",
-            subtitle: "NOW OPEN",
-            tagline: "Theme: Building Future Leaders Through Quality Education",
-            guest: "DEPARTMENT OF EDUCATION",
-            role: "Official Partner in Education",
-            date: "June 1 - August 30, 2024",
-            location: "Taft National High School, Eastern Samar",
-            description:
-                "Join our community of learners and start your journey towards academic excellence. We are now accepting applications for incoming Grade 7 students and transferees.",
-            image: "/images/BG1.jpg",
-            ctaText: "Apply Now",
-            ctaLink: "/admissions",
-        },
-        {
-            id: 2,
-            title: "Academic Excellence Awards",
-            subtitle: "RECOGNITION CEREMONY",
-            tagline: "Theme: Celebrating Success, Inspiring Excellence",
-            guest: "OUTSTANDING STUDENTS",
-            role: "Academic Achievers 2024",
-            date: "March 15, 2024",
-            location: "TNHS Gymnasium, Taft, Eastern Samar",
-            description:
-                "Join us in celebrating the outstanding achievements of our students who have demonstrated exceptional academic performance and leadership qualities.",
-            image: "/images/BG2.jpg",
-            ctaText: "View Details",
-            ctaLink: "/news",
-        },
-        {
-            id: 3,
-            title: "Campus Life at TNHS",
-            subtitle: "EXPERIENCE EXCELLENCE",
-            tagline: "Theme: Learning, Growing, and Thriving Together",
-            guest: "OUR STUDENTS",
-            role: "Future Leaders of Tomorrow",
-            date: "Year Round",
-            location: "Taft National High School Campus",
-            description:
-                "Experience the vibrant campus life at TNHS where students develop academically, socially, and personally in a supportive and nurturing environment.",
-            image: "/images/BG3.jpg",
-            ctaText: "Learn More",
-            ctaLink: "/about",
-        },
-    ];
 
     const features = [
         {
@@ -235,24 +224,47 @@ const Home = () => {
             <section className="relative h-screen overflow-hidden">
                 {/* Image Carousel */}
                 <div className="relative h-full w-full">
-                    {heroSlides.map((slide, index) => (
-                        <div
-                            key={slide.id}
-                            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                                index === currentSlide
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                            }`}
-                        >
-                            <img
-                                src={slide.image}
-                                alt={slide.title}
-                                className="h-full w-full object-cover"
-                            />
-                            {/* Lighter overlay for better text readability */}
-                            <div className="absolute inset-0 bg-black/20"></div>
+                    {loading ? (
+                        // Loading state
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center">
+                            <div className="text-center text-white">
+                                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
+                                <p className="text-xl">Loading...</p>
+                            </div>
                         </div>
-                    ))}
+                    ) : heroSlides.length === 0 ? (
+                        // No slides state
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center">
+                            <div className="text-center text-white">
+                                <h1 className="text-4xl font-bold mb-4">
+                                    Welcome to TNHS
+                                </h1>
+                                <p className="text-xl">
+                                    Content coming soon...
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        // Slides carousel
+                        heroSlides.map((slide, index) => (
+                            <div
+                                key={slide.id}
+                                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                                    index === currentSlide
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                }`}
+                            >
+                                <img
+                                    src={slide.image_path || "/images/BG1.jpg"}
+                                    alt={slide.title}
+                                    className="h-full w-full object-cover"
+                                />
+                                {/* Lighter overlay for better text readability */}
+                                <div className="absolute inset-0 bg-black/20"></div>
+                            </div>
+                        ))
+                    )}
                 </div>
 
                 {/* Content Overlay */}
@@ -283,12 +295,11 @@ const Home = () => {
                             </h1>
                         </div>
 
-                        {/* Mission Statement */}
+                        {/* School Identity */}
                         <div className="mb-10">
-                            <p className="text-3d-shadow-mission text-lg sm:text-xl lg:text-2xl leading-relaxed max-w-3xl mx-auto font-medium">
-                                Empowering students with quality education,
-                                fostering excellence, and building character for
-                                a brighter future...
+                            <p className="text-3d-shadow-mission text-lg sm:text-xl lg:text-2xl leading-relaxed max-w-3xl mx-auto font-medium text-yellow-300">
+                                "Moving forward with strength, growth, and
+                                resilience"
                             </p>
                         </div>
 
@@ -379,6 +390,55 @@ const Home = () => {
                     <div className="absolute top-1/3 right-1/4 w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse opacity-60"></div>
                     <div className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-blue-300 rounded-full animate-pulse opacity-60"></div>
                 </div>
+
+                {/* Navigation Controls */}
+                {heroSlides.length > 1 && (
+                    <>
+                        {/* Previous Button */}
+                        <button
+                            onClick={() =>
+                                setCurrentSlide(
+                                    (prev) =>
+                                        (prev - 1 + heroSlides.length) %
+                                        heroSlides.length
+                                )
+                            }
+                            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm"
+                            aria-label="Previous slide"
+                        >
+                            <ChevronLeft className="h-6 w-6" />
+                        </button>
+
+                        {/* Next Button */}
+                        <button
+                            onClick={() =>
+                                setCurrentSlide(
+                                    (prev) => (prev + 1) % heroSlides.length
+                                )
+                            }
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm"
+                            aria-label="Next slide"
+                        >
+                            <ChevronRight className="h-6 w-6" />
+                        </button>
+
+                        {/* Slide Indicators */}
+                        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                            {heroSlides.map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setCurrentSlide(index)}
+                                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                                        index === currentSlide
+                                            ? "bg-white"
+                                            : "bg-white/50 hover:bg-white/75"
+                                    }`}
+                                    aria-label={`Go to slide ${index + 1}`}
+                                />
+                            ))}
+                        </div>
+                    </>
+                )}
             </section>
 
             {/* Core Values & Quick Access Section */}
@@ -486,260 +546,256 @@ const Home = () => {
                         {/* Left Column - Announcements (Wider) */}
                         <div className="lg:col-span-2">
                             <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
-                                {/* Featured News Card - Based on Image Design */}
-                                <div className="mb-8">
-                                    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
-                                        <div className="flex flex-col md:flex-row h-full">
-                                            {/* Left Section - Image */}
-                                            <div className="relative md:w-2/5 h-48 md:h-auto">
-                                                <img
-                                                    src="/images/BG1.jpg"
-                                                    alt="TNHS Campus"
-                                                    className="w-full h-full object-cover"
-                                                />
-                                                {/* Featured Tag */}
-                                                <div className="absolute top-3 left-3 bg-gradient-to-r from-orange-400 to-yellow-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 shadow-lg">
-                                                    <span>★</span>
-                                                    <span>FEATURED</span>
+                                {/* Dynamic Announcements */}
+                                {loading ? (
+                                    <div className="text-center py-8">
+                                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-royal-blue mx-auto mb-4"></div>
+                                        <p className="text-gray-600">
+                                            Loading announcements...
+                                        </p>
+                                    </div>
+                                ) : announcements.length > 0 ? (
+                                    <div className="space-y-6">
+                                        {/* Featured Announcement (First one) */}
+                                        {announcements[0] && (
+                                            <div className="mb-8">
+                                                <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+                                                    <div className="flex flex-col md:flex-row h-full">
+                                                        {/* Left Section - Image */}
+                                                        <div className="relative md:w-2/5 h-48 md:h-auto">
+                                                            <img
+                                                                src={
+                                                                    announcements[0]
+                                                                        .image
+                                                                }
+                                                                alt={
+                                                                    announcements[0]
+                                                                        .title
+                                                                }
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                            {/* Featured Tag */}
+                                                            <div className="absolute top-3 left-3 bg-gradient-to-r from-orange-400 to-yellow-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 shadow-lg">
+                                                                <span>★</span>
+                                                                <span>
+                                                                    FEATURED
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Right Section - Content */}
+                                                        <div className="md:w-3/5 p-6 flex flex-col justify-between">
+                                                            {/* Top Metadata */}
+                                                            <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                                                                <div className="flex items-center space-x-1">
+                                                                    <span>
+                                                                        📅
+                                                                    </span>
+                                                                    <span>
+                                                                        {
+                                                                            announcements[0]
+                                                                                .date
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                                <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+                                                                    {
+                                                                        announcements[0]
+                                                                            .category
+                                                                    }
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Title */}
+                                                            <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                                                                {
+                                                                    announcements[0]
+                                                                        .title
+                                                                }
+                                                            </h3>
+
+                                                            {/* Description */}
+                                                            <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
+                                                                {
+                                                                    announcements[0]
+                                                                        .excerpt
+                                                                }
+                                                            </p>
+
+                                                            {/* Bottom Metadata */}
+                                                            <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                                                <div className="flex items-center space-x-1">
+                                                                    <span>
+                                                                        👤
+                                                                    </span>
+                                                                    <span>
+                                                                        {
+                                                                            announcements[0]
+                                                                                .author
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex items-center space-x-1">
+                                                                    <span>
+                                                                        👁️
+                                                                    </span>
+                                                                    <span>
+                                                                        {
+                                                                            announcements[0]
+                                                                                .views
+                                                                        }{" "}
+                                                                        views
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Read More Button */}
+                                                            <Button
+                                                                asChild
+                                                                className="bg-gradient-to-r from-orange-400 to-yellow-500 hover:from-orange-500 hover:to-yellow-600 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 transform self-end"
+                                                            >
+                                                                <Link
+                                                                    to="/news"
+                                                                    className="flex items-center space-x-1"
+                                                                >
+                                                                    <span>
+                                                                        Read
+                                                                        More
+                                                                    </span>
+                                                                    <span>
+                                                                        →
+                                                                    </span>
+                                                                </Link>
+                                                            </Button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
+                                        )}
 
-                                            {/* Right Section - Content */}
-                                            <div className="md:w-3/5 p-6 flex flex-col justify-between">
-                                                {/* Top Metadata */}
-                                                <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                                                    <div className="flex items-center space-x-1">
-                                                        <span>📅</span>
-                                                        <span>
-                                                            January 15, 2024
-                                                        </span>
-                                                    </div>
-                                                    <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
-                                                        NEWS
-                                                    </div>
-                                                </div>
-
-                                                {/* Title */}
-                                                <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                                                    TNHS Students Win Regional
-                                                    Science Fair
-                                                </h3>
-
-                                                {/* Description */}
-                                                <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
-                                                    Our students demonstrated
-                                                    exceptional creativity and
-                                                    scientific thinking at the
-                                                    Eastern Samar Regional
-                                                    Science Fair.
-                                                </p>
-
-                                                {/* Bottom Metadata */}
-                                                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                                                    <div className="flex items-center space-x-1">
-                                                        <span>👤</span>
-                                                        <span>
-                                                            Science Department
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex items-center space-x-1">
-                                                        <span>👁️</span>
-                                                        <span>2436 views</span>
-                                                    </div>
-                                                </div>
-
-                                                {/* Read More Button */}
-                                                <Button
-                                                    asChild
-                                                    className="bg-gradient-to-r from-orange-400 to-yellow-500 hover:from-orange-500 hover:to-yellow-600 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 transform self-end"
+                                        {/* Additional Announcements */}
+                                        {announcements
+                                            .slice(1, 3)
+                                            .map((announcement, index) => (
+                                                <div
+                                                    key={announcement.id}
+                                                    className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
                                                 >
-                                                    <Link
-                                                        to="/news"
-                                                        className="flex items-center space-x-1"
-                                                    >
-                                                        <span>Read More</span>
-                                                        <span>→</span>
-                                                    </Link>
-                                                </Button>
-                                            </div>
-                                        </div>
+                                                    <div className="flex flex-col md:flex-row h-full">
+                                                        {/* Left Section - Image */}
+                                                        <div className="relative md:w-2/5 h-48 md:h-auto">
+                                                            <img
+                                                                src={
+                                                                    announcement.image
+                                                                }
+                                                                alt={
+                                                                    announcement.title
+                                                                }
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                            {/* News Tag */}
+                                                            <div className="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 shadow-lg">
+                                                                <span>📰</span>
+                                                                <span>
+                                                                    NEWS
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Right Section - Content */}
+                                                        <div className="md:w-3/5 p-6 flex flex-col justify-between">
+                                                            {/* Top Metadata */}
+                                                            <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                                                                <div className="flex items-center space-x-1">
+                                                                    <span>
+                                                                        📅
+                                                                    </span>
+                                                                    <span>
+                                                                        {
+                                                                            announcement.date
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                                <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+                                                                    {
+                                                                        announcement.category
+                                                                    }
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Title */}
+                                                            <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                                                                {
+                                                                    announcement.title
+                                                                }
+                                                            </h3>
+
+                                                            {/* Description */}
+                                                            <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
+                                                                {
+                                                                    announcement.excerpt
+                                                                }
+                                                            </p>
+
+                                                            {/* Bottom Metadata */}
+                                                            <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                                                <div className="flex items-center space-x-1">
+                                                                    <span>
+                                                                        👤
+                                                                    </span>
+                                                                    <span>
+                                                                        {
+                                                                            announcement.author
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex items-center space-x-1">
+                                                                    <span>
+                                                                        👁️
+                                                                    </span>
+                                                                    <span>
+                                                                        {
+                                                                            announcement.views
+                                                                        }{" "}
+                                                                        views
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Read More Button */}
+                                                            <Button
+                                                                asChild
+                                                                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 transform self-end"
+                                                            >
+                                                                <Link
+                                                                    to="/news"
+                                                                    className="flex items-center space-x-1"
+                                                                >
+                                                                    <span>
+                                                                        Read
+                                                                        More
+                                                                    </span>
+                                                                    <span>
+                                                                        →
+                                                                    </span>
+                                                                </Link>
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
                                     </div>
-
-                                    {/* Additional Announcement Cards */}
-                                    <div className="space-y-6 mt-8">
-                                        {/* Second Announcement */}
-                                        <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
-                                            <div className="flex flex-col md:flex-row h-full">
-                                                {/* Left Section - Image */}
-                                                <div className="relative md:w-2/5 h-48 md:h-auto">
-                                                    <img
-                                                        src="/images/BG2.jpg"
-                                                        alt="TNHS Campus"
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                    {/* News Tag */}
-                                                    <div className="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 shadow-lg">
-                                                        <span>📰</span>
-                                                        <span>NEWS</span>
-                                                    </div>
-                                                </div>
-
-                                                {/* Right Section - Content */}
-                                                <div className="md:w-3/5 p-6 flex flex-col justify-between">
-                                                    {/* Top Metadata */}
-                                                    <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                                                        <div className="flex items-center space-x-1">
-                                                            <span>📅</span>
-                                                            <span>
-                                                                January 10, 2024
-                                                            </span>
-                                                        </div>
-                                                        <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
-                                                            ANNOUNCEMENT
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Title */}
-                                                    <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                                                        New Computer Laboratory
-                                                        Opens at TNHS
-                                                    </h3>
-
-                                                    {/* Description */}
-                                                    <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
-                                                        TNHS proudly announces
-                                                        the opening of our
-                                                        state-of-the-art
-                                                        computer laboratory,
-                                                        equipped with the latest
-                                                        technology to enhance
-                                                        student learning and
-                                                        digital skills
-                                                        development.
-                                                    </p>
-
-                                                    {/* Bottom Metadata */}
-                                                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                                                        <div className="flex items-center space-x-1">
-                                                            <span>👤</span>
-                                                            <span>
-                                                                IT Department
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-1">
-                                                            <span>👁️</span>
-                                                            <span>
-                                                                1,856 views
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Read More Button */}
-                                                    <Button
-                                                        asChild
-                                                        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 transform self-end"
-                                                    >
-                                                        <Link
-                                                            to="/news"
-                                                            className="flex items-center space-x-1"
-                                                        >
-                                                            <span>
-                                                                Read More
-                                                            </span>
-                                                            <span>→</span>
-                                                        </Link>
-                                                    </Button>
-                                                </div>
-                                            </div>
+                                ) : (
+                                    <div className="text-center py-8">
+                                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Newspaper className="w-8 h-8 text-gray-400" />
                                         </div>
-
-                                        {/* Third Announcement */}
-                                        <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
-                                            <div className="flex flex-col md:flex-row h-full">
-                                                {/* Left Section - Image */}
-                                                <div className="relative md:w-2/5 h-48 md:h-auto">
-                                                    <img
-                                                        src="/images/BG3.jpg"
-                                                        alt="TNHS Sports"
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                    {/* Event Tag */}
-                                                    <div className="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                                                        <span>🏆</span>
-                                                        <span>EVENT</span>
-                                                    </div>
-                                                </div>
-
-                                                {/* Right Section - Content */}
-                                                <div className="md:w-3/5 p-6 flex flex-col justify-between">
-                                                    {/* Top Metadata */}
-                                                    <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                                                        <div className="flex items-center space-x-1">
-                                                            <span>📅</span>
-                                                            <span>
-                                                                January 5, 2024
-                                                            </span>
-                                                        </div>
-                                                        <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
-                                                            SPORTS
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Title */}
-                                                    <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                                                        TNHS Basketball Team
-                                                        Wins Championship
-                                                    </h3>
-
-                                                    {/* Description */}
-                                                    <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
-                                                        Congratulations to our
-                                                        TNHS basketball team for
-                                                        winning the regional
-                                                        championship! Their
-                                                        dedication and teamwork
-                                                        have brought pride to
-                                                        our school community.
-                                                    </p>
-
-                                                    {/* Bottom Metadata */}
-                                                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                                                        <div className="flex items-center space-x-1">
-                                                            <span>👤</span>
-                                                            <span>
-                                                                Physical
-                                                                Education
-                                                                Department
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-1">
-                                                            <span>👁️</span>
-                                                            <span>
-                                                                3,124 views
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Read More Button */}
-                                                    <Button
-                                                        asChild
-                                                        className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 transform self-end"
-                                                    >
-                                                        <Link
-                                                            to="/news"
-                                                            className="flex items-center space-x-1"
-                                                        >
-                                                            <span>
-                                                                Read More
-                                                            </span>
-                                                            <span>→</span>
-                                                        </Link>
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <p className="text-gray-600">
+                                            No announcements available at the
+                                            moment.
+                                        </p>
                                     </div>
-                                </div>
+                                )}
                             </div>
                         </div>
 

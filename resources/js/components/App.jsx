@@ -11,6 +11,9 @@ import About from "../pages/public/About";
 import AboutHistory from "../pages/public/AboutHistory";
 import AboutMission from "../pages/public/AboutMission";
 import AboutLeadership from "../pages/public/AboutLeadership";
+import AboutSchoolSeal from "../pages/public/AboutSchoolSeal";
+import AboutQualityPolicy from "../pages/public/AboutQualityPolicy";
+import AboutPrivacyPolicy from "../pages/public/AboutPrivacyPolicy";
 import Academics from "../pages/public/Academics";
 import AcademicsJuniorHigh from "../pages/public/AcademicsJuniorHigh";
 import AcademicsSeniorHigh from "../pages/public/AcademicsSeniorHigh";
@@ -30,6 +33,7 @@ import AssistantPrincipal from "../pages/public/faculty/AssistantPrincipal";
 import TeachingStaff from "../pages/public/faculty/TeachingStaff";
 import AdministrativeStaff from "../pages/public/faculty/AdministrativeStaff";
 import SupportStaff from "../pages/public/faculty/SupportStaff";
+import Staff from "../pages/public/faculty/Staff";
 
 // More Pages
 import MoreResources from "../pages/public/MoreResources";
@@ -40,6 +44,10 @@ import MoreLinks from "../pages/public/MoreLinks";
 import AdminDashboard from "../pages/admin/Dashboard";
 import AdminAnnouncements from "../pages/admin/Announcements";
 import AdminUsers from "../pages/admin/Users";
+import HeroCarousel from "../pages/admin/HeroCarousel";
+import HeroCarouselForm from "../pages/admin/HeroCarouselForm";
+import Login from "../pages/admin/Login";
+import ProtectedRoute from "./admin/ProtectedRoute";
 
 // Scroll to top wrapper component
 const ScrollToTopWrapper = ({ children }) => {
@@ -67,6 +75,18 @@ function App() {
                     <Route
                         path="about/leadership"
                         element={<AboutLeadership />}
+                    />
+                    <Route
+                        path="about/school-seal"
+                        element={<AboutSchoolSeal />}
+                    />
+                    <Route
+                        path="about/quality-policy"
+                        element={<AboutQualityPolicy />}
+                    />
+                    <Route
+                        path="about/privacy-policy"
+                        element={<AboutPrivacyPolicy />}
                     />
                     <Route path="academics" element={<Academics />} />
                     <Route
@@ -114,7 +134,7 @@ function App() {
                     />
                     <Route
                         path="faculty/administrative-staff"
-                        element={<AdministrativeStaff />}
+                        element={<Staff />}
                     />
                     <Route
                         path="faculty/support-staff"
@@ -161,13 +181,38 @@ function App() {
                 </Route>
 
                 {/* Admin Routes */}
-                <Route path="/admin" element={<AdminLayout />}>
-                    <Route index element={<AdminDashboard />} />
+                <Route path="/admin">
+                    {/* Admin Login Route */}
+                    <Route path="login" element={<Login />} />
+
+                    {/* Protected Admin Routes */}
                     <Route
-                        path="announcements"
-                        element={<AdminAnnouncements />}
-                    />
-                    <Route path="users" element={<AdminUsers />} />
+                        path=""
+                        element={
+                            <ProtectedRoute>
+                                <AdminLayout />
+                            </ProtectedRoute>
+                        }
+                    >
+                        <Route index element={<AdminDashboard />} />
+                        <Route
+                            path="announcements"
+                            element={<AdminAnnouncements />}
+                        />
+                        <Route path="users" element={<AdminUsers />} />
+                        <Route
+                            path="hero-carousel"
+                            element={<HeroCarousel />}
+                        />
+                        <Route
+                            path="hero-carousel/create"
+                            element={<HeroCarouselForm />}
+                        />
+                        <Route
+                            path="hero-carousel/:id/edit"
+                            element={<HeroCarouselForm />}
+                        />
+                    </Route>
                 </Route>
             </Routes>
         </>
