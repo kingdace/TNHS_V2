@@ -12,6 +12,8 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
+        'admin/*',
+        'api/*',
         '*',
     ];
 
@@ -24,7 +26,7 @@ class VerifyCsrfToken extends Middleware
      */
     public function handle($request, \Closure $next)
     {
-        // Always pass CSRF verification for now
+        // Completely bypass CSRF verification
         return $next($request);
     }
 }

@@ -46,6 +46,9 @@ import AdminAnnouncements from "../pages/admin/Announcements";
 import AdminUsers from "../pages/admin/Users";
 import HeroCarousel from "../pages/admin/HeroCarousel";
 import HeroCarouselForm from "../pages/admin/HeroCarouselForm";
+import AcademicPrograms from "../pages/admin/AcademicPrograms";
+import SchoolInfo from "../pages/admin/SchoolInfo";
+import ContactInfo from "../pages/admin/ContactInfo";
 import Login from "../pages/admin/Login";
 import ProtectedRoute from "./admin/ProtectedRoute";
 
@@ -212,6 +215,12 @@ function App() {
                             path="hero-carousel/:id/edit"
                             element={<HeroCarouselForm />}
                         />
+                        <Route
+                            path="academic-programs"
+                            element={<AcademicPrograms />}
+                        />
+                        <Route path="school-info" element={<SchoolInfo />} />
+                        <Route path="contact-info" element={<ContactInfo />} />
                     </Route>
                 </Route>
             </Routes>

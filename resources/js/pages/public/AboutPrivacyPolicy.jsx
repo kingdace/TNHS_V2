@@ -372,3 +372,4 @@ const AboutPrivacyPolicy = () => {
 
 export default AboutPrivacyPolicy;
 
+

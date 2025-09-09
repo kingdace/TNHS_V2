@@ -28,7 +28,7 @@ const Login = () => {
 
     const checkAuthStatus = async () => {
         try {
-            const response = await fetch("/admin/auth/check", {
+            const response = await fetch("/auth/check", {
                 credentials: "include",
             });
 
@@ -60,7 +60,7 @@ const Login = () => {
         setError("");
 
         try {
-            const response = await fetch("/admin/auth/login", {
+            const response = await fetch("/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

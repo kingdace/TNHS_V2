@@ -3,15 +3,13 @@
  * Handles admin authentication API calls
  */
 
-const API_BASE_URL = "/admin";
-
 export const adminAuthService = {
     /**
      * Login admin user
      */
     async login(credentials) {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            const response = await fetch("/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -41,7 +39,7 @@ export const adminAuthService = {
      */
     async logout() {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+            const response = await fetch("/auth/logout", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -70,7 +68,7 @@ export const adminAuthService = {
      */
     async checkAuth() {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/check`, {
+            const response = await fetch("/auth/check", {
                 credentials: "include",
             });
 

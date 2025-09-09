@@ -12,6 +12,9 @@ import {
     LogOut,
     Images,
     Home,
+    BookOpen,
+    Info,
+    Phone,
 } from "lucide-react";
 import { adminAuthService } from "../../services/adminAuthService";
 
@@ -28,6 +31,21 @@ const AdminLayout = () => {
             name: "Hero Carousel",
             href: "/admin/hero-carousel",
             icon: Images,
+        },
+        {
+            name: "Academic Programs",
+            href: "/admin/academic-programs",
+            icon: BookOpen,
+        },
+        {
+            name: "School Information",
+            href: "/admin/school-info",
+            icon: Info,
+        },
+        {
+            name: "Contact Information",
+            href: "/admin/contact-info",
+            icon: Phone,
         },
         {
             name: "Announcements",

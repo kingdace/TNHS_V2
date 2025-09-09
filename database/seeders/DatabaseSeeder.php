@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             AnnouncementSeeder::class,
             HeroCarouselSeeder::class,
+            AcademicProgramSeeder::class,
+            SchoolInfoSeeder::class,
+            ContactInfoSeeder::class,
         ]);
     }
 }
