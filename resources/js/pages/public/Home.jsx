@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { announcementService } from "../../services/announcementService";
 import { publicService } from "../../services/publicService";
+import { useDynamicContent } from "../../hooks/useDynamicContent";
 
 const Home = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -42,6 +43,10 @@ const Home = () => {
     const [semester, setSemester] = useState("1st");
     const [showExamModal, setShowExamModal] = useState(false);
     const [examSchedules, setExamSchedules] = useState({});
+
+    // Dynamic content hooks
+    const { content: featuresContent } = useDynamicContent("home", "features");
+    const { content: statsContent } = useDynamicContent("home", "statistics");
 
     // Fetch announcements and hero slides on component mount
     useEffect(() => {
@@ -140,32 +145,64 @@ const Home = () => {
         alert("Redirecting to exam booking...");
     };
 
-    const features = [
-        {
-            icon: <GraduationCap className="h-8 w-8 text-royal-blue" />,
-            title: "Academic Excellence",
-            description:
-                "Comprehensive curriculum designed to prepare students for higher education and future careers.",
-        },
-        {
-            icon: <BookOpen className="h-8 w-8 text-royal-blue" />,
-            title: "Quality Education",
-            description:
-                "Experienced teachers and modern facilities to ensure the best learning experience.",
-        },
-        {
-            icon: <Users className="h-8 w-8 text-royal-blue" />,
-            title: "Student Development",
-            description:
-                "Focus on character building, leadership skills, and personal growth.",
-        },
-        {
-            icon: <Award className="h-8 w-8 text-royal-blue" />,
-            title: "Recognition & Awards",
-            description:
-                "Celebrating student achievements and fostering a culture of excellence.",
-        },
-    ];
+    // Get features data - use dynamic content if available, otherwise fallback to hardcoded
+    const getFeatures = () => {
+        if (featuresContent && featuresContent.length > 0) {
+            const featureData = JSON.parse(featuresContent[0].content_data);
+            return featureData.features.map((feature, index) => ({
+                icon: getFeatureIcon(feature.icon),
+                title: feature.title,
+                description: feature.description,
+            }));
+        }
+
+        // Fallback to hardcoded features
+        return [
+            {
+                icon: <GraduationCap className="h-8 w-8 text-royal-blue" />,
+                title: "Academic Excellence",
+                description:
+                    "Comprehensive curriculum designed to prepare students for higher education and future careers.",
+            },
+            {
+                icon: <BookOpen className="h-8 w-8 text-royal-blue" />,
+                title: "Quality Education",
+                description:
+                    "Experienced teachers and modern facilities to ensure the best learning experience.",
+            },
+            {
+                icon: <Users className="h-8 w-8 text-royal-blue" />,
+                title: "Student Development",
+                description:
+                    "Focus on character building, leadership skills, and personal growth.",
+            },
+            {
+                icon: <Award className="h-8 w-8 text-royal-blue" />,
+                title: "Recognition & Awards",
+                description:
+                    "Celebrating student achievements and fostering a culture of excellence.",
+            },
+        ];
+    };
+
+    // Helper function to get feature icons
+    const getFeatureIcon = (iconName) => {
+        const icons = {
+            "graduation-cap": (
+                <GraduationCap className="h-8 w-8 text-royal-blue" />
+            ),
+            "book-open": <BookOpen className="h-8 w-8 text-royal-blue" />,
+            users: <Users className="h-8 w-8 text-royal-blue" />,
+            award: <Award className="h-8 w-8 text-royal-blue" />,
+        };
+        return (
+            icons[iconName] || (
+                <GraduationCap className="h-8 w-8 text-royal-blue" />
+            )
+        );
+    };
+
+    const features = getFeatures();
 
     const upcomingEvents = [
         {

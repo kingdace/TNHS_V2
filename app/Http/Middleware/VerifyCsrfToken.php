@@ -12,21 +12,11 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        'admin/*',
-        'api/*',
-        '*',
+        // Only exclude specific API routes that need to be public
+        'api/announcements/public',
+        'api/hero-carousel',
+        'api/academic-programs',
+        'api/school-info',
+        'api/contact-info',
     ];
-
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle($request, \Closure $next)
-    {
-        // Completely bypass CSRF verification
-        return $next($request);
-    }
 }

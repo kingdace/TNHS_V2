@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -62,18 +63,18 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is active
+     * Check if user has specific role
      */
-    public function isActive(): bool
+    public function hasRole(string $role): bool
     {
-        return $this->is_active;
+        return $this->role === $role && $this->is_active;
     }
 
     /**
-     * Update last login timestamp
+     * Check if user is super admin
      */
-    public function updateLastLogin(): void
+    public function isSuperAdmin(): bool
     {
-        $this->update(['last_login_at' => now()]);
+        return $this->hasRole('super_admin');
     }
 }

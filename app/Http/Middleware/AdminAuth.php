@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
+use App\Models\User;
 
 class AdminAuth
 {
@@ -21,25 +22,48 @@ class AdminAuth
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Authentication required.',
-                    'redirect' => route('admin.login'),
+                    'message' => 'Authentication required',
+                    'error' => 'Unauthenticated'
                 ], 401);
             }
 
-            return redirect()->route('admin.login');
+            return redirect()->route('login');
         }
 
-        // Check if user is admin
-        if (!Auth::user()->isAdmin()) {
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Check if user is active
+        if (!$user->is_active) {
+            Auth::logout();
+
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Insufficient privileges.',
+                    'message' => 'Account is deactivated',
+                    'error' => 'Account deactivated'
                 ], 403);
             }
 
-            return redirect()->route('admin.login')->with('error', 'Insufficient privileges.');
+            return redirect()->route('login')->with('error', 'Your account has been deactivated.');
         }
+
+        // Check if user is admin
+        if (!$user->is_admin || !$user->is_active) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Admin access required',
+                    'error' => 'Forbidden'
+                ], 403);
+            }
+
+            return redirect('/')->with('error', 'You do not have permission to access this area.');
+        }
+
+        // Update last login time
+        $user->last_login_at = now();
+        $user->save();
 
         return $next($request);
     }

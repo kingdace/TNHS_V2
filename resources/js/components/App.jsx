@@ -1,5 +1,13 @@
 import React, { useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "../../css/app.css";
+
+// Contexts
+import { AuthProvider } from "../contexts/AuthContext";
+
+// Components
+import ProtectedRoute from "./ProtectedRoute";
+import LoginRoute from "./LoginRoute";
 
 // Layouts
 import PublicLayout from "./layout/PublicLayout";
@@ -38,7 +46,11 @@ import Staff from "../pages/public/faculty/Staff";
 // More Pages
 import MoreResources from "../pages/public/MoreResources";
 import MoreDownloads from "../pages/public/MoreDownloads";
+import TestDynamic from "../pages/public/TestDynamic";
 import MoreLinks from "../pages/public/MoreLinks";
+
+// Auth Pages
+import Login from "../pages/Login";
 
 // Admin Pages
 import AdminDashboard from "../pages/admin/Dashboard";
@@ -49,8 +61,7 @@ import HeroCarouselForm from "../pages/admin/HeroCarouselForm";
 import AcademicPrograms from "../pages/admin/AcademicPrograms";
 import SchoolInfo from "../pages/admin/SchoolInfo";
 import ContactInfo from "../pages/admin/ContactInfo";
-import Login from "../pages/admin/Login";
-import ProtectedRoute from "./admin/ProtectedRoute";
+import AdminPageContent from "../pages/admin/PageContent";
 
 // Scroll to top wrapper component
 const ScrollToTopWrapper = ({ children }) => {
@@ -62,169 +73,211 @@ const ScrollToTopWrapper = ({ children }) => {
 
 function App() {
     return (
-        <>
-            <Routes
-                future={{
-                    v7_startTransition: true,
-                    v7_relativeSplatPath: true,
-                }}
-            >
-                {/* Public Routes */}
-                <Route path="/" element={<PublicLayout />}>
-                    <Route index element={<Home />} />
-                    <Route path="about" element={<About />} />
-                    <Route path="about/history" element={<AboutHistory />} />
-                    <Route path="about/mission" element={<AboutMission />} />
-                    <Route
-                        path="about/leadership"
-                        element={<AboutLeadership />}
-                    />
-                    <Route
-                        path="about/school-seal"
-                        element={<AboutSchoolSeal />}
-                    />
-                    <Route
-                        path="about/quality-policy"
-                        element={<AboutQualityPolicy />}
-                    />
-                    <Route
-                        path="about/privacy-policy"
-                        element={<AboutPrivacyPolicy />}
-                    />
-                    <Route path="academics" element={<Academics />} />
-                    <Route
-                        path="academics/junior-high"
-                        element={<AcademicsJuniorHigh />}
-                    />
-                    <Route
-                        path="academics/senior-high"
-                        element={<AcademicsSeniorHigh />}
-                    />
-                    <Route
-                        path="academics/special-programs"
-                        element={<AcademicsSpecialPrograms />}
-                    />
-                    <Route
-                        path="academics/special-programs/:programId"
-                        element={<AcademicsSpecialProgramDetail />}
-                    />
-                    <Route path="admissions" element={<Admissions />} />
-                    <Route path="news" element={<News />} />
-                    <Route path="news/announcements" element={<News />} />
-                    <Route path="news/events" element={<News />} />
-                    <Route path="contact" element={<Contact />} />
-                    <Route
-                        path="contact/general"
-                        element={<ContactGeneral />}
-                    />
-                    <Route
-                        path="contact/admissions"
-                        element={<ContactAdmissions />}
-                    />
-                    <Route
-                        path="contact/support"
-                        element={<ContactSupport />}
-                    />
-                    <Route path="faculty" element={<FacultyIndex />} />
-                    <Route path="faculty/principal" element={<Principal />} />
-                    <Route
-                        path="faculty/assistant-principal"
-                        element={<AssistantPrincipal />}
-                    />
-                    <Route
-                        path="faculty/teaching-staff"
-                        element={<TeachingStaff />}
-                    />
-                    <Route
-                        path="faculty/administrative-staff"
-                        element={<Staff />}
-                    />
-                    <Route
-                        path="faculty/support-staff"
-                        element={<SupportStaff />}
-                    />
-
-                    {/* More Routes */}
-                    <Route path="more/resources" element={<MoreResources />} />
-                    <Route path="more/downloads" element={<MoreDownloads />} />
-                    <Route path="more/links" element={<MoreLinks />} />
-
-                    <Route
-                        path="student-portal"
-                        element={
-                            <ScrollToTopWrapper>
-                                <div className="pt-24 pb-20 text-center">
-                                    <h1 className="text-2xl font-bold mb-4">
-                                        Student Portal
-                                    </h1>
-                                    <p className="text-gray-600">
-                                        Student portal functionality coming
-                                        soon...
-                                    </p>
-                                </div>
-                            </ScrollToTopWrapper>
-                        }
-                    />
-                    <Route
-                        path="calendar"
-                        element={
-                            <ScrollToTopWrapper>
-                                <div className="pt-24 pb-20 text-center">
-                                    <h1 className="text-2xl font-bold mb-4">
-                                        School Calendar
-                                    </h1>
-                                    <p className="text-gray-600">
-                                        School calendar functionality coming
-                                        soon...
-                                    </p>
-                                </div>
-                            </ScrollToTopWrapper>
-                        }
-                    />
-                </Route>
-
-                {/* Admin Routes */}
-                <Route path="/admin">
-                    {/* Admin Login Route */}
-                    <Route path="login" element={<Login />} />
-
-                    {/* Protected Admin Routes */}
-                    <Route
-                        path=""
-                        element={
-                            <ProtectedRoute>
-                                <AdminLayout />
-                            </ProtectedRoute>
-                        }
+        <AuthProvider>
+            <Router>
+                <ScrollToTopWrapper>
+                    <Routes
+                        future={{
+                            v7_startTransition: true,
+                            v7_relativeSplatPath: true,
+                        }}
                     >
-                        <Route index element={<AdminDashboard />} />
+                        {/* Auth Routes - Outside of PublicLayout for clean login page */}
                         <Route
-                            path="announcements"
-                            element={<AdminAnnouncements />}
+                            path="login"
+                            element={
+                                <LoginRoute>
+                                    <Login />
+                                </LoginRoute>
+                            }
                         />
-                        <Route path="users" element={<AdminUsers />} />
-                        <Route
-                            path="hero-carousel"
-                            element={<HeroCarousel />}
-                        />
-                        <Route
-                            path="hero-carousel/create"
-                            element={<HeroCarouselForm />}
-                        />
-                        <Route
-                            path="hero-carousel/:id/edit"
-                            element={<HeroCarouselForm />}
-                        />
-                        <Route
-                            path="academic-programs"
-                            element={<AcademicPrograms />}
-                        />
-                        <Route path="school-info" element={<SchoolInfo />} />
-                        <Route path="contact-info" element={<ContactInfo />} />
-                    </Route>
-                </Route>
-            </Routes>
-        </>
+
+                        {/* Public Routes */}
+                        <Route path="/" element={<PublicLayout />}>
+                            <Route index element={<Home />} />
+                            <Route path="about" element={<About />} />
+                            <Route
+                                path="about/history"
+                                element={<AboutHistory />}
+                            />
+                            <Route
+                                path="about/mission"
+                                element={<AboutMission />}
+                            />
+                            <Route
+                                path="about/leadership"
+                                element={<AboutLeadership />}
+                            />
+                            <Route
+                                path="about/school-seal"
+                                element={<AboutSchoolSeal />}
+                            />
+                            <Route
+                                path="about/quality-policy"
+                                element={<AboutQualityPolicy />}
+                            />
+                            <Route
+                                path="about/privacy-policy"
+                                element={<AboutPrivacyPolicy />}
+                            />
+                            <Route path="academics" element={<Academics />} />
+                            <Route
+                                path="academics/junior-high"
+                                element={<AcademicsJuniorHigh />}
+                            />
+                            <Route
+                                path="academics/senior-high"
+                                element={<AcademicsSeniorHigh />}
+                            />
+                            <Route
+                                path="academics/special-programs"
+                                element={<AcademicsSpecialPrograms />}
+                            />
+                            <Route
+                                path="academics/special-programs/:programId"
+                                element={<AcademicsSpecialProgramDetail />}
+                            />
+                            <Route path="admissions" element={<Admissions />} />
+                            <Route path="news" element={<News />} />
+                            <Route
+                                path="news/announcements"
+                                element={<News />}
+                            />
+                            <Route path="news/events" element={<News />} />
+                            <Route path="contact" element={<Contact />} />
+                            <Route
+                                path="contact/general"
+                                element={<ContactGeneral />}
+                            />
+                            <Route
+                                path="contact/admissions"
+                                element={<ContactAdmissions />}
+                            />
+                            <Route
+                                path="contact/support"
+                                element={<ContactSupport />}
+                            />
+                            <Route path="faculty" element={<FacultyIndex />} />
+                            <Route
+                                path="faculty/principal"
+                                element={<Principal />}
+                            />
+                            <Route
+                                path="faculty/assistant-principal"
+                                element={<AssistantPrincipal />}
+                            />
+                            <Route
+                                path="faculty/teaching-staff"
+                                element={<TeachingStaff />}
+                            />
+                            <Route
+                                path="faculty/administrative-staff"
+                                element={<Staff />}
+                            />
+                            <Route
+                                path="faculty/support-staff"
+                                element={<SupportStaff />}
+                            />
+
+                            {/* More Routes */}
+                            <Route
+                                path="more/resources"
+                                element={<MoreResources />}
+                            />
+                            <Route
+                                path="more/downloads"
+                                element={<MoreDownloads />}
+                            />
+                            <Route path="more/links" element={<MoreLinks />} />
+                            <Route
+                                path="test-dynamic"
+                                element={<TestDynamic />}
+                            />
+
+                            <Route
+                                path="student-portal"
+                                element={
+                                    <ScrollToTopWrapper>
+                                        <div className="pt-24 pb-20 text-center">
+                                            <h1 className="text-2xl font-bold mb-4">
+                                                Student Portal
+                                            </h1>
+                                            <p className="text-gray-600">
+                                                Student portal functionality
+                                                coming soon...
+                                            </p>
+                                        </div>
+                                    </ScrollToTopWrapper>
+                                }
+                            />
+                            <Route
+                                path="calendar"
+                                element={
+                                    <ScrollToTopWrapper>
+                                        <div className="pt-24 pb-20 text-center">
+                                            <h1 className="text-2xl font-bold mb-4">
+                                                School Calendar
+                                            </h1>
+                                            <p className="text-gray-600">
+                                                School calendar functionality
+                                                coming soon...
+                                            </p>
+                                        </div>
+                                    </ScrollToTopWrapper>
+                                }
+                            />
+                        </Route>
+
+                        {/* Admin Routes - Protected */}
+                        <Route path="/admin">
+                            <Route
+                                path=""
+                                element={
+                                    <ProtectedRoute requireAdmin={true}>
+                                        <AdminLayout />
+                                    </ProtectedRoute>
+                                }
+                            >
+                                <Route index element={<AdminDashboard />} />
+                                <Route
+                                    path="announcements"
+                                    element={<AdminAnnouncements />}
+                                />
+                                <Route path="users" element={<AdminUsers />} />
+                                <Route
+                                    path="hero-carousel"
+                                    element={<HeroCarousel />}
+                                />
+                                <Route
+                                    path="hero-carousel/create"
+                                    element={<HeroCarouselForm />}
+                                />
+                                <Route
+                                    path="hero-carousel/:id/edit"
+                                    element={<HeroCarouselForm />}
+                                />
+                                <Route
+                                    path="academic-programs"
+                                    element={<AcademicPrograms />}
+                                />
+                                <Route
+                                    path="school-info"
+                                    element={<SchoolInfo />}
+                                />
+                                <Route
+                                    path="contact-info"
+                                    element={<ContactInfo />}
+                                />
+                                <Route
+                                    path="page-content"
+                                    element={<AdminPageContent />}
+                                />
+                            </Route>
+                        </Route>
+                    </Routes>
+                </ScrollToTopWrapper>
+            </Router>
+        </AuthProvider>
     );
 }
 

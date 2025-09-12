@@ -5,6 +5,15 @@
 
 const API_BASE_URL = "/api";
 
+// Helper function to get headers with CSRF token
+const getHeaders = () => ({
+    "Content-Type": "application/json",
+    "X-CSRF-TOKEN":
+        document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute("content") || "",
+});
+
 export const adminService = {
     /**
      * Hero Carousel Management
@@ -47,13 +56,7 @@ export const adminService = {
             try {
                 const response = await fetch(`${API_BASE_URL}/hero-carousel`, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN":
-                            document
-                                .querySelector('meta[name="csrf-token"]')
-                                ?.getAttribute("content") || "",
-                    },
+                    headers: getHeaders(),
                     body: JSON.stringify(slideData),
                 });
 
@@ -80,13 +83,7 @@ export const adminService = {
                     `${API_BASE_URL}/hero-carousel/${id}`,
                     {
                         method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN":
-                                document
-                                    .querySelector('meta[name="csrf-token"]')
-                                    ?.getAttribute("content") || "",
-                        },
+                        headers: getHeaders(),
                         body: JSON.stringify(slideData),
                     }
                 );
@@ -114,12 +111,7 @@ export const adminService = {
                     `${API_BASE_URL}/hero-carousel/${id}`,
                     {
                         method: "DELETE",
-                        headers: {
-                            "X-CSRF-TOKEN":
-                                document
-                                    .querySelector('meta[name="csrf-token"]')
-                                    ?.getAttribute("content") || "",
-                        },
+                        headers: getHeaders(),
                     }
                 );
 
@@ -152,9 +144,7 @@ export const adminService = {
                     `/admin/academic-programs?${queryParams}`,
                     {
                         method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
+                        headers: getHeaders(),
                         credentials: "include",
                     }
                 );
@@ -176,9 +166,7 @@ export const adminService = {
             try {
                 const response = await fetch("/admin/academic-programs", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: getHeaders(),
                     credentials: "include",
                     body: JSON.stringify(programData),
                 });
@@ -204,9 +192,7 @@ export const adminService = {
             try {
                 const response = await fetch(`/admin/academic-programs/${id}`, {
                     method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: getHeaders(),
                     credentials: "include",
                     body: JSON.stringify(programData),
                 });
@@ -232,9 +218,7 @@ export const adminService = {
             try {
                 const response = await fetch(`/admin/academic-programs/${id}`, {
                     method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: getHeaders(),
                     credentials: "include",
                 });
 
@@ -261,9 +245,7 @@ export const adminService = {
                     `/admin/academic-programs/${id}/toggle-active`,
                     {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
+                        headers: getHeaders(),
                         credentials: "include",
                     }
                 );
@@ -291,9 +273,7 @@ export const adminService = {
                     "/admin/academic-programs/reorder",
                     {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
+                        headers: getHeaders(),
                         credentials: "include",
                         body: JSON.stringify({ programs }),
                     }
@@ -328,9 +308,7 @@ export const adminService = {
                     `/admin/school-info?${queryParams}`,
                     {
                         method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
+                        headers: getHeaders(),
                         credentials: "include",
                     }
                 );
@@ -352,9 +330,7 @@ export const adminService = {
             try {
                 const response = await fetch("/admin/school-info", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: getHeaders(),
                     credentials: "include",
                     body: JSON.stringify(infoData),
                 });
@@ -380,9 +356,7 @@ export const adminService = {
             try {
                 const response = await fetch(`/admin/school-info/${id}`, {
                     method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: getHeaders(),
                     credentials: "include",
                     body: JSON.stringify(infoData),
                 });
@@ -408,9 +382,7 @@ export const adminService = {
             try {
                 const response = await fetch(`/admin/school-info/${id}`, {
                     method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: getHeaders(),
                     credentials: "include",
                 });
 
@@ -437,9 +409,7 @@ export const adminService = {
                     `/admin/school-info/${id}/toggle-active`,
                     {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
+                        headers: getHeaders(),
                         credentials: "include",
                     }
                 );
@@ -468,9 +438,7 @@ export const adminService = {
             try {
                 const response = await fetch("/admin/school-info/reorder", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: getHeaders(),
                     credentials: "include",
                     body: JSON.stringify({ info }),
                 });
@@ -504,9 +472,7 @@ export const adminService = {
                     `/admin/contact-info?${queryParams}`,
                     {
                         method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
+                        headers: getHeaders(),
                         credentials: "include",
                     }
                 );
@@ -528,9 +494,7 @@ export const adminService = {
             try {
                 const response = await fetch("/admin/contact-info", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: getHeaders(),
                     credentials: "include",
                     body: JSON.stringify(infoData),
                 });
@@ -556,9 +520,7 @@ export const adminService = {
             try {
                 const response = await fetch(`/admin/contact-info/${id}`, {
                     method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: getHeaders(),
                     credentials: "include",
                     body: JSON.stringify(infoData),
                 });
@@ -584,9 +546,7 @@ export const adminService = {
             try {
                 const response = await fetch(`/admin/contact-info/${id}`, {
                     method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: getHeaders(),
                     credentials: "include",
                 });
 
@@ -613,9 +573,7 @@ export const adminService = {
                     `/admin/contact-info/${id}/toggle-active`,
                     {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
+                        headers: getHeaders(),
                         credentials: "include",
                     }
                 );
@@ -644,9 +602,7 @@ export const adminService = {
             try {
                 const response = await fetch("/admin/contact-info/reorder", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: getHeaders(),
                     credentials: "include",
                     body: JSON.stringify({ info }),
                 });

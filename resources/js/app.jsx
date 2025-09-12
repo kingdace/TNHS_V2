@@ -1,16 +1,28 @@
+import "../css/app.css";
+import "./bootstrap";
+
+import { createRoot, hydrateRoot } from "react-dom/client";
 import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter as Router } from "react-router-dom";
-import App from "./components/App";
 
-const root = ReactDOM.createRoot(document.getElementById("app"));
+const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
-root.render(
-    <React.StrictMode>
-        <Router
-            future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-        >
-            <App />
-        </Router>
-    </React.StrictMode>
-);
+// Use React Router for all routes
+const el = document.getElementById("app");
+if (el) {
+    // Clear any existing content to avoid conflicts
+    el.innerHTML = "";
+
+    // Use a single root instance to avoid conflicts
+    if (!window.reactRoot) {
+        window.reactRoot = createRoot(el);
+    }
+
+    // Import and render the App component immediately
+    import("./components/App.jsx").then(({ default: App }) => {
+        if (import.meta.env.SSR) {
+            hydrateRoot(el, <App />);
+        } else {
+            window.reactRoot.render(<App />);
+        }
+    });
+}
