@@ -75,7 +75,7 @@ const Header = () => {
     return (
         <header className="bg-royal-blue shadow-lg sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-20">
+                <div className="flex items-center h-20">
                     {/* Logo and School Name */}
                     <div className="flex items-center space-x-4">
                         <div className="relative">
@@ -89,16 +89,16 @@ const Header = () => {
                         </div>
                         <div className="hidden sm:block">
                             <h1 className="text-2xl font-bold text-white">
-                                TNHS
+                                Taft National High School
                             </h1>
                             <p className="text-sm text-blue-100 font-medium">
-                                Taft National High School
+                                Nueva Ext., Surigao City
                             </p>
                         </div>
                     </div>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden lg:flex items-center space-x-1">
+                    <nav className="hidden lg:flex items-center space-x-1 ml-auto">
                         {navigation.map((item) => (
                             <div key={item.name} className="relative group">
                                 {item.hasDropdown ? (
@@ -164,14 +164,11 @@ const Header = () => {
                                 )}
                             </div>
                         ))}
-                    </nav>
 
-                    {/* Right Side Actions */}
-                    <div className="flex items-center space-x-4">
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="lg:hidden p-2 text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300"
+                            className="lg:hidden p-2 text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300 ml-4"
                         >
                             {isMenuOpen ? (
                                 <X className="h-6 w-6" />
@@ -179,7 +176,7 @@ const Header = () => {
                                 <Menu className="h-6 w-6" />
                             )}
                         </button>
-                    </div>
+                    </nav>
                 </div>
 
                 {/* Mobile Navigation */}

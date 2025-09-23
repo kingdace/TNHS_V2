@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\HeroCarouselController;
+use App\Http\Controllers\Api\EventController as PublicEventController;
+use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\HeroCarouselController as AdminHeroCarouselController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +28,9 @@ Route::prefix('api')->group(function () {
     Route::apiResource('school-info', \App\Http\Controllers\Api\SchoolInfoController::class);
     Route::apiResource('contact-info', \App\Http\Controllers\Api\ContactInfoController::class);
 
+    // Public events (school calendar)
+    Route::get('/events/public', [PublicEventController::class, 'publicByMonth']);
+
     // Academic Programs API routes
     Route::get('/academic-programs/grade/{grade}', [\App\Http\Controllers\Api\AcademicProgramController::class, 'byGrade']);
     Route::get('/academic-programs/type/{type}', [\App\Http\Controllers\Api\AcademicProgramController::class, 'byType']);
@@ -48,58 +53,27 @@ Route::prefix('api')->group(function () {
 });
 
 // Admin API routes - protected with admin authentication middleware
-Route::prefix('admin')->middleware(['admin.auth'])->group(function () {
-        Route::resource('hero-carousel', AdminHeroCarouselController::class)->names([
-            'index' => 'admin.hero-carousel.index',
-            'create' => 'admin.hero-carousel.create',
-            'store' => 'admin.hero-carousel.store',
-            'show' => 'admin.hero-carousel.show',
-            'edit' => 'admin.hero-carousel.edit',
-            'update' => 'admin.hero-carousel.update',
-            'destroy' => 'admin.hero-carousel.destroy'
-        ]);
-        Route::resource('academic-programs', \App\Http\Controllers\Admin\AcademicProgramController::class)->names([
-            'index' => 'admin.academic-programs.index',
-            'create' => 'admin.academic-programs.create',
-            'store' => 'admin.academic-programs.store',
-            'show' => 'admin.academic-programs.show',
-            'edit' => 'admin.academic-programs.edit',
-            'update' => 'admin.academic-programs.update',
-            'destroy' => 'admin.academic-programs.destroy'
-        ]);
-        Route::resource('school-info', \App\Http\Controllers\Admin\SchoolInfoController::class)->names([
-            'index' => 'admin.school-info.index',
-            'create' => 'admin.school-info.create',
-            'store' => 'admin.school-info.store',
-            'show' => 'admin.school-info.show',
-            'edit' => 'admin.school-info.edit',
-            'update' => 'admin.school-info.update',
-            'destroy' => 'admin.school-info.destroy'
-        ]);
-        Route::resource('contact-info', \App\Http\Controllers\Admin\ContactInfoController::class)->names([
-            'index' => 'admin.contact-info.index',
-            'create' => 'admin.contact-info.create',
-            'store' => 'admin.contact-info.store',
-            'show' => 'admin.contact-info.show',
-            'edit' => 'admin.contact-info.edit',
-            'update' => 'admin.contact-info.update',
-            'destroy' => 'admin.contact-info.destroy'
-        ]);
-        // Route::resource('announcements', \App\Http\Controllers\Admin\AnnouncementController::class);
-        // Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+Route::prefix('api/admin')->as('admin.')->middleware(['auth', 'admin.auth'])->group(function () {
+        Route::apiResource('hero-carousel', AdminHeroCarouselController::class);
+        Route::get('/hero-carousel-trashed', [AdminHeroCarouselController::class, 'trashed']);
+        Route::post('/hero-carousel/{id}/restore', [AdminHeroCarouselController::class, 'restore']);
+        Route::delete('/hero-carousel/{id}/force', [AdminHeroCarouselController::class, 'forceDelete']);
 
-        // Academic Programs Admin routes
+        Route::apiResource('academic-programs', \App\Http\Controllers\Admin\AcademicProgramController::class);
         Route::post('/academic-programs/reorder', [\App\Http\Controllers\Admin\AcademicProgramController::class, 'reorder']);
         Route::post('/academic-programs/{academicProgram}/toggle-active', [\App\Http\Controllers\Admin\AcademicProgramController::class, 'toggleActive']);
 
-        // School Info Admin routes
+        Route::apiResource('school-info', \App\Http\Controllers\Admin\SchoolInfoController::class);
         Route::post('/school-info/reorder', [\App\Http\Controllers\Admin\SchoolInfoController::class, 'reorder']);
         Route::post('/school-info/{schoolInfo}/toggle-active', [\App\Http\Controllers\Admin\SchoolInfoController::class, 'toggleActive']);
 
-        // Contact Info Admin routes
+        Route::apiResource('contact-info', \App\Http\Controllers\Admin\ContactInfoController::class);
         Route::post('/contact-info/reorder', [\App\Http\Controllers\Admin\ContactInfoController::class, 'reorder']);
         Route::post('/contact-info/{contactInfo}/toggle-active', [\App\Http\Controllers\Admin\ContactInfoController::class, 'toggleActive']);
-    });
+
+        // Admin events (school calendar management)
+        Route::apiResource('events', AdminEventController::class);
+});
 
 // Authentication routes
 Route::get('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])->name('login');

@@ -13,35 +13,26 @@ import {
     BookOpen,
     Users,
     Award,
-    Calendar,
     Newspaper,
-    ChevronLeft,
-    ChevronRight,
     Play,
     Facebook,
     Globe,
     MapPin,
     Phone,
     Mail,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 import { announcementService } from "../../services/announcementService";
 import { publicService } from "../../services/publicService";
 import { useDynamicContent } from "../../hooks/useDynamicContent";
+import EventCalendar from "../../components/calendar/EventCalendar";
 
 const Home = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [announcements, setAnnouncements] = useState([]);
     const [heroSlides, setHeroSlides] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    // Calendar and Exam Schedule States
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [selectedProgram, setSelectedProgram] = useState("");
-    const [academicYear, setAcademicYear] = useState("2025-2026");
-    const [semester, setSemester] = useState("1st");
-    const [showExamModal, setShowExamModal] = useState(false);
-    const [examSchedules, setExamSchedules] = useState({});
 
     // Dynamic content hooks
     const { content: featuresContent } = useDynamicContent("home", "features");
@@ -78,71 +69,16 @@ const Home = () => {
         fetchData();
     }, []);
 
-    // Auto-advance slides every 5 seconds
+    // Auto-advance slides every 10 seconds
     useEffect(() => {
         if (heroSlides.length === 0) return;
 
         const interval = setInterval(() => {
             setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-        }, 5000);
+        }, 10000);
 
         return () => clearInterval(interval);
     }, [heroSlides.length]);
-
-    // Calendar Functions
-    const getDaysInMonth = (date) => {
-        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-    };
-
-    const getFirstDayOfMonth = (date) => {
-        return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-    };
-
-    const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-    ];
-
-    const nextMonth = () => {
-        setCurrentDate(
-            new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
-        );
-    };
-
-    const prevMonth = () => {
-        setCurrentDate(
-            new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
-        );
-    };
-
-    const handleDateClick = (day) => {
-        setSelectedDate(day);
-        setShowExamModal(true);
-    };
-
-    const handleApplicationSubmit = (program) => {
-        setSelectedProgram(program);
-        // Here you would typically redirect to the actual application form
-        alert(`Redirecting to ${program} application form...`);
-    };
-
-    const handleExamVerification = () => {
-        alert("Verifying exam appointment...");
-    };
-
-    const handleExamBooking = () => {
-        alert("Redirecting to exam booking...");
-    };
 
     // Get features data - use dynamic content if available, otherwise fallback to hardcoded
     const getFeatures = () => {
@@ -203,81 +139,62 @@ const Home = () => {
 
     const features = getFeatures();
 
-    const upcomingEvents = [
-        {
-            title: "Enrollment Period",
-            date: "June 1 - August 30, 2024",
-            description:
-                "Open enrollment for incoming Grade 7 students and transferees.",
-            icon: <Calendar className="h-5 w-5" />,
-        },
-        {
-            title: "Academic Awards Ceremony",
-            date: "March 15, 2024",
-            description:
-                "Celebrating outstanding student achievements and academic excellence.",
-            icon: <Award className="h-5 w-5" />,
-        },
-        {
-            title: "Parent-Teacher Conference",
-            date: "February 28, 2024",
-            description:
-                "Open communication between parents and teachers for student success.",
-            icon: <Users className="h-5 w-5" />,
-        },
-    ];
-
-    const newsItems = [
-        {
-            title: "TNHS Students Win Regional Science Fair",
-            excerpt:
-                "Our students demonstrated exceptional creativity and scientific thinking at the Eastern Samar Regional Science Fair.",
-            date: "January 15, 2024",
-            author: "Science Department",
-            image: "/images/BG1.jpg",
-        },
-        {
-            title: "New Computer Laboratory Opens",
-            excerpt:
-                "State-of-the-art computer facilities to enhance digital literacy and 21st-century skills.",
-            date: "January 10, 2024",
-            author: "IT Department",
-            image: "/images/BG2.jpg",
-        },
-        {
-            title: "Sports Team Championship Victory",
-            excerpt:
-                "TNHS athletes bring home the championship trophy in the district sports competition.",
-            date: "January 5, 2024",
-            author: "Physical Education Department",
-            image: "/images/BG3.jpg",
-        },
-    ];
-
     return (
         <div className="min-h-screen">
             {/* Hero Section - Full Screen Image Carousel */}
-            <section className="relative h-screen overflow-hidden">
+            <section className="relative h-[60vh] sm:h-[65vh] md:h-[70vh] lg:h-[75vh] overflow-hidden">
                 {/* Image Carousel */}
                 <div className="relative h-full w-full">
                     {loading ? (
-                        // Loading state
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center">
-                            <div className="text-center text-white">
-                                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
-                                <p className="text-xl">Loading...</p>
+                        // Skeleton loading state
+                        <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse">
+                            {/* Skeleton content overlay */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+                                    {/* Skeleton Logo */}
+                                    <div className="mb-6 flex justify-center">
+                                        <div className="h-28 w-28 bg-gray-400 rounded-full animate-pulse"></div>
+                                    </div>
+
+                                    {/* Skeleton Title */}
+                                    <div className="mb-6 space-y-2">
+                                        <div className="h-12 bg-gray-400 rounded-lg w-80 mx-auto animate-pulse"></div>
+                                        <div className="h-12 bg-gray-400 rounded-lg w-96 mx-auto animate-pulse"></div>
+                                    </div>
+
+                                    {/* Skeleton Subtitle */}
+                                    <div className="mb-8">
+                                        <div className="h-6 bg-gray-400 rounded w-64 mx-auto animate-pulse"></div>
+                                    </div>
+
+                                    {/* Skeleton Buttons */}
+                                    <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                                        <div className="h-12 bg-gray-400 rounded-lg w-48 animate-pulse"></div>
+                                        <div className="h-12 bg-gray-400 rounded-lg w-32 animate-pulse"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Skeleton Navigation Dots */}
+                            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                                {[1, 2, 3].map((i) => (
+                                    <div
+                                        key={i}
+                                        className="h-3 w-3 bg-gray-400 rounded-full animate-pulse"
+                                    ></div>
+                                ))}
                             </div>
                         </div>
                     ) : heroSlides.length === 0 ? (
                         // No slides state
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center">
                             <div className="text-center text-white">
-                                <h1 className="text-4xl font-bold mb-4">
+                                {/* <h1 className="text-4xl font-bold mb-4">
                                     Welcome to TNHS
-                                </h1>
-                                <p className="text-xl">
+                                </h1> */}
+                                {/* <p className="text-xl">
                                     Content coming soon...
-                                </p>
+                                </p> */}
                             </div>
                         </div>
                     ) : (
@@ -294,10 +211,28 @@ const Home = () => {
                                 <img
                                     src={slide.image_path || "/images/BG1.jpg"}
                                     alt={slide.title}
-                                    className="h-full w-full object-cover"
+                                    className={`absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[3000ms] ease-out ${
+                                        index === currentSlide
+                                            ? "scale-[1.01]"
+                                            : "scale-100"
+                                    }`}
                                 />
-                                {/* Lighter overlay for better text readability */}
-                                <div className="absolute inset-0 bg-black/20"></div>
+                                {/* Readability overlays: gradient + vignette + subtle grid */}
+                                <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/40"></div>
+                                <div
+                                    className="absolute inset-0 pointer-events-none"
+                                    style={{
+                                        background:
+                                            "radial-gradient(ellipse at center, rgba(0,0,0,0) 60%, rgba(0,0,0,0.35) 100%)",
+                                    }}
+                                ></div>
+                                <div
+                                    className="absolute inset-0 opacity-[0.06]"
+                                    style={{
+                                        backgroundImage:
+                                            "repeating-linear-gradient(45deg, #fff, #fff 2px, transparent 2px, transparent 12px)",
+                                    }}
+                                ></div>
                             </div>
                         ))
                     )}
@@ -307,8 +242,8 @@ const Home = () => {
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center text-white px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
                         {/* School Logo */}
-                        <div className="mb-8 flex justify-center">
-                            <div className="h-36 w-36 bg-white rounded-full flex items-center justify-center shadow-2xl border-4 border-white/30 backdrop-blur-sm">
+                        <div className="mb-6 flex justify-center">
+                            <div className="h-28 w-28 bg-white rounded-full flex items-center justify-center shadow-2xl border-4 border-white/30 backdrop-blur-sm">
                                 <img
                                     src="/images/Logo.jpg"
                                     alt="TNHS Logo"
@@ -319,56 +254,53 @@ const Home = () => {
 
                         {/* Welcome Text */}
                         <div className="mb-6">
-                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-3">
-                                <span className="text-3d-shadow-welcome font-extrabold tracking-wider">
-                                    Welcome to{" "}
-                                </span>
+                            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-wide drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
+                                Welcome to
                             </h1>
-                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
-                                <span className="text-3d-shadow font-extrabold tracking-wider">
-                                    TAFT NATIONAL HIGH SCHOOL
-                                </span>
-                            </h1>
+                            <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-wider mt-1 drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
+                                TAFT NATIONAL HIGH SCHOOL
+                            </h2>
                         </div>
 
                         {/* School Identity */}
-                        <div className="mb-10">
-                            <p className="text-3d-shadow-mission text-lg sm:text-xl lg:text-2xl leading-relaxed max-w-3xl mx-auto font-medium text-yellow-300">
+                        <div className="mb-8">
+                            <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed max-w-3xl mx-auto font-semibold text-blue-100 drop-shadow">
                                 "Moving forward with strength, growth, and
                                 resilience"
                             </p>
                         </div>
 
-                        {/* CTA Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                            {/* Enrollment Requirements Button */}
-                            <Button
-                                asChild
-                                size="lg"
-                                className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold px-8 h-12 text-lg rounded-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0 relative overflow-hidden group"
-                            >
-                                <Link to="/admissions">
-                                    <span className="relative z-10">
-                                        Enrollment Requirements
-                                    </span>
-                                    {/* Shine effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                                </Link>
-                            </Button>
+                        {false && (
+                            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                                {/* Enrollment Requirements Button */}
+                                <Button
+                                    asChild
+                                    size="lg"
+                                    className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold px-8 h-12 text-lg rounded-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0 relative overflow-hidden group"
+                                >
+                                    <Link to="/admissions">
+                                        <span className="relative z-10">
+                                            Enrollment Requirements
+                                        </span>
+                                        {/* Shine effect */}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                                    </Link>
+                                </Button>
 
-                            {/* Learn More Button */}
-                            <Button
-                                asChild
-                                size="lg"
-                                className="bg-white hover:bg-gray-100 text-gray-900 font-bold px-8 h-12 text-lg rounded-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0 relative overflow-hidden group"
-                            >
-                                <Link to="/about">
-                                    <span className="relative z-10">
-                                        Learn More
-                                    </span>
-                                </Link>
-                            </Button>
-                        </div>
+                                {/* Learn More Button */}
+                                <Button
+                                    asChild
+                                    size="lg"
+                                    className="bg-white hover:bg-gray-100 text-gray-900 font-bold px-8 h-12 text-lg rounded-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0 relative overflow-hidden group"
+                                >
+                                    <Link to="/about">
+                                        <span className="relative z-10">
+                                            Learn More
+                                        </span>
+                                    </Link>
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -425,61 +357,14 @@ const Home = () => {
                     <div className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-blue-300 rounded-full animate-pulse opacity-60"></div>
                 </div>
 
-                {/* Navigation Controls */}
-                {heroSlides.length > 1 && (
-                    <>
-                        {/* Previous Button */}
-                        <button
-                            onClick={() =>
-                                setCurrentSlide(
-                                    (prev) =>
-                                        (prev - 1 + heroSlides.length) %
-                                        heroSlides.length
-                                )
-                            }
-                            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm"
-                            aria-label="Previous slide"
-                        >
-                            <ChevronLeft className="h-6 w-6" />
-                        </button>
-
-                        {/* Next Button */}
-                        <button
-                            onClick={() =>
-                                setCurrentSlide(
-                                    (prev) => (prev + 1) % heroSlides.length
-                                )
-                            }
-                            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm"
-                            aria-label="Next slide"
-                        >
-                            <ChevronRight className="h-6 w-6" />
-                        </button>
-
-                        {/* Slide Indicators */}
-                        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                            {heroSlides.map((_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setCurrentSlide(index)}
-                                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                                        index === currentSlide
-                                            ? "bg-white"
-                                            : "bg-white/50 hover:bg-white/75"
-                                    }`}
-                                    aria-label={`Go to slide ${index + 1}`}
-                                />
-                            ))}
-                        </div>
-                    </>
-                )}
+                {/* Removed duplicate controls (kept single arrows and dots above) */}
             </section>
 
             {/* Core Values & Quick Access Section */}
-            <section className="py-1 bg-white">
+            <section className="py-16 bg-white">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     {/* Core Values Section */}
-                    <div className="mb-1">
+                    <div className="mb-8">
                         <h1 className="text-4xl md:text-5xl font-bold text-royal-blue mb-6 tracking-wide leading-tight">
                             <div>
                                 <span className="text-5xl md:text-6xl">P</span>
@@ -523,8 +408,8 @@ const Home = () => {
                                 className="bg-royal-blue hover:bg-blue-700 text-white font-semibold h-12 px-5 rounded-lg transition-colors flex items-center justify-center"
                             >
                                 <Link to="/donate">
-                                    <span>GIVE TO TNHS</span>
-                                    <span>↑</span>
+                                    <span>DONATE TO TNHS</span>
+                                    <span></span>
                                 </Link>
                             </Button>
                         </div>
@@ -564,7 +449,7 @@ const Home = () => {
             </section>
 
             {/* Combined Search & News Section */}
-            <section className="py-16 bg-white">
+            <section className="py-16 bg-[#F7F7F7]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Two-Column Layout */}
                     <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
@@ -671,400 +556,109 @@ const Home = () => {
                             </div>
                         </div>
 
-                        {/* Right Column - Application Forms and Exam Schedules */}
-                        <div className="lg:col-span-1 space-y-6">
-                            {/* Online Application Forms */}
-                            <div className="bg-blue-800 rounded-xl shadow-lg p-6 border-2 border-white">
-                                <h4 className="text-xl font-bold text-white mb-6 text-center">
-                                    Online Application Forms
+                        {/* Right Column - School Information & Calendar */}
+                        <div className="lg:col-span-1 space-y-4">
+                            {/* School Information Hub */}
+                            <div className="bg-royal-blue rounded-xl shadow-lg p-5 border-2 border-white">
+                                <h4 className="text-lg font-bold text-white mb-4 text-center">
+                                    School Information Hub
                                 </h4>
 
-                                {/* Application Cards */}
-                                <div className="space-y-4">
-                                    {/* College Program */}
-                                    <div className="bg-white rounded-lg p-4 text-center">
-                                        <h5 className="font-bold text-gray-800 mb-2">
-                                            College Program
-                                        </h5>
-                                        <p className="text-gray-600 text-sm mb-3">
-                                            Applying for Bachelor's Degree or
-                                            Teacher's Certification Program
-                                            (TCP)
-                                        </p>
-                                        <Button
-                                            onClick={() =>
-                                                handleApplicationSubmit(
-                                                    "College Program"
-                                                )
-                                            }
-                                            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300"
-                                        >
-                                            Apply Now!
-                                        </Button>
-                                    </div>
-
-                                    {/* Graduate School Program */}
-                                    <div className="bg-white rounded-lg p-4 text-center">
-                                        <h5 className="font-bold text-gray-800 mb-2">
-                                            Graduate School Program
-                                        </h5>
-                                        <p className="text-gray-600 text-sm mb-3">
-                                            Applying for Masters and Doctoral
-                                            Degree
-                                        </p>
-                                        <Button
-                                            onClick={() =>
-                                                handleApplicationSubmit(
-                                                    "Graduate School Program"
-                                                )
-                                            }
-                                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300"
-                                        >
-                                            Apply Now!
-                                        </Button>
-                                    </div>
-
-                                    {/* School of Medicine Program */}
-                                    <div className="bg-white rounded-lg p-4 text-center">
-                                        <h5 className="font-bold text-gray-800 mb-2">
-                                            School of Medicine Program
-                                        </h5>
-                                        <p className="text-gray-600 text-sm mb-3">
-                                            Applying for Doctor of Medicine
-                                        </p>
-                                        <Button
-                                            onClick={() =>
-                                                handleApplicationSubmit(
-                                                    "School of Medicine Program"
-                                                )
-                                            }
-                                            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300"
-                                        >
-                                            Apply Now!
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Exam Schedules - Enhanced Design */}
-                            <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
-                                {/* Header with Image and Tag */}
-                                <div className="relative h-32 bg-gradient-to-r from-royal-blue to-blue-600">
-                                    <div className="absolute inset-0 bg-black/20"></div>
-                                    <div className="absolute top-3 left-3 bg-gradient-to-r from-green-400 to-emerald-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 shadow-lg">
-                                        <Calendar className="h-3 w-3" />
-                                        <span>EXAM SCHEDULE</span>
-                                    </div>
-                                    <div className="absolute bottom-3 left-3 text-white">
-                                        <h4 className="text-lg font-bold">
-                                            Exam Calendar
-                                        </h4>
-                                        <p className="text-sm opacity-90">
-                                            View exam schedules
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Content Section */}
-                                <div className="p-6">
-                                    {/* Top Metadata */}
-                                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                                        <div className="flex items-center space-x-1">
-                                            <span>📅</span>
-                                            <span>
-                                                Academic Year {academicYear}
-                                            </span>
+                                {/* Information Cards */}
+                                <div className="space-y-3">
+                                    {/* Sports Programs */}
+                                    <div className="bg-white rounded-lg p-3">
+                                        <div className="mb-3 overflow-hidden rounded-md border border-gray-200 shadow-sm">
+                                            <img
+                                                src="/images/sports.jpg"
+                                                alt="Sports Programs"
+                                                className="w-full h-30 object-cover"
+                                            />
                                         </div>
-                                        <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
-                                            EXAM PERIOD
-                                        </div>
-                                    </div>
-
-                                    {/* Exam Schedule Info */}
-                                    <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg p-4 mb-4 border border-blue-100">
-                                        <h5 className="text-sm font-semibold text-royal-blue mb-3 flex items-center">
-                                            <Calendar className="h-4 w-4 mr-2" />
-                                            Upcoming Exams
-                                        </h5>
-                                        <div className="space-y-2 text-xs text-gray-700">
-                                            <div className="flex items-center justify-between">
-                                                <span>
-                                                    📚 Midterm Examinations
-                                                </span>
-                                                <span className="text-royal-blue font-medium">
-                                                    March 15-19
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <span>
-                                                    📝 Final Examinations
-                                                </span>
-                                                <span className="text-royal-blue font-medium">
-                                                    May 20-24
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <span>🔬 Science Fair</span>
-                                                <span className="text-royal-blue font-medium">
-                                                    April 10
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Interactive Calendar - Enhanced */}
-                                    <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                                        {/* Calendar Header with Navigation */}
-                                        <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                                            <button
-                                                onClick={prevMonth}
-                                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors group"
-                                            >
-                                                <ChevronLeft className="h-4 w-4 text-royal-blue group-hover:text-blue-700" />
-                                            </button>
-                                            <h5 className="text-sm font-semibold text-royal-blue">
-                                                {
-                                                    monthNames[
-                                                        currentDate.getMonth()
-                                                    ]
-                                                }{" "}
-                                                {currentDate.getFullYear()}
+                                        <div className="text-center">
+                                            <h5 className="font-bold text-gray-800 mb-1 text-sm">
+                                                Sports Programs
                                             </h5>
-                                            <button
-                                                onClick={nextMonth}
-                                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors group"
+                                            <p className="text-gray-600 text-xs mb-2">
+                                                Teams, tryouts, schedules,
+                                                achievements
+                                            </p>
+                                            <Button
+                                                asChild
+                                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-3 py-1.5 text-xs rounded-lg transition-all duration-300"
                                             >
-                                                <ChevronRight className="h-4 w-4 text-royal-blue group-hover:text-blue-700" />
-                                            </button>
-                                        </div>
-
-                                        <div className="p-4">
-                                            <div className="grid grid-cols-7 gap-1 text-center">
-                                                {/* Days of the week */}
-                                                <div className="p-2 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                                    S
-                                                </div>
-                                                <div className="p-2 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                                    M
-                                                </div>
-                                                <div className="p-2 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                                    T
-                                                </div>
-                                                <div className="p-2 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                                    W
-                                                </div>
-                                                <div className="p-2 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                                    T
-                                                </div>
-                                                <div className="p-2 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                                    F
-                                                </div>
-                                                <div className="p-2 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                                    S
-                                                </div>
-
-                                                {/* Empty cells for days before the first day of the month */}
-                                                {Array.from(
-                                                    {
-                                                        length: getFirstDayOfMonth(
-                                                            currentDate
-                                                        ),
-                                                    },
-                                                    (_, i) => (
-                                                        <div
-                                                            key={`empty-${i}`}
-                                                            className="p-2 text-gray-400 text-xs"
-                                                        ></div>
-                                                    )
-                                                )}
-
-                                                {/* Calendar dates */}
-                                                {Array.from(
-                                                    {
-                                                        length: getDaysInMonth(
-                                                            currentDate
-                                                        ),
-                                                    },
-                                                    (_, i) => {
-                                                        const day = i + 1;
-                                                        const hasExam =
-                                                            Math.random() > 0.7; // Random exam indicator
-                                                        const isSelected =
-                                                            selectedDate ===
-                                                            day;
-
-                                                        return (
-                                                            <div
-                                                                key={day}
-                                                                onClick={() =>
-                                                                    handleDateClick(
-                                                                        day
-                                                                    )
-                                                                }
-                                                                className={`p-2 text-xs cursor-pointer rounded-lg transition-all duration-300 relative hover:scale-105 ${
-                                                                    isSelected
-                                                                        ? "bg-royal-blue text-white shadow-lg"
-                                                                        : hasExam
-                                                                        ? "text-red-600 hover:bg-red-50 border border-red-200"
-                                                                        : "text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-200"
-                                                                }`}
-                                                            >
-                                                                {day}
-                                                                {hasExam &&
-                                                                    !isSelected && (
-                                                                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></div>
-                                                                    )}
-                                                            </div>
-                                                        );
-                                                    }
-                                                )}
-                                            </div>
+                                                <Link to="/sports">
+                                                    Explore Sports
+                                                </Link>
+                                            </Button>
                                         </div>
                                     </div>
 
-                                    {/* Instructions - Enhanced */}
-                                    <div className="mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
-                                        <h5 className="text-sm font-semibold text-royal-blue mb-3 flex items-center">
-                                            <span className="mr-2">💡</span>
-                                            Exam Guidelines
-                                        </h5>
-                                        <ul className="space-y-2 text-xs text-gray-700">
-                                            <li className="flex items-start">
-                                                <span className="text-red-500 mr-2 mt-0.5">
-                                                    ●
-                                                </span>
-                                                <span>
-                                                    Red dots indicate scheduled
-                                                    exam dates
-                                                </span>
-                                            </li>
-                                            <li className="flex items-start">
-                                                <span className="text-royal-blue mr-2 mt-0.5">
-                                                    ●
-                                                </span>
-                                                <span>
-                                                    Click any date to view
-                                                    detailed exam schedule
-                                                </span>
-                                            </li>
-                                            <li className="flex items-start">
-                                                <span className="text-green-500 mr-2 mt-0.5">
-                                                    ●
-                                                </span>
-                                                <span>
-                                                    Bring valid ID and required
-                                                    materials
-                                                </span>
-                                            </li>
-                                        </ul>
+                                    {/* Clubs & Organizations */}
+                                    <div className="bg-white rounded-lg p-3">
+                                        <div className="mb-3 overflow-hidden rounded-md border border-gray-200 shadow-sm">
+                                            <img
+                                                src="/images/student.png"
+                                                alt="Clubs and Organizations"
+                                                className="w-full h-30 object-cover"
+                                            />
+                                        </div>
+                                        <div className="text-center">
+                                            <h5 className="font-bold text-gray-800 mb-1 text-sm">
+                                                Supreme Student Government
+                                            </h5>
+                                            <p className="text-gray-600 text-xs mb-2">
+                                                Student leadership, governance,
+                                                and school initiatives
+                                            </p>
+                                            <Button
+                                                asChild
+                                                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold px-3 py-1.5 text-xs rounded-lg transition-all duration-300"
+                                            >
+                                                <Link to="/clubs-organizations">
+                                                    Get Involved
+                                                </Link>
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Event Calendar Component */}
+                            <EventCalendar />
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Exam Schedule Modal */}
-            {showExamModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold text-royal-blue">
-                                Exam Schedule -{" "}
-                                {monthNames[currentDate.getMonth()]}{" "}
-                                {selectedDate}, {currentDate.getFullYear()}
-                            </h3>
-                            <button
-                                onClick={() => setShowExamModal(false)}
-                                className="text-gray-500 hover:text-gray-700"
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        <div className="space-y-3">
-                            <div className="bg-gray-50 p-3 rounded-lg">
-                                <h4 className="font-semibold text-sm text-gray-800 mb-2">
-                                    Available Exams:
-                                </h4>
-                                <div className="space-y-2 text-xs">
-                                    <div className="flex justify-between">
-                                        <span>Mathematics</span>
-                                        <span className="text-royal-blue">
-                                            9:00 AM
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span>English</span>
-                                        <span className="text-royal-blue">
-                                            1:00 PM
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span>Science</span>
-                                        <span className="text-royal-blue">
-                                            3:00 PM
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex space-x-2">
-                                <Button
-                                    onClick={() => {
-                                        alert(
-                                            `Booking exam for ${
-                                                monthNames[
-                                                    currentDate.getMonth()
-                                                ]
-                                            } ${selectedDate}`
-                                        );
-                                        setShowExamModal(false);
-                                    }}
-                                    className="flex-1 bg-royal-blue hover:bg-blue-700 text-white text-xs py-2"
-                                >
-                                    Book Exam
-                                </Button>
-                                <Button
-                                    onClick={() => setShowExamModal(false)}
-                                    variant="outline"
-                                    className="flex-1 text-xs py-2"
-                                >
-                                    Close
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {/* Call to Action Section */}
-            <section className="py-20 bg-royal-blue">
+            <section className="py-16 bg-white border-t border-gray-200">
                 <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-                        Ready to Join TNHS?
-                    </h2>
-                    <p className="text-xl text-blue-100 mb-8">
-                        Start your journey towards academic excellence and
-                        personal growth.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button
-                            asChild
-                            size="lg"
-                            className="bg-gradient-to-r from-white to-gray-100 hover:from-gray-100 hover:to-white text-royal-blue font-bold px-8 h-12 text-lg rounded-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0"
-                        >
-                            <Link to="/admissions">Enroll Now</Link>
-                        </Button>
-                        <Button
-                            asChild
-                            size="lg"
-                            variant="outline"
-                            className="border-2 border-white text-white hover:bg-white hover:text-royal-blue font-bold px-8 h-12 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 transform bg-transparent hover:bg-white"
-                        >
-                            <Link to="/contact">Contact Us</Link>
-                        </Button>
+                    <div className="bg-gradient-to-br from-royal-blue/5 to-blue-50 rounded-2xl p-8 border border-royal-blue/10">
+                        <h2 className="text-3xl sm:text-4xl font-bold text-royal-blue mb-4">
+                            Ready to Join TNHS?
+                        </h2>
+                        <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+                            Start your journey towards academic excellence and
+                            personal growth at Taft National High School.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <Button
+                                asChild
+                                size="lg"
+                                className="bg-royal-blue hover:bg-blue-800 text-white font-bold px-8 h-12 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 transform"
+                            >
+                                <Link to="/admissions">Enroll Now</Link>
+                            </Button>
+                            <Button
+                                asChild
+                                size="lg"
+                                variant="outline"
+                                className="border-2 border-royal-blue text-royal-blue hover:bg-royal-blue hover:text-white font-bold px-8 h-12 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 transform"
+                            >
+                                <Link to="/contact">Contact Us</Link>
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </section>

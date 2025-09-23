@@ -15,6 +15,11 @@ import {
     Eye,
     EyeOff,
     RotateCcw,
+    Search,
+    Filter,
+    ChevronDown,
+    Star,
+    Image as ImageIcon,
 } from "lucide-react";
 import { announcementService } from "../../services/announcementService";
 
@@ -34,6 +39,18 @@ const AdminAnnouncements = () => {
     });
     const [showTrash, setShowTrash] = useState(false);
     const [trashed, setTrashed] = useState([]);
+    const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+
+    // UI-only controls
+    const [query, setQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all"); // all|draft|published|archived
+    const [featuredOnly, setFeaturedOnly] = useState(false);
+    const [sortKey, setSortKey] = useState("newest"); // newest|oldest|title|status
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [publishingId, setPublishingId] = useState(null);
+    const [featuringId, setFeaturingId] = useState(null);
+    const [toast, setToast] = useState("");
 
     const load = async () => {
         try {
@@ -62,6 +79,41 @@ const AdminAnnouncements = () => {
         loadTrashed();
     }, []);
 
+    // Derived list with search/filter/sort (client-side only)
+    const normalized = (text) => (text || "").toString().toLowerCase();
+    const filteredSorted = (items || [])
+        .filter((it) => {
+            if (statusFilter !== "all" && it.status !== statusFilter)
+                return false;
+            if (featuredOnly && !it.is_featured) return false;
+            if (!query.trim()) return true;
+            const q = normalized(query);
+            return (
+                normalized(it.title).includes(q) ||
+                normalized(it.content).includes(q) ||
+                normalized(it.author).includes(q)
+            );
+        })
+        .sort((a, b) => {
+            if (sortKey === "title")
+                return (a.title || "").localeCompare(b.title || "");
+            if (sortKey === "status")
+                return (a.status || "").localeCompare(b.status || "");
+            const aTime = a.published_at
+                ? new Date(a.published_at).getTime()
+                : 0;
+            const bTime = b.published_at
+                ? new Date(b.published_at).getTime()
+                : 0;
+            return sortKey === "oldest" ? aTime - bTime : bTime - aTime; // default newest
+        });
+
+    const totalItems = filteredSorted.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    const currentPage = Math.min(page, totalPages);
+    const startIdx = (currentPage - 1) * pageSize;
+    const displayedItems = filteredSorted.slice(startIdx, startIdx + pageSize);
+
     const openCreate = () => {
         setEditing(null);
         setForm({
@@ -73,6 +125,10 @@ const AdminAnnouncements = () => {
             is_featured: false,
         });
         setShowForm(true);
+        if (imagePreviewUrl) {
+            URL.revokeObjectURL(imagePreviewUrl);
+            setImagePreviewUrl("");
+        }
     };
 
     const openEdit = (item) => {
@@ -86,6 +142,10 @@ const AdminAnnouncements = () => {
             is_featured: !!item.is_featured,
         });
         setShowForm(true);
+        if (imagePreviewUrl) {
+            URL.revokeObjectURL(imagePreviewUrl);
+            setImagePreviewUrl("");
+        }
     };
 
     const submit = async (e) => {
@@ -117,10 +177,19 @@ const AdminAnnouncements = () => {
     const toggleStatus = async (item) => {
         const next = item.status === "published" ? "draft" : "published";
         try {
+            setPublishingId(item.id);
             await announcementService.update(item.id, { status: next });
             await load();
+            setToast(
+                next === "published"
+                    ? "Announcement published"
+                    : "Announcement unpublished"
+            );
+            setTimeout(() => setToast(""), 2500);
         } catch (e) {
             setError("Status update failed.");
+        } finally {
+            setPublishingId(null);
         }
     };
 
@@ -140,157 +209,416 @@ const AdminAnnouncements = () => {
 
             <Card className="border-blue-100">
                 <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <CardTitle className="text-royal-blue">
-                                All Announcements
-                            </CardTitle>
-                            <CardDescription className="text-blue-700">
-                                Create and manage announcements for students and
-                                parents
-                            </CardDescription>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="text-royal-blue">
+                                    All Announcements
+                                </CardTitle>
+                                <CardDescription className="text-blue-700">
+                                    Create and manage announcements for students
+                                    and parents
+                                </CardDescription>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    className="text-gray-700"
+                                    onClick={() => setShowTrash((v) => !v)}
+                                >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    {showTrash ? "Hide Trash" : "View Trash"}
+                                </Button>
+                                <Button
+                                    className="bg-royal-blue hover:bg-blue-700 text-white"
+                                    onClick={openCreate}
+                                >
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Create Announcement
+                                </Button>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                className="text-gray-700"
-                                onClick={() => setShowTrash((v) => !v)}
-                            >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                {showTrash ? "Hide Trash" : "View Trash"}
-                            </Button>
-                            <Button
-                                className="bg-royal-blue hover:bg-blue-700 text-white"
-                                onClick={openCreate}
-                            >
-                                <Plus className="mr-2 h-4 w-4" />
-                                Create Announcement
-                            </Button>
+                        {/* Toolbar */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sticky top-0">
+                            {/* Search */}
+                            <div className="lg:col-span-5">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <input
+                                        value={query}
+                                        onChange={(e) =>
+                                            setQuery(e.target.value)
+                                        }
+                                        placeholder="Search title, content, author..."
+                                        className="w-full pl-9 pr-3 py-2 rounded-lg border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white"
+                                    />
+                                </div>
+                            </div>
+                            {/* Filters */}
+                            <div className="lg:col-span-3 flex items-center gap-2">
+                                <div className="flex items-center gap-2 w-full">
+                                    <Filter className="h-4 w-4 text-gray-400" />
+                                    <select
+                                        value={statusFilter}
+                                        onChange={(e) =>
+                                            setStatusFilter(e.target.value)
+                                        }
+                                        className="w-40 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                    >
+                                        <option value="all">
+                                            All statuses
+                                        </option>
+                                        <option value="draft">Draft</option>
+                                        <option value="published">
+                                            Published
+                                        </option>
+                                        <option value="archived">
+                                            Archived
+                                        </option>
+                                    </select>
+                                </div>
+                                <label className="flex items-center gap-2 text-sm text-gray-700 whitespace-nowrap">
+                                    <input
+                                        type="checkbox"
+                                        checked={featuredOnly}
+                                        onChange={(e) =>
+                                            setFeaturedOnly(e.target.checked)
+                                        }
+                                        className="h-4 w-4 text-royal-blue border-gray-300 rounded"
+                                    />
+                                    <Star
+                                        className={`h-4 w-4 ${
+                                            featuredOnly
+                                                ? "text-royal-blue"
+                                                : "text-gray-400"
+                                        }`}
+                                    />
+                                    Featured only
+                                </label>
+                            </div>
+                            {/* Sort */}
+                            <div className="lg:col-span-4">
+                                <div className="flex items-center gap-2 justify-end">
+                                    <span className="text-sm text-gray-600">
+                                        Sort by:
+                                    </span>
+                                    <select
+                                        value={sortKey}
+                                        onChange={(e) =>
+                                            setSortKey(e.target.value)
+                                        }
+                                        className="w-40 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                    >
+                                        <option value="newest">Newest</option>
+                                        <option value="oldest">Oldest</option>
+                                        <option value="title">Title A–Z</option>
+                                        <option value="status">Status</option>
+                                    </select>
+                                    {(query ||
+                                        statusFilter !== "all" ||
+                                        featuredOnly ||
+                                        sortKey !== "newest") && (
+                                        <Button
+                                            variant="outline"
+                                            className="text-gray-700"
+                                            onClick={() => {
+                                                setQuery("");
+                                                setStatusFilter("all");
+                                                setFeaturedOnly(false);
+                                                setSortKey("newest");
+                                                setPage(1);
+                                            }}
+                                        >
+                                            Clear filters
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </CardHeader>
                 <CardContent>
+                    {toast && (
+                        <div className="mb-3 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-2">
+                            {toast}
+                        </div>
+                    )}
                     {error && (
                         <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
                             {error}
                         </div>
                     )}
-
                     {loading ? (
-                        <div className="text-center py-12 text-blue-700">
-                            <Megaphone className="h-12 w-12 mx-auto mb-4 text-royal-blue/40 animate-pulse" />
-                            <p>Loading announcements...</p>
+                        <div className="space-y-3">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="flex items-start gap-4 py-2"
+                                >
+                                    <div className="w-12 h-12 rounded-lg bg-gray-100 animate-pulse" />
+                                    <div className="flex-1 space-y-2">
+                                        <div className="h-3 w-24 bg-gray-100 rounded animate-pulse" />
+                                        <div className="h-4 w-1/2 bg-gray-100 rounded animate-pulse" />
+                                        <div className="h-4 w-2/3 bg-gray-100 rounded animate-pulse" />
+                                    </div>
+                                    <div className="w-64 flex items-center gap-2">
+                                        <div className="h-8 w-24 bg-gray-100 rounded animate-pulse" />
+                                        <div className="h-8 w-24 bg-gray-100 rounded animate-pulse" />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    ) : items.length === 0 ? (
+                    ) : displayedItems.length === 0 ? (
                         <div className="text-center py-12 text-blue-700">
                             <Megaphone className="h-12 w-12 mx-auto mb-4 text-royal-blue/40" />
-                            <p>
-                                No announcements yet. Create your first
-                                announcement to get started.
-                            </p>
+                            <p>No announcements match your filters.</p>
                         </div>
                     ) : (
                         <div className="divide-y divide-blue-100">
-                            {items.map((item) => (
-                                <div
-                                    key={item.id}
-                                    className="py-4 flex items-start justify-between gap-4"
-                                >
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <span
-                                                className={`text-xs px-2 py-0.5 rounded-full border ${
-                                                    item.status === "published"
-                                                        ? "bg-green-50 text-green-700 border-green-200"
-                                                        : item.status ===
-                                                          "archived"
-                                                        ? "bg-gray-50 text-gray-700 border-gray-200"
-                                                        : "bg-yellow-50 text-yellow-700 border-yellow-200"
-                                                }`}
-                                            >
-                                                {item.status}
-                                            </span>
-                                            <span className="text-sm text-gray-500">
-                                                {item.published_at
-                                                    ? new Date(
-                                                          item.published_at
-                                                      ).toLocaleString()
-                                                    : "—"}
-                                            </span>
-                                        </div>
-                                        <h3 className="text-lg font-semibold text-gray-900 mt-1">
-                                            {item.title}
-                                        </h3>
-                                        <p className="text-gray-600 text-sm line-clamp-2 mt-1">
-                                            {item.content}
-                                        </p>
-                                        <p className="text-xs text-gray-500 mt-1">
-                                            By {item.author}
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Button
-                                            variant="outline"
-                                            className="text-gray-700"
-                                            onClick={() => toggleStatus(item)}
-                                        >
-                                            {item.status === "published" ? (
-                                                <EyeOff className="h-4 w-4 mr-2" />
+                            {displayedItems.map((item) => (
+                                <div key={item.id} className="py-4">
+                                    <div className="group flex items-start gap-4 p-3 rounded-lg transition-colors hover:bg-blue-50/50 hover:shadow-sm">
+                                        {/* Thumbnail */}
+                                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center border border-blue-100">
+                                            {item.image_path ? (
+                                                <img
+                                                    src={(() => {
+                                                        const p =
+                                                            item.image_path ||
+                                                            "";
+                                                        if (!p) return "";
+                                                        if (
+                                                            p.startsWith("http")
+                                                        )
+                                                            return p;
+                                                        if (
+                                                            p.startsWith(
+                                                                "/storage/"
+                                                            )
+                                                        )
+                                                            return p;
+                                                        // ensure single /storage prefix
+                                                        const cleaned =
+                                                            p.replace(
+                                                                /^\/?storage\//,
+                                                                ""
+                                                            );
+                                                        return `/storage/${cleaned}`;
+                                                    })()}
+                                                    alt={item.title}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) =>
+                                                        (e.currentTarget.style.display =
+                                                            "none")
+                                                    }
+                                                />
                                             ) : (
-                                                <Eye className="h-4 w-4 mr-2" />
+                                                <ImageIcon className="h-5 w-5 text-gray-400" />
                                             )}
-                                            {item.status === "published"
-                                                ? "Unpublish"
-                                                : "Publish"}
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            className={`text-gray-700 ${
-                                                item.is_featured
-                                                    ? "border-royal-blue text-royal-blue"
-                                                    : ""
-                                            }`}
-                                            onClick={async () => {
-                                                try {
-                                                    await announcementService.update(
-                                                        item.id,
-                                                        {
-                                                            is_featured:
-                                                                !item.is_featured,
-                                                        }
-                                                    );
-                                                    await load();
-                                                } catch (e) {
-                                                    setError(
-                                                        "Feature toggle failed."
-                                                    );
-                                                }
-                                            }}
-                                        >
-                                            {item.is_featured
-                                                ? "Unfeature"
-                                                : "Feature"}
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            className="text-gray-700"
-                                            onClick={() => openEdit(item)}
-                                        >
-                                            <Edit className="h-4 w-4 mr-2" />{" "}
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            className="bg-red-600 hover:bg-red-700"
-                                            onClick={() => remove(item.id)}
-                                        >
-                                            <Trash2 className="h-4 w-4 mr-2" />{" "}
-                                            Delete
-                                        </Button>
+                                        </div>
+                                        {/* Main content */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2">
+                                                {item.is_featured && (
+                                                    <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-royal-blue/10 text-royal-blue border border-royal-blue/20">
+                                                        <Star className="h-3 w-3 mr-1" />{" "}
+                                                        Featured
+                                                    </span>
+                                                )}
+                                                <span
+                                                    className={`text-[11px] px-2 py-0.5 rounded-full border ${
+                                                        item.status ===
+                                                        "published"
+                                                            ? "bg-green-50 text-green-700 border-green-200"
+                                                            : item.status ===
+                                                              "archived"
+                                                            ? "bg-gray-50 text-gray-700 border-gray-200"
+                                                            : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                                    }`}
+                                                >
+                                                    {item.status}
+                                                </span>
+                                                <span className="text-xs text-gray-500">
+                                                    {item.published_at
+                                                        ? new Date(
+                                                              item.published_at
+                                                          ).toLocaleString()
+                                                        : "—"}
+                                                </span>
+                                                <span className="text-xs text-gray-400 truncate">
+                                                    • By {item.author}
+                                                </span>
+                                            </div>
+                                            <h3 className="text-base font-semibold text-gray-900 mt-1 truncate">
+                                                {item.title}
+                                            </h3>
+                                            <p className="text-gray-600 text-sm line-clamp-2 mt-1">
+                                                {item.content}
+                                            </p>
+                                        </div>
+                                        {/* Actions */}
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={
+                                                        item.status ===
+                                                        "published"
+                                                    }
+                                                    onChange={() =>
+                                                        toggleStatus(item)
+                                                    }
+                                                    disabled={
+                                                        publishingId === item.id
+                                                    }
+                                                    className="h-4 w-4 text-royal-blue border-gray-300 rounded"
+                                                />
+                                                {publishingId === item.id ? (
+                                                    <span className="text-gray-400">
+                                                        Updating...
+                                                    </span>
+                                                ) : (
+                                                    <span>
+                                                        {item.status ===
+                                                        "published"
+                                                            ? "Published"
+                                                            : "Draft"}
+                                                    </span>
+                                                )}
+                                            </label>
+                                            <Button
+                                                variant="outline"
+                                                className={`text-gray-700 ${
+                                                    item.is_featured
+                                                        ? "border-royal-blue text-royal-blue"
+                                                        : ""
+                                                }`}
+                                                onClick={async () => {
+                                                    try {
+                                                        setFeaturingId(item.id);
+                                                        await announcementService.update(
+                                                            item.id,
+                                                            {
+                                                                is_featured:
+                                                                    !item.is_featured,
+                                                            }
+                                                        );
+                                                        await load();
+                                                        setToast(
+                                                            !item.is_featured
+                                                                ? "Marked as featured"
+                                                                : "Removed from featured"
+                                                        );
+                                                        setTimeout(
+                                                            () => setToast(""),
+                                                            2500
+                                                        );
+                                                    } catch (e) {
+                                                        setError(
+                                                            "Feature toggle failed."
+                                                        );
+                                                    } finally {
+                                                        setFeaturingId(null);
+                                                    }
+                                                }}
+                                            >
+                                                {featuringId === item.id
+                                                    ? "Updating..."
+                                                    : item.is_featured
+                                                    ? "Unfeature"
+                                                    : "Feature"}
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                className="text-gray-700"
+                                                onClick={() => openEdit(item)}
+                                            >
+                                                <Edit className="h-4 w-4 mr-2" />{" "}
+                                                Edit
+                                            </Button>
+                                            <Button
+                                                className="bg-red-600 hover:bg-red-700"
+                                                onClick={() => remove(item.id)}
+                                            >
+                                                <Trash2 className="h-4 w-4 mr-2" />{" "}
+                                                Delete
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     )}
+                    {/* Pagination footer (moved to bottom) */}
+                    <div className="flex items-center justify-between mt-6">
+                        <div className="text-sm text-gray-600">
+                            Showing {displayedItems.length} of {totalItems}{" "}
+                            items
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-600">Rows:</span>
+                            <select
+                                value={pageSize}
+                                onChange={(e) => {
+                                    setPageSize(parseInt(e.target.value, 10));
+                                    setPage(1);
+                                }}
+                                className="rounded-lg border border-blue-100 py-1.5 px-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
+                            >
+                                <option value={5}>5</option>
+                                <option value={10}>10</option>
+                                <option value={20}>20</option>
+                                <option value={50}>50</option>
+                            </select>
+                            <div className="flex items-center gap-1">
+                                <Button
+                                    variant="outline"
+                                    className="text-gray-700 px-3 py-1"
+                                    onClick={() =>
+                                        setPage((p) => Math.max(1, p - 1))
+                                    }
+                                    disabled={page <= 1}
+                                    title="Previous page"
+                                >
+                                    Prev
+                                </Button>
+                                <span className="text-sm text-gray-600 px-2">
+                                    {page} /{" "}
+                                    {Math.max(
+                                        1,
+                                        Math.ceil(totalItems / pageSize)
+                                    )}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    className="text-gray-700 px-3 py-1"
+                                    onClick={() =>
+                                        setPage((p) =>
+                                            Math.min(
+                                                Math.max(
+                                                    1,
+                                                    Math.ceil(
+                                                        totalItems / pageSize
+                                                    )
+                                                ),
+                                                p + 1
+                                            )
+                                        )
+                                    }
+                                    disabled={
+                                        page >=
+                                        Math.max(
+                                            1,
+                                            Math.ceil(totalItems / pageSize)
+                                        )
+                                    }
+                                    title="Next page"
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
 
@@ -435,27 +763,66 @@ const AdminAnnouncements = () => {
                                 <input
                                     type="file"
                                     accept="image/*"
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            image: e.target.files?.[0] || null,
-                                        })
-                                    }
+                                    onChange={(e) => {
+                                        const file =
+                                            e.target.files?.[0] || null;
+                                        setForm({ ...form, image: file });
+                                        if (imagePreviewUrl) {
+                                            URL.revokeObjectURL(
+                                                imagePreviewUrl
+                                            );
+                                        }
+                                        if (file) {
+                                            setImagePreviewUrl(
+                                                URL.createObjectURL(file)
+                                            );
+                                        } else {
+                                            setImagePreviewUrl("");
+                                        }
+                                    }}
                                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
                                 />
-                                {editing?.image_path && (
-                                    <div className="mt-2 text-xs text-gray-500">
-                                        Current:{" "}
-                                        <a
-                                            href={
-                                                "/storage/" + editing.image_path
-                                            }
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="text-royal-blue underline"
-                                        >
-                                            view
-                                        </a>
+                                {(imagePreviewUrl || editing?.image_path) && (
+                                    <div className="mt-3 flex items-center gap-3">
+                                        {imagePreviewUrl && (
+                                            <img
+                                                src={imagePreviewUrl}
+                                                alt="Selected preview"
+                                                className="w-16 h-16 rounded-lg object-cover border border-blue-100"
+                                            />
+                                        )}
+                                        {!imagePreviewUrl &&
+                                            editing?.image_path && (
+                                                <a
+                                                    href={
+                                                        (
+                                                            editing.image_path ||
+                                                            ""
+                                                        ).startsWith("http")
+                                                            ? editing.image_path
+                                                            : (
+                                                                  editing.image_path ||
+                                                                  ""
+                                                              ).startsWith(
+                                                                  "/storage/"
+                                                              )
+                                                            ? editing.image_path
+                                                            : `/storage/${(
+                                                                  editing.image_path ||
+                                                                  ""
+                                                              ).replace(
+                                                                  /^\/?storage\//,
+                                                                  ""
+                                                              )}`
+                                                    }
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="text-royal-blue underline text-sm"
+                                                    title="Open current image"
+                                                >
+                                                    View current image
+                                                </a>
+                                            )}
                                     </div>
                                 )}
                             </div>

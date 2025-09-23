@@ -14,6 +14,7 @@ export default {
         extend: {
             fontFamily: {
                 sans: ["Figtree", ...defaultTheme.fontFamily.sans],
+                display: ["Montserrat", ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 "royal-blue": "#1e40af", // Blue-800 equivalent

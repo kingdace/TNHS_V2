@@ -62,6 +62,7 @@ import AcademicPrograms from "../pages/admin/AcademicPrograms";
 import SchoolInfo from "../pages/admin/SchoolInfo";
 import ContactInfo from "../pages/admin/ContactInfo";
 import AdminPageContent from "../pages/admin/PageContent";
+import AdminEvents from "../pages/admin/Events.jsx";
 
 // Scroll to top wrapper component
 const ScrollToTopWrapper = ({ children }) => {
@@ -271,6 +272,10 @@ function App() {
                                 <Route
                                     path="page-content"
                                     element={<AdminPageContent />}
+                                />
+                                <Route
+                                    path="events"
+                                    element={<AdminEvents />}
                                 />
                             </Route>
                         </Route>

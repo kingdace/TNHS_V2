@@ -45,12 +45,17 @@ const AdminLayout = () => {
             name: "Announcements",
             href: "/admin/announcements",
             icon: Bell,
-            badge: "3",
+            // badge: "3",
         },
         {
             name: "Hero Carousel",
             href: "/admin/hero-carousel",
             icon: Image,
+        },
+        {
+            name: "Events",
+            href: "/admin/events",
+            icon: Calendar,
         },
         {
             name: "Academic Programs",
@@ -106,7 +111,7 @@ const AdminLayout = () => {
     const handleLogout = async () => {
         try {
             await logout();
-            navigate("/admin/login");
+            navigate("/login");
         } catch (error) {
             console.error("Logout failed:", error);
         }
