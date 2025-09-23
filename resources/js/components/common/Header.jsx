@@ -26,8 +26,8 @@ const Header = () => {
             href: "/news",
             hasDropdown: true,
             submenu: [
-                { name: "Announcements", href: "/news/announcements" },
-                { name: "Events", href: "/news/events" },
+                { name: "Announcements", href: "/announcements" },
+                { name: "Events", href: "/events" },
             ],
         },
         {

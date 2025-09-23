@@ -530,7 +530,7 @@ const Home = () => {
                                                                 className="bg-royal-blue hover:bg-blue-700 text-white px-3.5 py-2 h-9 rounded-lg"
                                                             >
                                                                 <Link
-                                                                    to="/news"
+                                                                    to={`/announcements/${a.id}`}
                                                                     className="inline-flex items-center"
                                                                 >
                                                                     Read More

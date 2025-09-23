@@ -1,5 +1,10 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Navigate,
+} from "react-router-dom";
 import "../../css/app.css";
 
 // Contexts
@@ -28,7 +33,9 @@ import AcademicsSeniorHigh from "../pages/public/AcademicsSeniorHigh";
 import AcademicsSpecialPrograms from "../pages/public/AcademicsSpecialPrograms";
 import AcademicsSpecialProgramDetail from "../pages/public/AcademicsSpecialProgramDetail";
 import Admissions from "../pages/public/Admissions";
-import News from "../pages/public/News";
+import Announcements from "../pages/public/Announcements";
+import AnnouncementDetail from "../pages/public/AnnouncementDetail";
+import Events from "../pages/public/Events";
 import Contact from "../pages/public/Contact";
 import ContactGeneral from "../pages/public/ContactGeneral";
 import ContactAdmissions from "../pages/public/ContactAdmissions";
@@ -139,12 +146,26 @@ function App() {
                                 element={<AcademicsSpecialProgramDetail />}
                             />
                             <Route path="admissions" element={<Admissions />} />
-                            <Route path="news" element={<News />} />
+                            {/* Redirect old routes to new ones */}
                             <Route
                                 path="news/announcements"
-                                element={<News />}
+                                element={
+                                    <Navigate to="/announcements" replace />
+                                }
                             />
-                            <Route path="news/events" element={<News />} />
+                            <Route
+                                path="news/events"
+                                element={<Navigate to="/events" replace />}
+                            />
+                            <Route
+                                path="announcements"
+                                element={<Announcements />}
+                            />
+                            <Route
+                                path="announcements/:id"
+                                element={<AnnouncementDetail />}
+                            />
+                            <Route path="events" element={<Events />} />
                             <Route path="contact" element={<Contact />} />
                             <Route
                                 path="contact/general"

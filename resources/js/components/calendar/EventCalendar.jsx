@@ -108,73 +108,61 @@ const EventCalendar = () => {
                 </div>
             </div>
 
-            {/* Content Section */}
-            <div className="p-3">
-                {/* Interactive Calendar */}
+            {/* Content Section - More Compact Layout */}
+            <div className="p-2">
+                {/* Compact Calendar with Legend */}
                 <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
                     {/* Calendar Header with Navigation */}
-                    <div className="flex items-center justify-between p-3 border-b border-gray-100">
+                    <div className="flex items-center justify-between px-2 py-2 border-b border-gray-100">
                         <button
                             onClick={prevMonth}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors group"
+                            className="p-1 hover:bg-gray-100 rounded transition-colors"
                         >
-                            <ChevronLeft className="h-4 w-4 text-royal-blue group-hover:text-blue-700" />
+                            <ChevronLeft className="h-3 w-3 text-royal-blue" />
                         </button>
-                        <h5 className="text-sm font-semibold text-royal-blue">
+                        <h5 className="text-xs font-semibold text-royal-blue">
                             {monthNames[currentDate.getMonth()]}{" "}
                             {currentDate.getFullYear()}
                         </h5>
                         <button
                             onClick={nextMonth}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors group"
+                            className="p-1 hover:bg-gray-100 rounded transition-colors"
                         >
-                            <ChevronRight className="h-4 w-4 text-royal-blue group-hover:text-blue-700" />
+                            <ChevronRight className="h-3 w-3 text-royal-blue" />
                         </button>
                     </div>
 
-                    <div className="p-3">
-                        <div className="grid grid-cols-7 gap-1 text-center">
-                            {/* Days of the week */}
-                            <div className="p-1 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                S
-                            </div>
-                            <div className="p-1 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                M
-                            </div>
-                            <div className="p-1 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                T
-                            </div>
-                            <div className="p-1 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                W
-                            </div>
-                            <div className="p-1 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                T
-                            </div>
-                            <div className="p-1 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                F
-                            </div>
-                            <div className="p-1 font-semibold text-royal-blue text-xs bg-gray-50 rounded">
-                                S
-                            </div>
+                    {/* Calendar Grid */}
+                    <div className="p-2">
+                        <div className="grid grid-cols-7 gap-0.5 text-center mb-2">
+                            {/* Days of the week - Compact */}
+                            {["S", "M", "T", "W", "T", "F", "S"].map(
+                                (day, i) => (
+                                    <div
+                                        key={i}
+                                        className="text-[10px] font-semibold text-royal-blue py-1"
+                                    >
+                                        {day}
+                                    </div>
+                                )
+                            )}
+                        </div>
 
-                            {/* Empty cells for days before the first day of the month */}
+                        <div className="grid grid-cols-7 gap-0.5 text-center">
+                            {/* Empty cells */}
                             {Array.from(
-                                {
-                                    length: getFirstDayOfMonth(currentDate),
-                                },
+                                { length: getFirstDayOfMonth(currentDate) },
                                 (_, i) => (
                                     <div
                                         key={`empty-${i}`}
-                                        className="p-1 text-gray-400 text-xs"
+                                        className="h-6"
                                     ></div>
                                 )
                             )}
 
-                            {/* Calendar dates */}
+                            {/* Calendar dates - More compact */}
                             {Array.from(
-                                {
-                                    length: getDaysInMonth(currentDate),
-                                },
+                                { length: getDaysInMonth(currentDate) },
                                 (_, i) => {
                                     const day = i + 1;
                                     const key = `${currentDate.getFullYear()}-${String(
@@ -187,20 +175,18 @@ const EventCalendar = () => {
                                     const hasEvents = dayEvents.length > 0;
                                     const isSelected = selectedDate === day;
 
-                                    // Get primary event type for styling
                                     const primaryEventType = hasEvents
                                         ? dayEvents[0].event_type
                                         : null;
-
                                     const eventTypeColors = {
-                                        exam: "border-red-500 text-red-700 hover:bg-red-50",
+                                        exam: "border-red-400 text-red-700",
                                         academic:
-                                            "border-blue-500 text-blue-700 hover:bg-blue-50",
-                                        sports: "border-green-500 text-green-700 hover:bg-green-50",
+                                            "border-blue-400 text-blue-700",
+                                        sports: "border-green-400 text-green-700",
                                         cultural:
-                                            "border-purple-500 text-purple-700 hover:bg-purple-50",
+                                            "border-purple-400 text-purple-700",
                                         meeting:
-                                            "border-amber-500 text-amber-700 hover:bg-amber-50",
+                                            "border-amber-400 text-amber-700",
                                     };
 
                                     const eventDotColors = {
@@ -215,30 +201,30 @@ const EventCalendar = () => {
                                         <div
                                             key={day}
                                             onClick={() => handleDateClick(day)}
-                                            className={`p-1 text-xs cursor-pointer rounded-lg transition-all duration-300 relative ${
+                                            className={`h-6 w-6 mx-auto text-[10px] cursor-pointer rounded transition-all duration-200 relative flex items-center justify-center ${
                                                 isSelected
-                                                    ? "bg-royal-blue text-white shadow-lg"
+                                                    ? "bg-royal-blue text-white shadow-sm"
                                                     : hasEvents
                                                     ? `border ${
                                                           eventTypeColors[
                                                               primaryEventType
                                                           ] ||
                                                           eventTypeColors.exam
-                                                      }`
-                                                    : "text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-200"
+                                                      } bg-gray-50`
+                                                    : "text-gray-700 hover:bg-gray-100"
                                             }`}
                                         >
                                             {day}
                                             {hasEvents && !isSelected && (
                                                 <div
-                                                    className={`absolute -top-1 -right-1 w-2 h-2 ${
+                                                    className={`absolute -top-0.5 -right-0.5 w-1.5 h-1.5 ${
                                                         eventDotColors[
                                                             primaryEventType
                                                         ] || eventDotColors.exam
                                                     } rounded-full border border-white`}
                                                 >
                                                     {dayEvents.length > 1 && (
-                                                        <div className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 bg-gray-600 rounded-full border border-white"></div>
+                                                        <div className="absolute -bottom-0.5 -right-0.5 w-1 h-1 bg-gray-600 rounded-full border border-white"></div>
                                                     )}
                                                 </div>
                                             )}
@@ -248,30 +234,155 @@ const EventCalendar = () => {
                             )}
                         </div>
                     </div>
+
+                    {/* Compact Legend */}
+                    <div className="px-2 pb-2 flex-justify-center">
+                        <div className="flex flex-wrap gap-2 text-[9px] justify-center">
+                            <div className="flex items-center gap-1">
+                                <div className="w-1.5 h-1.5 bg-red-500 rounded-full"></div>
+                                <span>Exams</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                                <span>Academic</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                                <span>Sports</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                <span>Cultural</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Legend */}
-                <div className="mt-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-2 border border-blue-100">
-                    <h5 className="text-xs font-semibold text-royal-blue mb-2 flex items-center">
-                        <span className="mr-1">📅</span>
-                        Event Types
-                    </h5>
-                    <div className="grid grid-cols-2 gap-1 text-xs">
-                        <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                            <span>Exams</span>
+                {/* Combined Stats & Upcoming Events - More Compact */}
+                <div className="mt-2 space-y-2">
+                    {/* Quick Stats Bar */}
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-md p-2 border border-blue-100">
+                        <div className="flex items-center justify-between text-xs">
+                            <span className="font-medium text-blue-700">
+                                📊 This Month:
+                            </span>
+                            <div className="flex gap-3">
+                                {(() => {
+                                    const currentMonthKey = `${currentDate.getFullYear()}-${String(
+                                        currentDate.getMonth() + 1
+                                    ).padStart(2, "0")}`;
+                                    const monthEvents = Object.entries(
+                                        eventsByDay
+                                    )
+                                        .filter(([key]) =>
+                                            key.startsWith(currentMonthKey)
+                                        )
+                                        .flatMap(([, events]) => events);
+
+                                    const totalEvents = monthEvents.length;
+                                    const uniqueDays = Object.keys(
+                                        Object.entries(eventsByDay)
+                                            .filter(([key]) =>
+                                                key.startsWith(currentMonthKey)
+                                            )
+                                            .reduce((acc, [key]) => {
+                                                acc[key] = true;
+                                                return acc;
+                                            }, {})
+                                    ).length;
+
+                                    return (
+                                        <>
+                                            <span className="text-blue-700 font-semibold">
+                                                {totalEvents} events
+                                            </span>
+                                            <span className="text-blue-600">
+                                                {uniqueDays} days
+                                            </span>
+                                        </>
+                                    );
+                                })()}
+                            </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            <span>Academic</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span>Sports</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                            <span>Cultural</span>
+                    </div>
+                    {/* Upcoming Events - Compact List */}
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-md p-2 border border-green-100">
+                        <h6 className="text-xs font-semibold text-green-700 mb-2 flex items-center">
+                            <span className="mr-1">📅</span>
+                            Upcoming
+                        </h6>
+                        {/* Show 3 events by default, scrollable for more */}
+                        <div className="space-y-1.5 max-h-36 overflow-y-auto">
+                            {(() => {
+                                const currentMonthKey = `${currentDate.getFullYear()}-${String(
+                                    currentDate.getMonth() + 1
+                                ).padStart(2, "0")}`;
+
+                                const monthEvents = Object.entries(eventsByDay)
+                                    .filter(([key]) =>
+                                        key.startsWith(currentMonthKey)
+                                    )
+                                    .flatMap(([, events]) => events)
+                                    .sort(
+                                        (a, b) =>
+                                            new Date(a.start_date) -
+                                            new Date(b.start_date)
+                                    )
+                                    .slice(0, 3); // Show 3 events, scrollable for more
+
+                                if (monthEvents.length === 0) {
+                                    return (
+                                        <div className="text-center py-1">
+                                            <p className="text-[10px] text-gray-500">
+                                                No upcoming events
+                                            </p>
+                                        </div>
+                                    );
+                                }
+
+                                return monthEvents.map((event) => {
+                                    const eventDate = new Date(
+                                        event.start_date
+                                    );
+                                    const today = new Date();
+                                    const isToday =
+                                        eventDate.toDateString() ===
+                                        today.toDateString();
+
+                                    return (
+                                        <div
+                                            key={event.id}
+                                            className="flex items-center gap-2 p-1.5 bg-white rounded border border-gray-200"
+                                        >
+                                            <div
+                                                className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                                                    event.event_type === "exam"
+                                                        ? "bg-red-500"
+                                                        : event.event_type ===
+                                                          "academic"
+                                                        ? "bg-blue-500"
+                                                        : event.event_type ===
+                                                          "sports"
+                                                        ? "bg-green-500"
+                                                        : event.event_type ===
+                                                          "cultural"
+                                                        ? "bg-purple-500"
+                                                        : "bg-amber-500"
+                                                }`}
+                                            ></div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-[10px] font-medium text-gray-900 truncate">
+                                                    {event.title}
+                                                </p>
+                                                <p className="text-[9px] text-gray-500">
+                                                    {eventDate.toLocaleDateString()}{" "}
+                                                    {isToday && "• TODAY"}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                });
+                            })()}
                         </div>
                     </div>
                 </div>
