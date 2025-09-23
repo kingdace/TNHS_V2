@@ -15,7 +15,6 @@ import {
     Award,
     Calendar,
     Newspaper,
-    ArrowRight,
     ChevronLeft,
     ChevronRight,
     Play,
@@ -56,7 +55,7 @@ const Home = () => {
 
                 // Fetch announcements
                 const announcementsData =
-                    await announcementService.getPublicAnnouncements();
+                    await announcementService.getFeaturedAnnouncements();
                 const transformedAnnouncements = announcementsData.map(
                     (announcement) =>
                         announcementService.transformAnnouncement(announcement)
@@ -346,12 +345,11 @@ const Home = () => {
                             <Button
                                 asChild
                                 size="lg"
-                                className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold px-10 py-5 text-xl rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0 relative overflow-hidden group"
+                                className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold px-8 h-12 text-lg rounded-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0 relative overflow-hidden group"
                             >
                                 <Link to="/admissions">
-                                    <span className="relative z-10 flex items-center">
+                                    <span className="relative z-10">
                                         Enrollment Requirements
-                                        <ArrowRight className="ml-3 h-6 w-6" />
                                     </span>
                                     {/* Shine effect */}
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
@@ -362,12 +360,11 @@ const Home = () => {
                             <Button
                                 asChild
                                 size="lg"
-                                className="bg-white hover:bg-gray-100 text-gray-900 font-bold px-10 py-5 text-xl rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0 relative overflow-hidden group"
+                                className="bg-white hover:bg-gray-100 text-gray-900 font-bold px-8 h-12 text-lg rounded-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0 relative overflow-hidden group"
                             >
                                 <Link to="/about">
-                                    <span className="relative z-10 flex items-center">
+                                    <span className="relative z-10">
                                         Learn More
-                                        <ArrowRight className="ml-3 h-6 w-6" />
                                     </span>
                                 </Link>
                             </Button>
@@ -505,34 +502,25 @@ const Home = () => {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <Button
                                 asChild
-                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-2xl transition-colors flex items-center justify-center space-x-2"
+                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold h-12 px-5 rounded-lg transition-colors flex items-center justify-center"
                             >
-                                <Link to="/admissions">
-                                    <span>ADMISSION</span>
-                                    <span>→</span>
-                                </Link>
+                                <Link to="/admissions">ADMISSION</Link>
                             </Button>
                             <Button
                                 asChild
-                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-2xl transition-colors flex items-center justify-center space-x-2"
+                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold h-12 px-5 rounded-lg transition-colors flex items-center justify-center"
                             >
-                                <Link to="/students">
-                                    <span>STUDENTS</span>
-                                    <span>→</span>
-                                </Link>
+                                <Link to="/students">STUDENTS</Link>
                             </Button>
                             <Button
                                 asChild
-                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-2xl transition-colors flex items-center justify-center space-x-2"
+                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold h-12 px-5 rounded-lg transition-colors flex items-center justify-center"
                             >
-                                <Link to="/faculty">
-                                    <span>FACULTY & STAFF</span>
-                                    <span>→</span>
-                                </Link>
+                                <Link to="/faculty">FACULTY & STAFF</Link>
                             </Button>
                             <Button
                                 asChild
-                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-2xl transition-colors flex items-center justify-center space-x-2"
+                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold h-12 px-5 rounded-lg transition-colors flex items-center justify-center"
                             >
                                 <Link to="/donate">
                                     <span>GIVE TO TNHS</span>
@@ -585,242 +573,89 @@ const Home = () => {
                             <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
                                 {/* Dynamic Announcements */}
                                 {loading ? (
-                                    <div className="text-center py-8">
-                                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-royal-blue mx-auto mb-4"></div>
-                                        <p className="text-gray-600">
-                                            Loading announcements...
-                                        </p>
+                                    <div className="space-y-5">
+                                        {[0, 1, 2, 3, 4].map((i) => (
+                                            <div
+                                                key={i}
+                                                className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden"
+                                            >
+                                                <div className="flex flex-col md:flex-row">
+                                                    <div className="md:w-2/5 h-44 bg-gray-200 animate-pulse" />
+                                                    <div className="md:w-3/5 p-5 space-y-3">
+                                                        <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+                                                        <div className="h-5 w-3/4 bg-gray-200 rounded animate-pulse" />
+                                                        <div className="h-4 w-full bg-gray-200 rounded animate-pulse" />
+                                                        <div className="h-4 w-2/3 bg-gray-200 rounded animate-pulse" />
+                                                        <div className="h-9 w-32 bg-gray-200 rounded animate-pulse ml-auto" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 ) : announcements.length > 0 ? (
-                                    <div className="space-y-6">
-                                        {/* Featured Announcement (First one) */}
-                                        {announcements[0] && (
-                                            <div className="mb-8">
-                                                <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
-                                                    <div className="flex flex-col md:flex-row h-full">
-                                                        {/* Left Section - Image */}
-                                                        <div className="relative md:w-2/5 h-48 md:h-auto">
-                                                            <img
-                                                                src={
-                                                                    announcements[0]
-                                                                        .image
-                                                                }
-                                                                alt={
-                                                                    announcements[0]
-                                                                        .title
-                                                                }
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                            {/* Featured Tag */}
-                                                            <div className="absolute top-3 left-3 bg-gradient-to-r from-orange-400 to-yellow-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 shadow-lg">
-                                                                <span>★</span>
+                                    <div className="space-y-5">
+                                        {announcements.slice(0, 5).map((a) => (
+                                            <div
+                                                key={a.id}
+                                                className="bg-white rounded-xl border border-blue-100 shadow hover:shadow-md transition-all duration-200 overflow-hidden"
+                                            >
+                                                <div className="flex flex-col md:flex-row">
+                                                    {/* Image */}
+                                                    <div className="relative md:w-2/5 h-48 md:h-44">
+                                                        <img
+                                                            src={a.image}
+                                                            alt={a.title}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                        <div className="absolute top-3 left-3">
+                                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow">
+                                                                <span>★</span>{" "}
+                                                                FEATURED
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    {/* Content */}
+                                                    <div className="md:w-3/5 p-5 flex flex-col">
+                                                        <div className="flex items-center justify-between text-xs text-gray-500 mb-2.5">
+                                                            <div className="inline-flex items-center gap-2">
+                                                                <span>📅</span>
                                                                 <span>
-                                                                    FEATURED
+                                                                    {a.date}
                                                                 </span>
                                                             </div>
+                                                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-royal-blue">
+                                                                {a.category}
+                                                            </span>
                                                         </div>
-
-                                                        {/* Right Section - Content */}
-                                                        <div className="md:w-3/5 p-6 flex flex-col justify-between">
-                                                            {/* Top Metadata */}
-                                                            <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                                                                <div className="flex items-center space-x-1">
-                                                                    <span>
-                                                                        📅
-                                                                    </span>
-                                                                    <span>
-                                                                        {
-                                                                            announcements[0]
-                                                                                .date
-                                                                        }
-                                                                    </span>
-                                                                </div>
-                                                                <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
-                                                                    {
-                                                                        announcements[0]
-                                                                            .category
-                                                                    }
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Title */}
-                                                            <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                                                                {
-                                                                    announcements[0]
-                                                                        .title
-                                                                }
-                                                            </h3>
-
-                                                            {/* Description */}
-                                                            <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
-                                                                {
-                                                                    announcements[0]
-                                                                        .excerpt
-                                                                }
-                                                            </p>
-
-                                                            {/* Bottom Metadata */}
-                                                            <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                                                                <div className="flex items-center space-x-1">
-                                                                    <span>
-                                                                        👤
-                                                                    </span>
-                                                                    <span>
-                                                                        {
-                                                                            announcements[0]
-                                                                                .author
-                                                                        }
-                                                                    </span>
-                                                                </div>
-                                                                <div className="flex items-center space-x-1">
-                                                                    <span>
-                                                                        👁️
-                                                                    </span>
-                                                                    <span>
-                                                                        {
-                                                                            announcements[0]
-                                                                                .views
-                                                                        }{" "}
-                                                                        views
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Read More Button */}
+                                                        <h3 className="text-xl font-bold text-gray-900 mb-1.5 line-clamp-2">
+                                                            {a.title}
+                                                        </h3>
+                                                        <p className="text-gray-600 text-sm line-clamp-3 mb-3">
+                                                            {a.excerpt}
+                                                        </p>
+                                                        <div className="mt-auto flex items-center justify-between text-xs text-gray-500">
+                                                            <span className="inline-flex items-center gap-2">
+                                                                <span>👤</span>
+                                                                <span className="font-medium">
+                                                                    {a.author}
+                                                                </span>
+                                                            </span>
                                                             <Button
                                                                 asChild
-                                                                className="bg-gradient-to-r from-orange-400 to-yellow-500 hover:from-orange-500 hover:to-yellow-600 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 transform self-end"
+                                                                className="bg-royal-blue hover:bg-blue-700 text-white px-3.5 py-2 h-9 rounded-lg"
                                                             >
                                                                 <Link
                                                                     to="/news"
-                                                                    className="flex items-center space-x-1"
+                                                                    className="inline-flex items-center"
                                                                 >
-                                                                    <span>
-                                                                        Read
-                                                                        More
-                                                                    </span>
-                                                                    <span>
-                                                                        →
-                                                                    </span>
+                                                                    Read More
                                                                 </Link>
                                                             </Button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        )}
-
-                                        {/* Additional Announcements */}
-                                        {announcements
-                                            .slice(1, 3)
-                                            .map((announcement, index) => (
-                                                <div
-                                                    key={announcement.id}
-                                                    className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
-                                                >
-                                                    <div className="flex flex-col md:flex-row h-full">
-                                                        {/* Left Section - Image */}
-                                                        <div className="relative md:w-2/5 h-48 md:h-auto">
-                                                            <img
-                                                                src={
-                                                                    announcement.image
-                                                                }
-                                                                alt={
-                                                                    announcement.title
-                                                                }
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                            {/* News Tag */}
-                                                            <div className="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 shadow-lg">
-                                                                <span>📰</span>
-                                                                <span>
-                                                                    NEWS
-                                                                </span>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Right Section - Content */}
-                                                        <div className="md:w-3/5 p-6 flex flex-col justify-between">
-                                                            {/* Top Metadata */}
-                                                            <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                                                                <div className="flex items-center space-x-1">
-                                                                    <span>
-                                                                        📅
-                                                                    </span>
-                                                                    <span>
-                                                                        {
-                                                                            announcement.date
-                                                                        }
-                                                                    </span>
-                                                                </div>
-                                                                <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
-                                                                    {
-                                                                        announcement.category
-                                                                    }
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Title */}
-                                                            <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                                                                {
-                                                                    announcement.title
-                                                                }
-                                                            </h3>
-
-                                                            {/* Description */}
-                                                            <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
-                                                                {
-                                                                    announcement.excerpt
-                                                                }
-                                                            </p>
-
-                                                            {/* Bottom Metadata */}
-                                                            <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                                                                <div className="flex items-center space-x-1">
-                                                                    <span>
-                                                                        👤
-                                                                    </span>
-                                                                    <span>
-                                                                        {
-                                                                            announcement.author
-                                                                        }
-                                                                    </span>
-                                                                </div>
-                                                                <div className="flex items-center space-x-1">
-                                                                    <span>
-                                                                        👁️
-                                                                    </span>
-                                                                    <span>
-                                                                        {
-                                                                            announcement.views
-                                                                        }{" "}
-                                                                        views
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Read More Button */}
-                                                            <Button
-                                                                asChild
-                                                                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 transform self-end"
-                                                            >
-                                                                <Link
-                                                                    to="/news"
-                                                                    className="flex items-center space-x-1"
-                                                                >
-                                                                    <span>
-                                                                        Read
-                                                                        More
-                                                                    </span>
-                                                                    <span>
-                                                                        →
-                                                                    </span>
-                                                                </Link>
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                        ))}
                                     </div>
                                 ) : (
                                     <div className="text-center py-8">
@@ -1218,7 +1053,7 @@ const Home = () => {
                         <Button
                             asChild
                             size="lg"
-                            className="bg-gradient-to-r from-white to-gray-100 hover:from-gray-100 hover:to-white text-royal-blue font-bold px-8 py-4 text-lg rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0"
+                            className="bg-gradient-to-r from-white to-gray-100 hover:from-gray-100 hover:to-white text-royal-blue font-bold px-8 h-12 text-lg rounded-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0"
                         >
                             <Link to="/admissions">Enroll Now</Link>
                         </Button>
@@ -1226,7 +1061,7 @@ const Home = () => {
                             asChild
                             size="lg"
                             variant="outline"
-                            className="border-2 border-white text-white hover:bg-white hover:text-royal-blue font-bold px-8 py-4 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 transform bg-transparent hover:bg-white"
+                            className="border-2 border-white text-white hover:bg-white hover:text-royal-blue font-bold px-8 h-12 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 transform bg-transparent hover:bg-white"
                         >
                             <Link to="/contact">Contact Us</Link>
                         </Button>

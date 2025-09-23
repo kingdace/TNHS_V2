@@ -32,13 +32,22 @@ class AnnouncementController extends Controller
             'content' => 'required|string',
             'author' => 'required|string|max:255',
             'status' => 'required|in:draft,published,archived',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'is_featured' => 'nullable|boolean',
         ]);
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('announcements', 'public');
+        }
 
         $announcement = Announcement::create([
             'title' => $request->title,
             'content' => $request->content,
             'author' => $request->author,
+            'image_path' => $imagePath,
             'status' => $request->status,
+            'is_featured' => (bool) $request->boolean('is_featured'),
             'published_at' => $request->status === 'published' ? now() : null,
         ]);
 
@@ -65,20 +74,32 @@ class AnnouncementController extends Controller
      */
     public function update(Request $request, Announcement $announcement): JsonResponse
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'author' => 'required|string|max:255',
-            'status' => 'required|in:draft,published,archived',
+        $validated = $request->validate([
+            'title' => 'sometimes|nullable|string|max:255',
+            'content' => 'sometimes|nullable|string',
+            'author' => 'sometimes|nullable|string|max:255',
+            'status' => 'sometimes|in:draft,published,archived',
+            'image' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'is_featured' => 'sometimes|boolean',
         ]);
 
-        $announcement->update([
-            'title' => $request->title,
-            'content' => $request->content,
-            'author' => $request->author,
-            'status' => $request->status,
-            'published_at' => $request->status === 'published' ? now() : null,
-        ]);
+        $data = [];
+        if ($request->has('title')) { $data['title'] = $request->title; }
+        if ($request->has('content')) { $data['content'] = $request->content; }
+        if ($request->has('author')) { $data['author'] = $request->author; }
+        if ($request->has('status')) {
+            $data['status'] = $request->status;
+            $data['published_at'] = $request->status === 'published' ? now() : null;
+        }
+        if ($request->has('is_featured')) {
+            $data['is_featured'] = (bool) $request->boolean('is_featured');
+        }
+
+        if ($request->hasFile('image')) {
+            $data['image_path'] = $request->file('image')->store('announcements', 'public');
+        }
+
+        $announcement->update($data);
 
         return response()->json([
             'success' => true,
@@ -105,13 +126,54 @@ class AnnouncementController extends Controller
      */
     public function public(): JsonResponse
     {
-        $announcements = Announcement::published()
-            ->latest('published_at')
-            ->get();
+        $query = Announcement::published()->latest('published_at');
+        if (request()->boolean('featured')) {
+            $query->where('is_featured', true);
+        }
+        $announcements = $query->get();
 
         return response()->json([
             'success' => true,
             'data' => $announcements
+        ]);
+    }
+
+    /**
+     * List trashed announcements (soft-deleted)
+     */
+    public function trashed(): JsonResponse
+    {
+        $announcements = Announcement::onlyTrashed()->latest('deleted_at')->get();
+        return response()->json([
+            'success' => true,
+            'data' => $announcements
+        ]);
+    }
+
+    /**
+     * Restore a soft-deleted announcement
+     */
+    public function restore($id): JsonResponse
+    {
+        $announcement = Announcement::onlyTrashed()->findOrFail($id);
+        $announcement->restore();
+        return response()->json([
+            'success' => true,
+            'message' => 'Announcement restored successfully',
+            'data' => $announcement
+        ]);
+    }
+
+    /**
+     * Permanently delete a soft-deleted announcement
+     */
+    public function forceDelete($id): JsonResponse
+    {
+        $announcement = Announcement::onlyTrashed()->findOrFail($id);
+        $announcement->forceDelete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Announcement permanently deleted'
         ]);
     }
 }

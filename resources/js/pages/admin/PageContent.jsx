@@ -205,14 +205,14 @@ const PageContent = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Header */}
-            <div className="flex justify-between items-center">
+            <div className="bg-gradient-to-r from-blue-900 to-blue-700 rounded-xl px-6 py-4 text-white shadow-lg flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">
+                    <h1 className="text-2xl font-bold">
                         Page Content Management
                     </h1>
-                    <p className="text-gray-600 mt-1">
+                    <p className="text-blue-100 text-sm mt-0.5">
                         Manage dynamic content for your website pages
                     </p>
                 </div>
@@ -226,9 +226,11 @@ const PageContent = () => {
             </div>
 
             {/* Filters */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-lg">Filters & Search</CardTitle>
+            <Card className="border-blue-100">
+                <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
+                    <CardTitle className="text-lg text-royal-blue">
+                        Filters & Search
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -333,12 +335,12 @@ const PageContent = () => {
                     </Card>
                 ) : (
                     Object.entries(content).map(([pageName, pageContent]) => (
-                        <Card key={pageName}>
-                            <CardHeader>
-                                <CardTitle className="text-xl capitalize">
+                        <Card key={pageName} className="border-blue-100">
+                            <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
+                                <CardTitle className="text-xl capitalize text-royal-blue">
                                     {pageName} Page
                                 </CardTitle>
-                                <CardDescription>
+                                <CardDescription className="text-blue-700">
                                     {pageContent.length} content item
                                     {pageContent.length !== 1 ? "s" : ""}
                                 </CardDescription>
@@ -348,7 +350,7 @@ const PageContent = () => {
                                     {pageContent.map((item) => (
                                         <div
                                             key={item.id}
-                                            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                                            className="flex items-center justify-between p-4 border border-blue-100 rounded-lg hover:bg-blue-50 transition-colors"
                                         >
                                             <div className="flex items-center space-x-4">
                                                 <div

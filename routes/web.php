@@ -17,7 +17,10 @@ Route::get('/', function () {
 // API Routes - must come before the catch-all route
 Route::prefix('api')->group(function () {
     Route::get('/announcements/public', [AnnouncementController::class, 'public']);
-    Route::apiResource('announcements', AnnouncementController::class);
+    Route::apiResource('announcements', AnnouncementController::class)->middleware(['auth', 'admin.auth']);
+    Route::get('/announcements-trashed', [AnnouncementController::class, 'trashed'])->middleware(['auth', 'admin.auth']);
+    Route::post('/announcements/{id}/restore', [AnnouncementController::class, 'restore'])->middleware(['auth', 'admin.auth']);
+    Route::delete('/announcements/{id}/force', [AnnouncementController::class, 'forceDelete'])->middleware(['auth', 'admin.auth']);
     Route::apiResource('hero-carousel', HeroCarouselController::class);
     Route::apiResource('academic-programs', \App\Http\Controllers\Api\AcademicProgramController::class);
     Route::apiResource('school-info', \App\Http\Controllers\Api\SchoolInfoController::class);

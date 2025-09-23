@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('author');
             $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
             $table->timestamp('published_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::runDown();
+        Schema::dropIfExists('announcements');
     }
 };

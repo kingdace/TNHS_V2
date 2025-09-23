@@ -4,20 +4,29 @@
  */
 
 const API_BASE_URL = "/api";
+const getHeaders = () => ({
+    "Content-Type": "application/json",
+    "X-CSRF-TOKEN":
+        document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute("content") || "",
+});
 
 export const announcementService = {
     /**
      * Fetch all published announcements for public view
      */
-    async getPublicAnnouncements() {
+    async getPublicAnnouncements({ featured = false } = {}) {
         try {
-            console.log(
-                "Making API call to:",
-                `${API_BASE_URL}/announcements/public`
+            const url = new URL(
+                `${API_BASE_URL}/announcements/public`,
+                window.location.origin
             );
-            const response = await fetch(
-                `${API_BASE_URL}/announcements/public`
-            );
+            if (featured) url.searchParams.set("featured", "1");
+            const response = await fetch(url.toString(), {
+                headers: { Accept: "application/json" },
+                credentials: "include",
+            });
 
             console.log("API response status:", response.status);
             console.log("API response ok:", response.ok);
@@ -30,10 +39,6 @@ export const announcementService = {
             console.log("API response data:", data);
 
             if (data.success) {
-                console.log(
-                    "API returned success, data length:",
-                    data.data.length
-                );
                 return data.data;
             } else {
                 throw new Error("API returned unsuccessful response");
@@ -44,11 +49,17 @@ export const announcementService = {
             return [];
         }
     },
+    async getFeaturedAnnouncements() {
+        return this.getPublicAnnouncements({ featured: true });
+    },
 
     /**
      * Transform announcement data to match the expected format
      */
     transformAnnouncement(announcement) {
+        const imageFromUpload = announcement.image_path
+            ? `/storage/${announcement.image_path}`
+            : null;
         return {
             id: announcement.id,
             title: announcement.title,
@@ -57,9 +68,9 @@ export const announcementService = {
             author: announcement.author,
             date: this.formatDate(announcement.published_at),
             category: "Announcements",
-            views: Math.floor(Math.random() * 2000) + 500, // Random views for display
-            image: this.getRandomImage(), // Random image for display
-            featured: false, // Can be enhanced later
+            views: Math.floor(Math.random() * 2000) + 500,
+            image: imageFromUpload || this.getRandomImage(),
+            featured: !!announcement.is_featured,
             tags: this.extractTags(announcement.title), // Extract tags from title
         };
     },
@@ -129,5 +140,176 @@ export const announcementService = {
         );
 
         return matchedTags.length > 0 ? matchedTags.slice(0, 3) : ["General"];
+    },
+
+    /**
+     * Admin: list all announcements (requires auth)
+     */
+    async list() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/announcements`, {
+                headers: { Accept: "application/json" },
+                credentials: "include",
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            return data.data ?? [];
+        } catch (error) {
+            console.error("Error listing announcements:", error);
+            return [];
+        }
+    },
+
+    /**
+     * Admin: create announcement
+     */
+    async create(payload) {
+        try {
+            const formData = new FormData();
+            Object.entries(payload).forEach(([key, value]) => {
+                if (value === undefined || value === null) return;
+                if (typeof value === "boolean") {
+                    formData.append(key, value ? "1" : "0");
+                } else {
+                    formData.append(key, value);
+                }
+            });
+            const response = await fetch(`${API_BASE_URL}/announcements`, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
+                    Accept: "application/json",
+                },
+                credentials: "include",
+                body: formData,
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            return data.data;
+        } catch (error) {
+            console.error("Error creating announcement:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Admin: update announcement
+     */
+    async update(id, payload) {
+        try {
+            const formData = new FormData();
+            Object.entries(payload).forEach(([key, value]) => {
+                if (value === undefined || value === null) return;
+                if (typeof value === "boolean") {
+                    formData.append(key, value ? "1" : "0");
+                } else {
+                    formData.append(key, value);
+                }
+            });
+            // Laravel expects POST with _method=PUT for multipart
+            formData.append("_method", "PUT");
+            const response = await fetch(
+                `${API_BASE_URL}/announcements/${id}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
+                        Accept: "application/json",
+                    },
+                    credentials: "include",
+                    body: formData,
+                }
+            );
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            return data.data;
+        } catch (error) {
+            console.error("Error updating announcement:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Admin: delete announcement
+     */
+    async remove(id) {
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/announcements/${id}`,
+                {
+                    method: "DELETE",
+                    headers: { ...getHeaders(), Accept: "application/json" },
+                    credentials: "include",
+                }
+            );
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return true;
+        } catch (error) {
+            console.error("Error deleting announcement:", error);
+            throw error;
+        }
+    },
+    /**
+     * Admin: list trashed announcements
+     */
+    async listTrashed() {
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/announcements-trashed`,
+                {
+                    headers: { Accept: "application/json" },
+                    credentials: "include",
+                }
+            );
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            return data.data ?? [];
+        } catch (error) {
+            console.error("Error listing trashed announcements:", error);
+            return [];
+        }
+    },
+
+    /**
+     * Admin: restore trashed announcement
+     */
+    async restore(id) {
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/announcements/${id}/restore`,
+                {
+                    method: "POST",
+                    headers: { ...getHeaders(), Accept: "application/json" },
+                    credentials: "include",
+                }
+            );
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            return data.data;
+        } catch (error) {
+            console.error("Error restoring announcement:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Admin: permanently delete trashed announcement
+     */
+    async forceDelete(id) {
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/announcements/${id}/force`,
+                {
+                    method: "DELETE",
+                    headers: { ...getHeaders(), Accept: "application/json" },
+                    credentials: "include",
+                }
+            );
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return true;
+        } catch (error) {
+            console.error("Error force deleting announcement:", error);
+            throw error;
+        }
     },
 };

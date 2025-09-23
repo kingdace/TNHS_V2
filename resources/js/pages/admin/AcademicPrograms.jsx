@@ -214,20 +214,18 @@ const AcademicPrograms = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Header */}
-            <div className="flex justify-between items-center">
+            <div className="bg-gradient-to-r from-blue-900 to-blue-700 rounded-xl px-6 py-4 text-white shadow-lg flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">
-                        Academic Programs
-                    </h1>
-                    <p className="text-gray-600">
+                    <h1 className="text-2xl font-bold">Academic Programs</h1>
+                    <p className="text-blue-100 text-sm">
                         Manage academic programs and curriculum
                     </p>
                 </div>
                 <button
                     onClick={() => setShowForm(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                    className="bg-royal-blue hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
                 >
                     <Plus className="h-4 w-4" />
                     Add Program
@@ -235,7 +233,7 @@ const AcademicPrograms = () => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-blue-100">
                 <div className="flex gap-4">
                     <div className="flex-1">
                         <div className="relative">
@@ -273,7 +271,7 @@ const AcademicPrograms = () => {
             )}
 
             {/* Programs List */}
-            <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+            <div className="bg-white rounded-lg shadow-sm border border-blue-100 overflow-hidden">
                 {filteredPrograms.length === 0 ? (
                     <div className="text-center py-12">
                         <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />

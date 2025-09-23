@@ -48,7 +48,7 @@ class DynamicContentService {
      */
     static async getDownloadFiles(category = null) {
         try {
-            const url = category 
+            const url = category
                 ? `${API_BASE_URL}/downloads/category/${category}`
                 : `${API_BASE_URL}/downloads`;
             const response = await fetch(url);
@@ -65,7 +65,7 @@ class DynamicContentService {
      */
     static async getExternalLinks(category = null) {
         try {
-            const url = category 
+            const url = category
                 ? `${API_BASE_URL}/external-links/category/${category}`
                 : `${API_BASE_URL}/external-links`;
             const response = await fetch(url);
@@ -82,7 +82,7 @@ class DynamicContentService {
      */
     static async getStaffProfiles(type = null) {
         try {
-            const url = type 
+            const url = type
                 ? `${API_BASE_URL}/staff-profiles/type/${type}`
                 : `${API_BASE_URL}/staff-profiles`;
             const response = await fetch(url);

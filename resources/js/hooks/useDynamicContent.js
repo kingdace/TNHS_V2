@@ -11,11 +11,11 @@ export const useDynamicContent = (pageName, sectionName = null) => {
             try {
                 setLoading(true);
                 setError(null);
-                
-                const response = sectionName 
+
+                const response = sectionName
                     ? await DynamicContentService.getPageSectionContent(pageName, sectionName)
                     : await DynamicContentService.getPageContent(pageName);
-                
+
                 if (response.success) {
                     setContent(response.data);
                 } else {
@@ -45,9 +45,9 @@ export const useDownloadFiles = (category = null) => {
             try {
                 setLoading(true);
                 setError(null);
-                
+
                 const response = await DynamicContentService.getDownloadFiles(category);
-                
+
                 if (response.success) {
                     setFiles(response.data);
                 } else {
@@ -77,9 +77,9 @@ export const useExternalLinks = (category = null) => {
             try {
                 setLoading(true);
                 setError(null);
-                
+
                 const response = await DynamicContentService.getExternalLinks(category);
-                
+
                 if (response.success) {
                     setLinks(response.data);
                 } else {
@@ -109,9 +109,9 @@ export const useStaffProfiles = (type = null) => {
             try {
                 setLoading(true);
                 setError(null);
-                
+
                 const response = await DynamicContentService.getStaffProfiles(type);
-                
+
                 if (response.success) {
                     setProfiles(response.data);
                 } else {

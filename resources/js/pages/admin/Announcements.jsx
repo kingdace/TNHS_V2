@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import {
     Card,
@@ -8,46 +7,538 @@ import {
     CardHeader,
     CardTitle,
 } from "../../components/ui/card";
-import { Plus, Megaphone } from "lucide-react";
+import {
+    Plus,
+    Megaphone,
+    Edit,
+    Trash2,
+    Eye,
+    EyeOff,
+    RotateCcw,
+} from "lucide-react";
+import { announcementService } from "../../services/announcementService";
 
 const AdminAnnouncements = () => {
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [showForm, setShowForm] = useState(false);
+    const [editing, setEditing] = useState(null);
+    const [form, setForm] = useState({
+        title: "",
+        content: "",
+        author: "",
+        status: "draft",
+        image: null,
+        is_featured: false,
+    });
+    const [showTrash, setShowTrash] = useState(false);
+    const [trashed, setTrashed] = useState([]);
+
+    const load = async () => {
+        try {
+            setLoading(true);
+            const data = await announcementService.list();
+            setItems(data);
+            setError("");
+        } catch (e) {
+            setError("Failed to load announcements.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const loadTrashed = async () => {
+        try {
+            const data = await announcementService.listTrashed();
+            setTrashed(data);
+        } catch (e) {
+            // no-op
+        }
+    };
+
+    useEffect(() => {
+        load();
+        loadTrashed();
+    }, []);
+
+    const openCreate = () => {
+        setEditing(null);
+        setForm({
+            title: "",
+            content: "",
+            author: "",
+            status: "draft",
+            image: null,
+            is_featured: false,
+        });
+        setShowForm(true);
+    };
+
+    const openEdit = (item) => {
+        setEditing(item);
+        setForm({
+            title: item.title,
+            content: item.content,
+            author: item.author,
+            status: item.status,
+            image: null,
+            is_featured: !!item.is_featured,
+        });
+        setShowForm(true);
+    };
+
+    const submit = async (e) => {
+        e.preventDefault();
+        try {
+            if (editing) {
+                await announcementService.update(editing.id, form);
+            } else {
+                await announcementService.create(form);
+            }
+            setShowForm(false);
+            await load();
+        } catch (e) {
+            setError("Save failed. Check required fields.");
+        }
+    };
+
+    const remove = async (id) => {
+        if (!confirm("Move this announcement to Trash?")) return;
+        try {
+            await announcementService.remove(id);
+            await load();
+            await loadTrashed();
+        } catch (e) {
+            setError("Delete failed.");
+        }
+    };
+
+    const toggleStatus = async (item) => {
+        const next = item.status === "published" ? "draft" : "published";
+        try {
+            await announcementService.update(item.id, { status: next });
+            await load();
+        } catch (e) {
+            setError("Status update failed.");
+        }
+    };
+
     return (
-        <div>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">
-                    Announcements
-                </h1>
-                <p className="text-gray-600">
-                    Manage school announcements and updates
-                </p>
+        <div className="space-y-8">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-900 to-blue-700 rounded-xl px-6 py-4 text-white shadow-lg">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold">Announcements</h1>
+                        <p className="text-blue-100 text-sm">
+                            Manage school announcements and updates
+                        </p>
+                    </div>
+                </div>
             </div>
 
-            <Card>
-                <CardHeader>
+            <Card className="border-blue-100">
+                <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <CardTitle>All Announcements</CardTitle>
-                            <CardDescription>
+                            <CardTitle className="text-royal-blue">
+                                All Announcements
+                            </CardTitle>
+                            <CardDescription className="text-blue-700">
                                 Create and manage announcements for students and
                                 parents
                             </CardDescription>
                         </div>
-                        <Button>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Create Announcement
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                className="text-gray-700"
+                                onClick={() => setShowTrash((v) => !v)}
+                            >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                {showTrash ? "Hide Trash" : "View Trash"}
+                            </Button>
+                            <Button
+                                className="bg-royal-blue hover:bg-blue-700 text-white"
+                                onClick={openCreate}
+                            >
+                                <Plus className="mr-2 h-4 w-4" />
+                                Create Announcement
+                            </Button>
+                        </div>
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-center py-12 text-gray-500">
-                        <Megaphone className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                        <p>
-                            No announcements yet. Create your first announcement
-                            to get started.
-                        </p>
-                    </div>
+                    {error && (
+                        <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
+                            {error}
+                        </div>
+                    )}
+
+                    {loading ? (
+                        <div className="text-center py-12 text-blue-700">
+                            <Megaphone className="h-12 w-12 mx-auto mb-4 text-royal-blue/40 animate-pulse" />
+                            <p>Loading announcements...</p>
+                        </div>
+                    ) : items.length === 0 ? (
+                        <div className="text-center py-12 text-blue-700">
+                            <Megaphone className="h-12 w-12 mx-auto mb-4 text-royal-blue/40" />
+                            <p>
+                                No announcements yet. Create your first
+                                announcement to get started.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="divide-y divide-blue-100">
+                            {items.map((item) => (
+                                <div
+                                    key={item.id}
+                                    className="py-4 flex items-start justify-between gap-4"
+                                >
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span
+                                                className={`text-xs px-2 py-0.5 rounded-full border ${
+                                                    item.status === "published"
+                                                        ? "bg-green-50 text-green-700 border-green-200"
+                                                        : item.status ===
+                                                          "archived"
+                                                        ? "bg-gray-50 text-gray-700 border-gray-200"
+                                                        : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                                }`}
+                                            >
+                                                {item.status}
+                                            </span>
+                                            <span className="text-sm text-gray-500">
+                                                {item.published_at
+                                                    ? new Date(
+                                                          item.published_at
+                                                      ).toLocaleString()
+                                                    : "—"}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-lg font-semibold text-gray-900 mt-1">
+                                            {item.title}
+                                        </h3>
+                                        <p className="text-gray-600 text-sm line-clamp-2 mt-1">
+                                            {item.content}
+                                        </p>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            By {item.author}
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            variant="outline"
+                                            className="text-gray-700"
+                                            onClick={() => toggleStatus(item)}
+                                        >
+                                            {item.status === "published" ? (
+                                                <EyeOff className="h-4 w-4 mr-2" />
+                                            ) : (
+                                                <Eye className="h-4 w-4 mr-2" />
+                                            )}
+                                            {item.status === "published"
+                                                ? "Unpublish"
+                                                : "Publish"}
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            className={`text-gray-700 ${
+                                                item.is_featured
+                                                    ? "border-royal-blue text-royal-blue"
+                                                    : ""
+                                            }`}
+                                            onClick={async () => {
+                                                try {
+                                                    await announcementService.update(
+                                                        item.id,
+                                                        {
+                                                            is_featured:
+                                                                !item.is_featured,
+                                                        }
+                                                    );
+                                                    await load();
+                                                } catch (e) {
+                                                    setError(
+                                                        "Feature toggle failed."
+                                                    );
+                                                }
+                                            }}
+                                        >
+                                            {item.is_featured
+                                                ? "Unfeature"
+                                                : "Feature"}
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            className="text-gray-700"
+                                            onClick={() => openEdit(item)}
+                                        >
+                                            <Edit className="h-4 w-4 mr-2" />{" "}
+                                            Edit
+                                        </Button>
+                                        <Button
+                                            className="bg-red-600 hover:bg-red-700"
+                                            onClick={() => remove(item.id)}
+                                        >
+                                            <Trash2 className="h-4 w-4 mr-2" />{" "}
+                                            Delete
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </CardContent>
             </Card>
+
+            {showTrash && (
+                <Card className="border-red-200">
+                    <CardHeader className="bg-gradient-to-r from-red-50 to-rose-50">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="text-red-700">
+                                    Trash
+                                </CardTitle>
+                                <CardDescription className="text-red-600">
+                                    Soft-deleted announcements. Restore or
+                                    delete permanently.
+                                </CardDescription>
+                            </div>
+                            <Button
+                                variant="outline"
+                                className="text-gray-700"
+                                onClick={loadTrashed}
+                            >
+                                Refresh
+                            </Button>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        {trashed.length === 0 ? (
+                            <div className="text-center py-8 text-red-700">
+                                No items in Trash.
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-red-100">
+                                {trashed.map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className="py-4 flex items-start justify-between gap-4"
+                                    >
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-900">
+                                                {item.title}
+                                            </h3>
+                                            <p className="text-sm text-gray-600 line-clamp-2">
+                                                {item.content}
+                                            </p>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Deleted at{" "}
+                                                {new Date(
+                                                    item.deleted_at
+                                                ).toLocaleString()}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                variant="outline"
+                                                className="text-gray-700"
+                                                onClick={async () => {
+                                                    await announcementService.restore(
+                                                        item.id
+                                                    );
+                                                    await load();
+                                                    await loadTrashed();
+                                                }}
+                                            >
+                                                <RotateCcw className="h-4 w-4 mr-2" />{" "}
+                                                Restore
+                                            </Button>
+                                            <Button
+                                                className="bg-red-600 hover:bg-red-700"
+                                                onClick={async () => {
+                                                    if (
+                                                        confirm(
+                                                            "Permanently delete this announcement?"
+                                                        )
+                                                    ) {
+                                                        await announcementService.forceDelete(
+                                                            item.id
+                                                        );
+                                                        await loadTrashed();
+                                                    }
+                                                }}
+                                            >
+                                                <Trash2 className="h-4 w-4 mr-2" />{" "}
+                                                Delete Permanently
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            )}
+
+            {showForm && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-lg border border-blue-100">
+                        <div className="px-6 py-4 border-b bg-gradient-to-r from-gray-50 to-blue-50 rounded-t-xl">
+                            <h3 className="text-lg font-semibold text-royal-blue">
+                                {editing
+                                    ? "Edit Announcement"
+                                    : "Create Announcement"}
+                            </h3>
+                        </div>
+                        <form onSubmit={submit} className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Title
+                                </label>
+                                <input
+                                    value={form.title}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            title: e.target.value,
+                                        })
+                                    }
+                                    required
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Content
+                                </label>
+                                <textarea
+                                    value={form.content}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            content: e.target.value,
+                                        })
+                                    }
+                                    required
+                                    rows={6}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Image (optional)
+                                </label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            image: e.target.files?.[0] || null,
+                                        })
+                                    }
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                />
+                                {editing?.image_path && (
+                                    <div className="mt-2 text-xs text-gray-500">
+                                        Current:{" "}
+                                        <a
+                                            href={
+                                                "/storage/" + editing.image_path
+                                            }
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-royal-blue underline"
+                                        >
+                                            view
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Author
+                                    </label>
+                                    <input
+                                        value={form.author}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                author: e.target.value,
+                                            })
+                                        }
+                                        required
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Status
+                                    </label>
+                                    <select
+                                        value={form.status}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                status: e.target.value,
+                                            })
+                                        }
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                    >
+                                        <option value="draft">Draft</option>
+                                        <option value="published">
+                                            Published
+                                        </option>
+                                        <option value="archived">
+                                            Archived
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    id="is_featured"
+                                    type="checkbox"
+                                    checked={!!form.is_featured}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            is_featured: e.target.checked,
+                                        })
+                                    }
+                                    className="h-4 w-4 text-royal-blue border-gray-300 rounded"
+                                />
+                                <label
+                                    htmlFor="is_featured"
+                                    className="text-sm text-gray-700"
+                                >
+                                    Feature on Home page
+                                </label>
+                            </div>
+                            <div className="flex items-center justify-end gap-2 pt-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setShowForm(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    className="bg-royal-blue hover:bg-blue-700 text-white"
+                                >
+                                    {editing ? "Save Changes" : "Create"}
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
