@@ -30,22 +30,43 @@ class AnnouncementController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'content_html' => 'nullable|string',
             'author' => 'required|string|max:255',
             'status' => 'required|in:draft,published,archived',
+            'category' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'images.*' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'image_url' => 'nullable|url',
             'is_featured' => 'nullable|boolean',
         ]);
 
         $imagePath = null;
+        $images = [];
+        $externalLink = null;
+
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('announcements', 'public');
+        }
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $images[] = $file->store('announcements', 'public');
+            }
+        }
+
+        if ($request->filled('image_url')) {
+            $externalLink = $this->convertGDriveLink($request->image_url);
         }
 
         $announcement = Announcement::create([
             'title' => $request->title,
             'content' => $request->content,
+            'content_html' => $request->content_html,
             'author' => $request->author,
             'image_path' => $imagePath,
+            'images' => $images,
+            'external_link' => $externalLink,
+            'category' => $request->category ?? 'General',
             'status' => $request->status,
             'is_featured' => (bool) $request->boolean('is_featured'),
             'published_at' => $request->status === 'published' ? now() : null,
@@ -77,16 +98,22 @@ class AnnouncementController extends Controller
         $validated = $request->validate([
             'title' => 'sometimes|nullable|string|max:255',
             'content' => 'sometimes|nullable|string',
+            'content_html' => 'sometimes|nullable|string',
             'author' => 'sometimes|nullable|string|max:255',
             'status' => 'sometimes|in:draft,published,archived',
+            'category' => 'sometimes|nullable|string|max:255',
             'image' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'images.*' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'image_url' => 'sometimes|nullable|url',
             'is_featured' => 'sometimes|boolean',
         ]);
 
         $data = [];
         if ($request->has('title')) { $data['title'] = $request->title; }
         if ($request->has('content')) { $data['content'] = $request->content; }
+        if ($request->has('content_html')) { $data['content_html'] = $request->content_html; }
         if ($request->has('author')) { $data['author'] = $request->author; }
+        if ($request->has('category')) { $data['category'] = $request->category; }
         if ($request->has('status')) {
             $data['status'] = $request->status;
             $data['published_at'] = $request->status === 'published' ? now() : null;
@@ -97,6 +124,20 @@ class AnnouncementController extends Controller
 
         if ($request->hasFile('image')) {
             $data['image_path'] = $request->file('image')->store('announcements', 'public');
+        }
+
+        if ($request->hasFile('images')) {
+            $images = [];
+            foreach ($request->file('images') as $file) {
+                $images[] = $file->store('announcements', 'public');
+            }
+            $data['images'] = $images;
+        }
+
+        if ($request->has('image_url')) {
+            $data['external_link'] = $request->filled('image_url')
+                ? $this->convertGDriveLink($request->image_url)
+                : null;
         }
 
         $announcement->update($data);
@@ -175,5 +216,26 @@ class AnnouncementController extends Controller
             'success' => true,
             'message' => 'Announcement permanently deleted'
         ]);
+    }
+
+    /**
+     * Convert Google Drive sharing link to direct view link
+     */
+    private function convertGDriveLink(string $url): string
+    {
+        // If it's already a direct link, return as is
+        if (str_contains($url, 'drive.google.com/uc?')) {
+            return $url;
+        }
+
+        // Extract file ID from sharing link
+        $pattern = '/\/file\/d\/([a-zA-Z0-9_-]+)\//';
+        if (preg_match($pattern, $url, $matches)) {
+            $fileId = $matches[1];
+            return "https://drive.google.com/uc?export=view&id={$fileId}";
+        }
+
+        // If not a GDrive link, return as is (could be other URL)
+        return $url;
     }
 }

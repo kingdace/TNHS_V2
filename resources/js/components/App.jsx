@@ -70,6 +70,13 @@ import SchoolInfo from "../pages/admin/SchoolInfo";
 import ContactInfo from "../pages/admin/ContactInfo";
 import AdminPageContent from "../pages/admin/PageContent";
 import AdminEvents from "../pages/admin/Events.jsx";
+import AboutManagement from "../pages/admin/About";
+import NewsEventsManagement from "../pages/admin/NewsEvents";
+import HistoryManagement from "../pages/admin/about/HistoryManagement";
+import MissionVisionManagement from "../pages/admin/about/MissionVisionManagement";
+import SchoolSealManagement from "../pages/admin/about/SchoolSealManagement";
+import PrivacyPolicyManagement from "../pages/admin/about/PrivacyPolicyManagement";
+import QualityPolicyManagement from "../pages/admin/about/QualityPolicyManagement";
 
 // Scroll to top wrapper component
 const ScrollToTopWrapper = ({ children }) => {
@@ -262,8 +269,8 @@ function App() {
                             >
                                 <Route index element={<AdminDashboard />} />
                                 <Route
-                                    path="announcements"
-                                    element={<AdminAnnouncements />}
+                                    path="news-events"
+                                    element={<NewsEventsManagement />}
                                 />
                                 <Route path="users" element={<AdminUsers />} />
                                 <Route
@@ -295,8 +302,28 @@ function App() {
                                     element={<AdminPageContent />}
                                 />
                                 <Route
-                                    path="events"
-                                    element={<AdminEvents />}
+                                    path="about"
+                                    element={<AboutManagement />}
+                                />
+                                <Route
+                                    path="about/history"
+                                    element={<HistoryManagement />}
+                                />
+                                <Route
+                                    path="about/mission-vision"
+                                    element={<MissionVisionManagement />}
+                                />
+                                <Route
+                                    path="about/school-seal"
+                                    element={<SchoolSealManagement />}
+                                />
+                                <Route
+                                    path="about/privacy-policy"
+                                    element={<PrivacyPolicyManagement />}
+                                />
+                                <Route
+                                    path="about/quality-policy"
+                                    element={<QualityPolicyManagement />}
                                 />
                             </Route>
                         </Route>

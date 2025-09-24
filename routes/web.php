@@ -30,6 +30,7 @@ Route::prefix('api')->group(function () {
 
     // Public events (school calendar)
     Route::get('/events/public', [PublicEventController::class, 'publicByMonth']);
+    Route::get('/events/public-list', [PublicEventController::class, 'publicList']);
 
     // Academic Programs API routes
     Route::get('/academic-programs/grade/{grade}', [\App\Http\Controllers\Api\AcademicProgramController::class, 'byGrade']);

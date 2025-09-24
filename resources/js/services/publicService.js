@@ -54,6 +54,7 @@ export const publicService = {
     events: {
         /**
          * Get active events for a specific month (YYYY-MM), optionally filtered by types
+         * Used for the homepage calendar component
          */
         async getByMonth(yearMonth, { types = [] } = {}) {
             try {
@@ -71,6 +72,39 @@ export const publicService = {
             } catch (error) {
                 console.error("Error fetching public events:", error);
                 return [];
+            }
+        },
+
+        /**
+         * Get public events for the events listing page
+         * Returns only events marked as public with pagination
+         */
+        async getPublicList({
+            type = null,
+            featuredOnly = false,
+            limit = 12,
+            page = 1,
+        } = {}) {
+            try {
+                const params = new URLSearchParams();
+                if (type) params.set("type", type);
+                if (featuredOnly) params.set("featured_only", "1");
+                params.set("limit", limit.toString());
+                params.set("page", page.toString());
+
+                const response = await fetch(
+                    `${API_BASE_URL}/events/public-list?${params.toString()}`
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.success
+                    ? data
+                    : { data: [], pagination: { total: 0, pages: 0 } };
+            } catch (error) {
+                console.error("Error fetching public events list:", error);
+                return { data: [], pagination: { total: 0, pages: 0 } };
             }
         },
     },

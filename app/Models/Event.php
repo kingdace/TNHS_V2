@@ -13,23 +13,48 @@ class Event extends Model
     protected $fillable = [
         'title',
         'description',
+        'excerpt',
         'event_type',
         'start_date',
         'end_date',
         'location',
         'image_path',
         'is_featured',
+        'is_public',
+        'slug',
         'is_active',
         'display_order',
     ];
 
     protected $casts = [
         'is_featured' => 'boolean',
+        'is_public' => 'boolean',
         'is_active' => 'boolean',
         'display_order' => 'integer',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
     ];
+
+    protected $appends = [
+        'start_date_for_form',
+        'end_date_for_form',
+    ];
+
+    /**
+     * Get the start_date in datetime-local format for forms
+     */
+    public function getStartDateForFormAttribute()
+    {
+        return $this->start_date ? $this->start_date->format('Y-m-d\TH:i') : null;
+    }
+
+    /**
+     * Get the end_date in datetime-local format for forms
+     */
+    public function getEndDateForFormAttribute()
+    {
+        return $this->end_date ? $this->end_date->format('Y-m-d\TH:i') : null;
+    }
 
     /**
      * Scope a query to only include active events.

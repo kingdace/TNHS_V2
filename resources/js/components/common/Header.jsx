@@ -22,12 +22,12 @@ const Header = () => {
             ],
         },
         {
-            name: "News & Events",
+            name: "Announcements",
             href: "/news",
             hasDropdown: true,
             submenu: [
-                { name: "Announcements", href: "/announcements" },
-                { name: "Events", href: "/events" },
+                { name: "School Highlights", href: "/announcements" },
+                { name: "School Events", href: "/events" },
             ],
         },
         {

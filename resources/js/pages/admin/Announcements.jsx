@@ -22,6 +22,7 @@ import {
     Image as ImageIcon,
 } from "lucide-react";
 import { announcementService } from "../../services/announcementService";
+import RichTextEditor from "../../components/RichTextEditor";
 
 const AdminAnnouncements = () => {
     const [items, setItems] = useState([]);
@@ -32,9 +33,13 @@ const AdminAnnouncements = () => {
     const [form, setForm] = useState({
         title: "",
         content: "",
+        content_html: "",
         author: "",
         status: "draft",
+        category: "General",
         image: null,
+        images: [],
+        image_url: "",
         is_featured: false,
     });
     const [showTrash, setShowTrash] = useState(false);
@@ -44,6 +49,7 @@ const AdminAnnouncements = () => {
     // UI-only controls
     const [query, setQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("all"); // all|draft|published|archived
+    const [categoryFilter, setCategoryFilter] = useState("all"); // all|General|Academic|Events|Sports|Arts|Announcements|News|Important
     const [featuredOnly, setFeaturedOnly] = useState(false);
     const [sortKey, setSortKey] = useState("newest"); // newest|oldest|title|status
     const [page, setPage] = useState(1);
@@ -85,6 +91,8 @@ const AdminAnnouncements = () => {
         .filter((it) => {
             if (statusFilter !== "all" && it.status !== statusFilter)
                 return false;
+            if (categoryFilter !== "all" && it.category !== categoryFilter)
+                return false;
             if (featuredOnly && !it.is_featured) return false;
             if (!query.trim()) return true;
             const q = normalized(query);
@@ -119,16 +127,17 @@ const AdminAnnouncements = () => {
         setForm({
             title: "",
             content: "",
+            content_html: "",
             author: "",
             status: "draft",
+            category: "General",
             image: null,
+            images: [],
+            image_url: "",
             is_featured: false,
         });
         setShowForm(true);
-        if (imagePreviewUrl) {
-            URL.revokeObjectURL(imagePreviewUrl);
-            setImagePreviewUrl("");
-        }
+        setImagePreviewUrl("");
     };
 
     const openEdit = (item) => {
@@ -136,16 +145,23 @@ const AdminAnnouncements = () => {
         setForm({
             title: item.title,
             content: item.content,
+            content_html: item.content_html || "",
             author: item.author,
             status: item.status,
+            category: item.category || "General",
             image: null,
+            images: [],
+            image_url: item.external_link || "",
             is_featured: !!item.is_featured,
         });
         setShowForm(true);
-        if (imagePreviewUrl) {
-            URL.revokeObjectURL(imagePreviewUrl);
-            setImagePreviewUrl("");
-        }
+        // Set proper image preview URL
+        const imageUrl = item.image_path
+            ? item.image_path.startsWith("http")
+                ? item.image_path
+                : `/storage/${item.image_path.replace(/^\/?storage\//, "")}`
+            : "";
+        setImagePreviewUrl(imageUrl);
     };
 
     const submit = async (e) => {
@@ -193,31 +209,74 @@ const AdminAnnouncements = () => {
         }
     };
 
+    // Convert Google Drive sharing link to direct view link for preview
+    const convertGDriveLink = (url) => {
+        if (!url) return "";
+        console.log("Converting URL:", url);
+
+        // If it's already a direct link, return as is
+        if (url.includes("drive.google.com/uc?")) {
+            console.log("Already a direct link:", url);
+            return url;
+        }
+
+        // Extract file ID from sharing link - try multiple patterns
+        let match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)\//);
+        if (!match) {
+            // Try alternative pattern for different URL formats
+            match = url.match(/\/d\/([a-zA-Z0-9_-]+)\//);
+        }
+        if (!match) {
+            // Try open?id= format
+            match = url.match(/open\?id=([a-zA-Z0-9_-]+)/);
+        }
+
+        if (match) {
+            const fileId = match[1];
+            // Try the standard direct view URL
+            const directUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+            console.log("Converted to:", directUrl);
+
+            // For drive_link URLs, also try the thumbnail URL as fallback
+            if (url.includes("usp=drive_link")) {
+                console.log(
+                    "Detected drive_link URL, this might have restrictions"
+                );
+            }
+
+            return directUrl;
+        }
+
+        // Return as is if not a GDrive link
+        console.log("Not a GDrive link, returning as is:", url);
+        return url;
+    };
+
     return (
         <div className="space-y-8">
-            {/* Header */}
+            {/* Header
             <div className="bg-gradient-to-r from-blue-900 to-blue-700 rounded-xl px-6 py-4 text-white shadow-lg">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold">Announcements</h1>
+                        <h1 className="text-2xl font-bold">School Highlights</h1>
                         <p className="text-blue-100 text-sm">
                             Manage school announcements and updates
                         </p>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             <Card className="border-blue-100">
-                <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
+                <CardHeader className="bg-gray-75">
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <div>
                                 <CardTitle className="text-royal-blue">
-                                    All Announcements
+                                    All Highlights
                                 </CardTitle>
                                 <CardDescription className="text-blue-700">
-                                    Create and manage announcements for students
-                                    and parents
+                                    Create and manage campus highlights and
+                                    updates
                                 </CardDescription>
                             </div>
                             <div className="flex items-center gap-2">
@@ -254,8 +313,48 @@ const AdminAnnouncements = () => {
                                     />
                                 </div>
                             </div>
+                            {/* Sort
+                            <div className="lg:col-span-4">
+                                <div className="flex items-center gap-2 justify-end">
+                                    <span className="text-sm text-gray-600">
+                                        Sort by:
+                                    </span>
+                                    <select
+                                        value={sortKey}
+                                        onChange={(e) =>
+                                            setSortKey(e.target.value)
+                                        }
+                                        className="w-40 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                    >
+                                        <option value="newest">Newest</option>
+                                        <option value="oldest">Oldest</option>
+                                        <option value="title">Title A–Z</option>
+                                        <option value="status">Status</option>
+                                    </select>
+                                    {(query ||
+                                        statusFilter !== "all" ||
+                                        categoryFilter !== "all" ||
+                                        featuredOnly ||
+                                        sortKey !== "newest") && (
+                                        <Button
+                                            variant="outline"
+                                            className="text-gray-700"
+                                            onClick={() => {
+                                                setQuery("");
+                                                setStatusFilter("all");
+                                                setCategoryFilter("all");
+                                                setFeaturedOnly(false);
+                                                setSortKey("newest");
+                                                setPage(1);
+                                            }}
+                                        >
+                                            Clear filters
+                                        </Button>
+                                    )}
+                                </div>
+                            </div> */}
                             {/* Filters */}
-                            <div className="lg:col-span-3 flex items-center gap-2">
+                            <div className="lg:col-span-7 flex items-center gap-2">
                                 <div className="flex items-center gap-2 w-full">
                                     <Filter className="h-4 w-4 text-gray-400" />
                                     <select
@@ -263,7 +362,7 @@ const AdminAnnouncements = () => {
                                         onChange={(e) =>
                                             setStatusFilter(e.target.value)
                                         }
-                                        className="w-40 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        className="w-32 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
                                     >
                                         <option value="all">
                                             All statuses
@@ -274,6 +373,31 @@ const AdminAnnouncements = () => {
                                         </option>
                                         <option value="archived">
                                             Archived
+                                        </option>
+                                    </select>
+                                    <select
+                                        value={categoryFilter}
+                                        onChange={(e) =>
+                                            setCategoryFilter(e.target.value)
+                                        }
+                                        className="w-32 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
+                                    >
+                                        <option value="all">
+                                            All categories
+                                        </option>
+                                        <option value="General">General</option>
+                                        <option value="Academic">
+                                            Academic
+                                        </option>
+                                        <option value="Events">Events</option>
+                                        <option value="Sports">Sports</option>
+                                        <option value="Arts">Arts</option>
+                                        <option value="Announcements">
+                                            Announcements
+                                        </option>
+                                        <option value="News">News</option>
+                                        <option value="Important">
+                                            Important
                                         </option>
                                     </select>
                                 </div>
@@ -295,44 +419,6 @@ const AdminAnnouncements = () => {
                                     />
                                     Featured only
                                 </label>
-                            </div>
-                            {/* Sort */}
-                            <div className="lg:col-span-4">
-                                <div className="flex items-center gap-2 justify-end">
-                                    <span className="text-sm text-gray-600">
-                                        Sort by:
-                                    </span>
-                                    <select
-                                        value={sortKey}
-                                        onChange={(e) =>
-                                            setSortKey(e.target.value)
-                                        }
-                                        className="w-40 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                    >
-                                        <option value="newest">Newest</option>
-                                        <option value="oldest">Oldest</option>
-                                        <option value="title">Title A–Z</option>
-                                        <option value="status">Status</option>
-                                    </select>
-                                    {(query ||
-                                        statusFilter !== "all" ||
-                                        featuredOnly ||
-                                        sortKey !== "newest") && (
-                                        <Button
-                                            variant="outline"
-                                            className="text-gray-700"
-                                            onClick={() => {
-                                                setQuery("");
-                                                setStatusFilter("all");
-                                                setFeaturedOnly(false);
-                                                setSortKey("newest");
-                                                setPage(1);
-                                            }}
-                                        >
-                                            Clear filters
-                                        </Button>
-                                    )}
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -423,6 +509,24 @@ const AdminAnnouncements = () => {
                                                     <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-royal-blue/10 text-royal-blue border border-royal-blue/20">
                                                         <Star className="h-3 w-3 mr-1" />{" "}
                                                         Featured
+                                                    </span>
+                                                )}
+                                                {item.external_link && (
+                                                    <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                                                        <svg
+                                                            className="h-3 w-3 mr-1"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            viewBox="0 0 24 24"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                                            />
+                                                        </svg>
+                                                        Link
                                                     </span>
                                                 )}
                                                 <span
@@ -713,196 +817,326 @@ const AdminAnnouncements = () => {
             )}
 
             {showForm && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-lg border border-blue-100">
-                        <div className="px-6 py-4 border-b bg-gradient-to-r from-gray-50 to-blue-50 rounded-t-xl">
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-lg border border-blue-100 max-h-[90vh] flex flex-col">
+                        <div className="px-6 py-4 border-b bg-gradient-to-r from-gray-50 to-blue-50 rounded-t-xl flex-shrink-0">
                             <h3 className="text-lg font-semibold text-royal-blue">
                                 {editing
                                     ? "Edit Announcement"
                                     : "Create Announcement"}
                             </h3>
                         </div>
-                        <form onSubmit={submit} className="p-6 space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Title
-                                </label>
-                                <input
-                                    value={form.title}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            title: e.target.value,
-                                        })
-                                    }
-                                    required
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Content
-                                </label>
-                                <textarea
-                                    value={form.content}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            content: e.target.value,
-                                        })
-                                    }
-                                    required
-                                    rows={6}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Image (optional)
-                                </label>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        const file =
-                                            e.target.files?.[0] || null;
-                                        setForm({ ...form, image: file });
-                                        if (imagePreviewUrl) {
-                                            URL.revokeObjectURL(
-                                                imagePreviewUrl
-                                            );
-                                        }
-                                        if (file) {
-                                            setImagePreviewUrl(
-                                                URL.createObjectURL(file)
-                                            );
-                                        } else {
-                                            setImagePreviewUrl("");
-                                        }
-                                    }}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                />
-                                {(imagePreviewUrl || editing?.image_path) && (
-                                    <div className="mt-3 flex items-center gap-3">
-                                        {imagePreviewUrl && (
-                                            <img
-                                                src={imagePreviewUrl}
-                                                alt="Selected preview"
-                                                className="w-16 h-16 rounded-lg object-cover border border-blue-100"
-                                            />
-                                        )}
-                                        {!imagePreviewUrl &&
-                                            editing?.image_path && (
-                                                <a
-                                                    href={
-                                                        (
-                                                            editing.image_path ||
-                                                            ""
-                                                        ).startsWith("http")
-                                                            ? editing.image_path
-                                                            : (
-                                                                  editing.image_path ||
-                                                                  ""
-                                                              ).startsWith(
-                                                                  "/storage/"
-                                                              )
-                                                            ? editing.image_path
-                                                            : `/storage/${(
-                                                                  editing.image_path ||
-                                                                  ""
-                                                              ).replace(
-                                                                  /^\/?storage\//,
-                                                                  ""
-                                                              )}`
-                                                    }
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="text-royal-blue underline text-sm"
-                                                    title="Open current image"
-                                                >
-                                                    View current image
-                                                </a>
-                                            )}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
+                        <div className="flex-1 overflow-y-auto">
+                            <form onSubmit={submit} className="p-6 space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Author
+                                        Title
                                     </label>
                                     <input
-                                        value={form.author}
+                                        value={form.title}
                                         onChange={(e) =>
                                             setForm({
                                                 ...form,
-                                                author: e.target.value,
+                                                title: e.target.value,
                                             })
                                         }
                                         required
                                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
                                     />
                                 </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Category
+                                        </label>
+                                        <select
+                                            value={form.category}
+                                            onChange={(e) =>
+                                                setForm({
+                                                    ...form,
+                                                    category: e.target.value,
+                                                })
+                                            }
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        >
+                                            <option value="General">
+                                                General
+                                            </option>
+                                            <option value="Academic">
+                                                Academic
+                                            </option>
+                                            <option value="Events">
+                                                Events
+                                            </option>
+                                            <option value="Sports">
+                                                Sports
+                                            </option>
+                                            <option value="Arts">Arts</option>
+                                            <option value="Announcements">
+                                                Announcements
+                                            </option>
+                                            <option value="News">News</option>
+                                            <option value="Important">
+                                                Important
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Status
+                                        </label>
+                                        <select
+                                            value={form.status}
+                                            onChange={(e) =>
+                                                setForm({
+                                                    ...form,
+                                                    status: e.target.value,
+                                                })
+                                            }
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        >
+                                            <option value="draft">Draft</option>
+                                            <option value="published">
+                                                Published
+                                            </option>
+                                            <option value="archived">
+                                                Archived
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Status
+                                        Content (Rich Text)
                                     </label>
-                                    <select
-                                        value={form.status}
-                                        onChange={(e) =>
+                                    <RichTextEditor
+                                        value={form.content_html}
+                                        onChange={(html, text) => {
+                                            setForm((prevForm) => ({
+                                                ...prevForm,
+                                                content_html: html,
+                                                content: text,
+                                            }));
+                                        }}
+                                        placeholder="Write your announcement content here..."
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                                        Featured Image (optional)
+                                    </label>
+                                    <div className="mb-3">
+                                        <label className="block text-xs text-gray-600 mb-1">
+                                            Upload main image (max 1 image, 2MB)
+                                        </label>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file =
+                                                    e.target.files?.[0] || null;
+                                                setForm({
+                                                    ...form,
+                                                    image: file,
+                                                });
+                                                if (imagePreviewUrl) {
+                                                    URL.revokeObjectURL(
+                                                        imagePreviewUrl
+                                                    );
+                                                }
+                                                if (file) {
+                                                    setImagePreviewUrl(
+                                                        URL.createObjectURL(
+                                                            file
+                                                        )
+                                                    );
+                                                } else if (editing) {
+                                                    // If editing and no new file selected, keep existing preview
+                                                    setImagePreviewUrl(
+                                                        editing.image_path
+                                                            ? editing.image_path.startsWith(
+                                                                  "http"
+                                                              )
+                                                                ? editing.image_path
+                                                                : `/storage/${editing.image_path.replace(
+                                                                      /^\/?storage\//,
+                                                                      ""
+                                                                  )}`
+                                                            : ""
+                                                    );
+                                                } else {
+                                                    setImagePreviewUrl("");
+                                                }
+                                            }}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        />
+                                        {editing && !form.image && (
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Leave empty to keep current
+                                                image
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {imagePreviewUrl && (
+                                        <div className="mt-3 flex items-center gap-3">
+                                            <img
+                                                src={imagePreviewUrl}
+                                                alt="Preview"
+                                                className="w-16 h-16 rounded-lg object-cover border border-blue-100"
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display =
+                                                        "none";
+                                                }}
+                                            />
+                                            <span className="text-xs text-blue-600">
+                                                {form.image
+                                                    ? "New image preview"
+                                                    : "Current featured image"}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                                        Gallery Images (optional)
+                                    </label>
+                                    <div className="mb-3">
+                                        <label className="block text-xs text-gray-600 mb-1">
+                                            Upload multiple images (max 5
+                                            images, 2MB each)
+                                        </label>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            multiple
+                                            onChange={(e) => {
+                                                const files = Array.from(
+                                                    e.target.files || []
+                                                );
+                                                setForm({
+                                                    ...form,
+                                                    images: files,
+                                                });
+                                            }}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        />
+                                    </div>
+
+                                    {form.images && form.images.length > 0 && (
+                                        <div className="mt-3">
+                                            <p className="text-xs text-blue-600 mb-2">
+                                                {form.images.length} gallery
+                                                image(s) selected
+                                            </p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {form.images.map(
+                                                    (file, index) => (
+                                                        <img
+                                                            key={index}
+                                                            src={URL.createObjectURL(
+                                                                file
+                                                            )}
+                                                            alt={`Gallery ${
+                                                                index + 1
+                                                            }`}
+                                                            className="w-12 h-12 rounded-lg object-cover border border-blue-100"
+                                                            onError={(e) => {
+                                                                e.currentTarget.style.display =
+                                                                    "none";
+                                                            }}
+                                                        />
+                                                    )
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        External Link (optional)
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={form.image_url}
+                                        onChange={(e) => {
+                                            const url = e.target.value;
                                             setForm({
                                                 ...form,
-                                                status: e.target.value,
-                                            })
-                                        }
+                                                image_url: url,
+                                            });
+                                        }}
+                                        placeholder="https://drive.google.com/... or any external link"
                                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                    >
-                                        <option value="draft">Draft</option>
-                                        <option value="published">
-                                            Published
-                                        </option>
-                                        <option value="archived">
-                                            Archived
-                                        </option>
-                                    </select>
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Link will be displayed below the image
+                                        for users to view additional content
+                                    </p>
                                 </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    id="is_featured"
-                                    type="checkbox"
-                                    checked={!!form.is_featured}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            is_featured: e.target.checked,
-                                        })
-                                    }
-                                    className="h-4 w-4 text-royal-blue border-gray-300 rounded"
-                                />
-                                <label
-                                    htmlFor="is_featured"
-                                    className="text-sm text-gray-700"
-                                >
-                                    Feature on Home page
-                                </label>
-                            </div>
-                            <div className="flex items-center justify-end gap-2 pt-2">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => setShowForm(false)}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    className="bg-royal-blue hover:bg-blue-700 text-white"
-                                >
-                                    {editing ? "Save Changes" : "Create"}
-                                </Button>
-                            </div>
-                        </form>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Author
+                                        </label>
+                                        <input
+                                            value={form.author}
+                                            onChange={(e) =>
+                                                setForm({
+                                                    ...form,
+                                                    author: e.target.value,
+                                                })
+                                            }
+                                            required
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            id="is_featured"
+                                            type="checkbox"
+                                            checked={!!form.is_featured}
+                                            onChange={(e) =>
+                                                setForm({
+                                                    ...form,
+                                                    is_featured:
+                                                        e.target.checked,
+                                                })
+                                            }
+                                            className="h-4 w-4 text-royal-blue border-gray-300 rounded"
+                                        />
+                                        <label
+                                            htmlFor="is_featured"
+                                            className="text-sm text-gray-700"
+                                        >
+                                            Feature on Home page
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center justify-end gap-2 pt-2">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => setShowForm(false)}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        className="bg-royal-blue hover:bg-blue-700 text-white"
+                                    >
+                                        {editing ? "Save Changes" : "Create"}
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}

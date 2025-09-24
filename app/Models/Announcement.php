@@ -13,8 +13,12 @@ class Announcement extends Model
     protected $fillable = [
         'title',
         'content',
+        'content_html',
         'author',
         'image_path',
+        'images',
+        'external_link',
+        'category',
         'status',
         'is_featured',
         'published_at',
@@ -23,6 +27,7 @@ class Announcement extends Model
     protected $casts = [
         'published_at' => 'datetime',
         'is_featured' => 'boolean',
+        'images' => 'array',
     ];
 
     public function scopePublished($query)

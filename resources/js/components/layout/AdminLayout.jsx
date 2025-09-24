@@ -24,6 +24,9 @@ import {
     Image,
     TrendingUp,
     Clock,
+    Shield,
+    Target,
+    Award,
 } from "lucide-react";
 
 const AdminLayout = () => {
@@ -43,19 +46,13 @@ const AdminLayout = () => {
         },
         {
             name: "Announcements",
-            href: "/admin/announcements",
+            href: "/admin/news-events",
             icon: Bell,
-            // badge: "3",
         },
         {
             name: "Hero Carousel",
             href: "/admin/hero-carousel",
             icon: Image,
-        },
-        {
-            name: "Events",
-            href: "/admin/events",
-            icon: Calendar,
         },
         {
             name: "Academic Programs",
@@ -71,6 +68,11 @@ const AdminLayout = () => {
             name: "Contact Information",
             href: "/admin/contact-info",
             icon: Phone,
+        },
+        {
+            name: "About Management",
+            href: "/admin/about",
+            icon: FileText,
         },
         {
             name: "Page Content",
@@ -155,12 +157,14 @@ const AdminLayout = () => {
     const getCurrentPageTitle = () => {
         const path = location.pathname;
         if (path === "/admin") return "Dashboard";
-        if (path.includes("/admin/announcements")) return "Announcements";
+        if (path.includes("/admin/news-events"))
+            return "News & Events Management";
         if (path.includes("/admin/hero-carousel")) return "Hero Carousel";
         if (path.includes("/admin/academic-programs"))
             return "Academic Programs";
         if (path.includes("/admin/school-info")) return "School Information";
         if (path.includes("/admin/contact-info")) return "Contact Information";
+        if (path.includes("/admin/about")) return "About Management";
         if (path.includes("/admin/page-content")) return "Page Content";
         if (path.includes("/admin/users")) return "User Management";
         if (path.includes("/admin/staff-profiles")) return "Staff Profiles";

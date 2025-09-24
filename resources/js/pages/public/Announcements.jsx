@@ -8,7 +8,14 @@ const Announcements = () => {
     const [announcements, setAnnouncements] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedCategory, setSelectedCategory] = useState("all");
     const announcementsPerPage = 6;
+
+    // Get unique categories from announcements
+    const categories = [
+        "all",
+        ...new Set(announcements.map((ann) => ann.category).filter(Boolean)),
+    ];
 
     // Fetch announcements on component mount
     useEffect(() => {
@@ -32,11 +39,22 @@ const Announcements = () => {
         window.scrollTo(0, 0);
     }, []);
 
+    // Filter announcements by category
+    const filteredAnnouncements =
+        selectedCategory === "all"
+            ? announcements
+            : announcements.filter((ann) => ann.category === selectedCategory);
+
     // Pagination calculations
-    const totalPages = Math.ceil(announcements.length / announcementsPerPage);
+    const totalPages = Math.ceil(
+        filteredAnnouncements.length / announcementsPerPage
+    );
     const startIndex = (currentPage - 1) * announcementsPerPage;
     const endIndex = startIndex + announcementsPerPage;
-    const currentAnnouncements = announcements.slice(startIndex, endIndex);
+    const currentAnnouncements = filteredAnnouncements.slice(
+        startIndex,
+        endIndex
+    );
 
     // Handle page change
     const handlePageChange = (page) => {
@@ -52,7 +70,7 @@ const Announcements = () => {
                     {/* Compact Header Section */}
                     <div className="text-center mb-8">
                         <h1 className="text-3xl font-bold text-royal-blue mb-2">
-                            School Announcements
+                            School Highlights
                         </h1>
                         {/* <div className="w-24 h-1 bg-gradient-to-r from-royal-blue to-blue-600 rounded-full mx-auto"></div> */}
                     </div>
@@ -95,6 +113,38 @@ const Announcements = () => {
                         </div>
                     ) : (
                         <>
+                            {/* Category Filter */}
+                            <div className="mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div className="flex items-center gap-4">
+                                    <span className="text-sm font-medium text-gray-700">
+                                        Filter by category:
+                                    </span>
+                                    <select
+                                        value={selectedCategory}
+                                        onChange={(e) => {
+                                            setSelectedCategory(e.target.value);
+                                            setCurrentPage(1); // Reset to first page when filtering
+                                        }}
+                                        className="w-[140px] px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-royal-blue text-sm"
+                                    >
+                                        {categories.map((category) => (
+                                            <option
+                                                key={category}
+                                                value={category}
+                                            >
+                                                {category === "all"
+                                                    ? "All Categories"
+                                                    : category}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    Showing {filteredAnnouncements.length} of{" "}
+                                    {announcements.length} announcements
+                                </div>
+                            </div>
+
                             {/* Announcements Grid - Same style as Home page */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
                                 {currentAnnouncements.map(

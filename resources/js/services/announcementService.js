@@ -57,19 +57,35 @@ export const announcementService = {
      * Transform announcement data to match the expected format
      */
     transformAnnouncement(announcement) {
-        const imageFromUpload = announcement.image_path
-            ? `/storage/${announcement.image_path}`
+        // Handle image source (file path or URL)
+        const imageSrc = announcement.image_path
+            ? announcement.image_path.startsWith("http")
+                ? announcement.image_path // Direct URL
+                : `/storage/${announcement.image_path}` // File path
             : null;
+
+        // Handle gallery images
+        const galleryImages = announcement.images
+            ? Array.isArray(announcement.images)
+                ? announcement.images.map((img) =>
+                      img.startsWith("http") ? img : `/storage/${img}`
+                  )
+                : []
+            : [];
+
         return {
             id: announcement.id,
             title: announcement.title,
             content: announcement.content,
+            content_html: announcement.content_html,
             excerpt: this.truncateText(announcement.content, 150),
             author: announcement.author,
             date: this.formatDate(announcement.published_at),
-            category: "Announcements",
+            category: announcement.category || "General",
             views: Math.floor(Math.random() * 2000) + 500,
-            image: imageFromUpload || this.getRandomImage(),
+            image: imageSrc || this.getRandomImage(),
+            images: galleryImages,
+            external_link: announcement.external_link || null,
             featured: !!announcement.is_featured,
             tags: this.extractTags(announcement.title), // Extract tags from title
         };
@@ -165,27 +181,63 @@ export const announcementService = {
      */
     async create(payload) {
         try {
-            const formData = new FormData();
-            Object.entries(payload).forEach(([key, value]) => {
-                if (value === undefined || value === null) return;
-                if (typeof value === "boolean") {
-                    formData.append(key, value ? "1" : "0");
-                } else {
-                    formData.append(key, value);
-                }
-            });
+            let body;
+            let headers = {
+                ...getHeaders(),
+                Accept: "application/json",
+            };
+
+            // Check if we have files (image or images array)
+            const hasFiles =
+                payload.image || (payload.images && payload.images.length > 0);
+
+            if (hasFiles) {
+                const formData = new FormData();
+                Object.entries(payload).forEach(([key, value]) => {
+                    if (value === undefined || value === null) return;
+
+                    if (key === "images" && Array.isArray(value)) {
+                        // Handle multiple images
+                        value.forEach((file, index) => {
+                            formData.append(`images[${index}]`, file);
+                        });
+                    } else if (typeof value === "boolean") {
+                        formData.append(key, value ? "1" : "0");
+                    } else if (key === "image_url" && !value && payload.image) {
+                        // Skip empty image_url when we have a file
+                        return;
+                    } else if (key !== "images") {
+                        // Skip the images key since we handled it above
+                        formData.append(key, value);
+                    }
+                });
+                body = formData;
+                // Remove Content-Type header for FormData (browser sets it automatically)
+                delete headers["Content-Type"];
+            } else {
+                // Use JSON for URL-only submissions
+                const data = {};
+                Object.entries(payload).forEach(([key, value]) => {
+                    if (value === undefined || value === null) return;
+                    if (key === "images") return; // Skip images array for JSON
+                    if (typeof value === "boolean") {
+                        data[key] = value ? 1 : 0;
+                    } else {
+                        data[key] = value;
+                    }
+                });
+                body = JSON.stringify(data);
+            }
+
             const response = await fetch(`${API_BASE_URL}/announcements`, {
                 method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
-                    Accept: "application/json",
-                },
+                headers,
                 credentials: "include",
-                body: formData,
+                body,
             });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            return data.data;
+            const responseData = await response.json();
+            return responseData.data;
         } catch (error) {
             console.error("Error creating announcement:", error);
             throw error;
@@ -197,32 +249,84 @@ export const announcementService = {
      */
     async update(id, payload) {
         try {
-            const formData = new FormData();
-            Object.entries(payload).forEach(([key, value]) => {
-                if (value === undefined || value === null) return;
-                if (typeof value === "boolean") {
-                    formData.append(key, value ? "1" : "0");
-                } else {
-                    formData.append(key, value);
-                }
-            });
-            // Laravel expects POST with _method=PUT for multipart
-            formData.append("_method", "PUT");
+            let body;
+            let headers = {
+                ...getHeaders(),
+                Accept: "application/json",
+            };
+
+            // Check if we have files (image or images array)
+            const hasFiles =
+                payload.image || (payload.images && payload.images.length > 0);
+
+            if (hasFiles) {
+                const formData = new FormData();
+                // Add _method for Laravel PUT requests
+                formData.append("_method", "PUT");
+
+                Object.entries(payload).forEach(([key, value]) => {
+                    if (value === undefined || value === null) return;
+
+                    if (key === "images" && Array.isArray(value)) {
+                        // Handle multiple images
+                        value.forEach((file, index) => {
+                            formData.append(`images[${index}]`, file);
+                        });
+                    } else if (typeof value === "boolean") {
+                        formData.append(key, value ? "1" : "0");
+                    } else if (key === "image_url" && !value && payload.image) {
+                        // Skip empty image_url when we have a file
+                        return;
+                    } else if (key !== "images") {
+                        // Skip the images key since we handled it above
+                        formData.append(key, value);
+                    }
+                });
+                body = formData;
+                // Remove Content-Type header for FormData (browser sets it automatically)
+                delete headers["Content-Type"];
+            } else {
+                // Use FormData for all updates to ensure consistency
+                const formData = new FormData();
+                formData.append("_method", "PUT");
+
+                Object.entries(payload).forEach(([key, value]) => {
+                    if (value === undefined) return;
+                    if (key === "images") return; // Skip images array for non-file updates
+
+                    if (typeof value === "boolean") {
+                        formData.append(key, value ? "1" : "0");
+                    } else if (value === null) {
+                        formData.append(key, "");
+                    } else {
+                        formData.append(key, value);
+                    }
+                });
+                body = formData;
+                // Remove Content-Type header for FormData (browser sets it automatically)
+                delete headers["Content-Type"];
+            }
+
             const response = await fetch(
                 `${API_BASE_URL}/announcements/${id}`,
                 {
-                    method: "POST",
-                    headers: {
-                        "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
-                        Accept: "application/json",
-                    },
+                    method: "POST", // Use POST with _method=PUT for Laravel
+                    headers,
                     credentials: "include",
-                    body: formData,
+                    body,
                 }
             );
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            return data.data;
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error("Update failed:", response.status, errorData);
+                throw new Error(
+                    `HTTP ${response.status}: ${
+                        errorData.message || "Update failed"
+                    }`
+                );
+            }
+            const responseData = await response.json();
+            return responseData.data;
         } catch (error) {
             console.error("Error updating announcement:", error);
             throw error;

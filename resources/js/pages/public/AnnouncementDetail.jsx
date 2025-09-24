@@ -129,28 +129,101 @@ const AnnouncementDetail = () => {
                 </div>
 
                 {/* Featured Image */}
-                <div className="mb-8">
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <img
-                            src={announcement.image}
-                            alt={announcement.title}
-                            className="w-full h-auto object-contain"
-                            style={{
-                                maxHeight: "500px",
-                                minHeight: "200px",
-                            }}
-                        />
+                {announcement.image && (
+                    <div className="mb-8">
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                            <img
+                                src={announcement.image}
+                                alt={announcement.title}
+                                className="w-full h-auto object-contain"
+                                style={{
+                                    maxHeight: "500px",
+                                    minHeight: "200px",
+                                }}
+                            />
+                        </div>
                     </div>
-                </div>
+                )}
+
+                {/* Gallery Images */}
+                {announcement.images && announcement.images.length > 0 && (
+                    <div className="mb-8">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                            Gallery
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {announcement.images.map((image, index) => (
+                                <div
+                                    key={index}
+                                    className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+                                >
+                                    <img
+                                        src={(() => {
+                                            const img = image || "";
+                                            if (!img) return "";
+                                            if (img.startsWith("http"))
+                                                return img;
+                                            if (img.startsWith("/storage/"))
+                                                return img;
+                                            const cleaned = img.replace(
+                                                /^\/?storage\//,
+                                                ""
+                                            );
+                                            return `/storage/${cleaned}`;
+                                        })()}
+                                        alt={`${announcement.title} - Image ${
+                                            index + 1
+                                        }`}
+                                        className="w-full h-48 object-cover hover:scale-105 transition-transform duration-200"
+                                        onError={(e) => {
+                                            e.currentTarget.style.display =
+                                                "none";
+                                        }}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* External Link */}
+                {announcement.external_link && (
+                    <div className="mb-8 text-center">
+                        <a
+                            href={announcement.external_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg border border-blue-200 transition-colors text-lg font-medium"
+                        >
+                            <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                />
+                            </svg>
+                            View Additional Content
+                        </a>
+                    </div>
+                )}
 
                 {/* Main Content */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 lg:p-12">
                     <div className="prose prose-lg max-w-none">
-                        <div className="text-gray-800 leading-relaxed">
-                            <div className="text-lg leading-relaxed whitespace-pre-wrap">
-                                {announcement.content}
-                            </div>
-                        </div>
+                        <div
+                            className="text-gray-800 leading-relaxed"
+                            dangerouslySetInnerHTML={{
+                                __html:
+                                    announcement.content_html ||
+                                    announcement.content,
+                            }}
+                        />
                     </div>
 
                     {/* Tags Section */}
