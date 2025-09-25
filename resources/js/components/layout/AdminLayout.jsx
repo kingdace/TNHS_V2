@@ -54,50 +54,16 @@ const AdminLayout = () => {
             href: "/admin/hero-carousel",
             icon: Image,
         },
-        {
-            name: "Academic Programs",
-            href: "/admin/academic-programs",
-            icon: BookOpen,
-        },
+
         {
             name: "School Information",
             href: "/admin/school-info",
             icon: School,
         },
         {
-            name: "Contact Information",
-            href: "/admin/contact-info",
-            icon: Phone,
-        },
-        {
             name: "About Management",
             href: "/admin/about",
             icon: FileText,
-        },
-        {
-            name: "Page Content",
-            href: "/admin/page-content",
-            icon: FileText,
-        },
-        {
-            name: "Staff Profiles",
-            href: "/admin/staff-profiles",
-            icon: UserCheck,
-        },
-        {
-            name: "Download Files",
-            href: "/admin/download-files",
-            icon: Download,
-        },
-        {
-            name: "External Links",
-            href: "/admin/external-links",
-            icon: ExternalLink,
-        },
-        {
-            name: "User Management",
-            href: "/admin/users",
-            icon: Users,
         },
     ];
 

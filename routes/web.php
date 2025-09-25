@@ -18,14 +18,46 @@ Route::get('/', function () {
 
 // API Routes - must come before the catch-all route
 Route::prefix('api')->group(function () {
+    // CSRF token endpoint
+    Route::get('/csrf-token', function () {
+        return response()->json(['csrf_token' => csrf_token()]);
+    });
+
     Route::get('/announcements/public', [AnnouncementController::class, 'public']);
     Route::apiResource('announcements', AnnouncementController::class)->middleware(['auth', 'admin.auth']);
     Route::get('/announcements-trashed', [AnnouncementController::class, 'trashed'])->middleware(['auth', 'admin.auth']);
     Route::post('/announcements/{id}/restore', [AnnouncementController::class, 'restore'])->middleware(['auth', 'admin.auth']);
     Route::delete('/announcements/{id}/force', [AnnouncementController::class, 'forceDelete'])->middleware(['auth', 'admin.auth']);
     Route::apiResource('hero-carousel', HeroCarouselController::class);
-    Route::apiResource('academic-programs', \App\Http\Controllers\Api\AcademicProgramController::class);
+
+    // School Info API routes (must come before apiResource to avoid conflicts)
+    Route::get('/school-info/type/{type}', [\App\Http\Controllers\Api\SchoolInfoController::class, 'byType']);
+    Route::get('/school-info/history', [\App\Http\Controllers\Api\SchoolInfoController::class, 'history']);
+
+    // Public History API routes
+    Route::get('/history-milestones/public', [\App\Http\Controllers\Api\HistoryMilestoneController::class, 'public']);
+    Route::get('/history-achievements/public', [\App\Http\Controllers\Api\HistoryAchievementController::class, 'public']);
+
+    // Public Mission & Vision API routes
+    Route::get('/missions/public', [\App\Http\Controllers\Api\MissionController::class, 'public']);
+    Route::get('/visions/public', [\App\Http\Controllers\Api\VisionController::class, 'public']);
+    Route::get('/core-values/public', [\App\Http\Controllers\Api\CoreValueController::class, 'public']);
+    Route::get('/guiding-principles/public', [\App\Http\Controllers\Api\GuidingPrincipleController::class, 'public']);
+    Route::get('/goal-objectives/public', [\App\Http\Controllers\Api\GoalObjectiveController::class, 'public']);
+
+    // Public School Seal API routes
+    Route::get('/school-seal-info/public', [\App\Http\Controllers\Api\SchoolSealInfoController::class, 'public']);
+    Route::get('/school-seal-info/type/{type}', [\App\Http\Controllers\Api\SchoolSealInfoController::class, 'getByType']);
+    Route::get('/school-seal-symbolic-elements/public', [\App\Http\Controllers\Api\SchoolSealSymbolicElementController::class, 'public']);
+    Route::get('/school-seal-core-values/public', [\App\Http\Controllers\Api\SchoolSealCoreValueController::class, 'public']);
+    Route::get('/school-info/mission', [\App\Http\Controllers\Api\SchoolInfoController::class, 'mission']);
+    Route::get('/school-info/vision', [\App\Http\Controllers\Api\SchoolInfoController::class, 'vision']);
+    Route::get('/school-info/values', [\App\Http\Controllers\Api\SchoolInfoController::class, 'values']);
+    Route::get('/school-info/achievements', [\App\Http\Controllers\Api\SchoolInfoController::class, 'achievements']);
+    Route::get('/school-info/facilities', [\App\Http\Controllers\Api\SchoolInfoController::class, 'facilities']);
     Route::apiResource('school-info', \App\Http\Controllers\Api\SchoolInfoController::class);
+
+    Route::apiResource('academic-programs', \App\Http\Controllers\Api\AcademicProgramController::class);
     Route::apiResource('contact-info', \App\Http\Controllers\Api\ContactInfoController::class);
 
     // Public events (school calendar)
@@ -35,15 +67,6 @@ Route::prefix('api')->group(function () {
     // Academic Programs API routes
     Route::get('/academic-programs/grade/{grade}', [\App\Http\Controllers\Api\AcademicProgramController::class, 'byGrade']);
     Route::get('/academic-programs/type/{type}', [\App\Http\Controllers\Api\AcademicProgramController::class, 'byType']);
-
-    // School Info API routes
-    Route::get('/school-info/type/{type}', [\App\Http\Controllers\Api\SchoolInfoController::class, 'byType']);
-    Route::get('/school-info/history', [\App\Http\Controllers\Api\SchoolInfoController::class, 'history']);
-    Route::get('/school-info/mission', [\App\Http\Controllers\Api\SchoolInfoController::class, 'mission']);
-    Route::get('/school-info/vision', [\App\Http\Controllers\Api\SchoolInfoController::class, 'vision']);
-    Route::get('/school-info/values', [\App\Http\Controllers\Api\SchoolInfoController::class, 'values']);
-    Route::get('/school-info/achievements', [\App\Http\Controllers\Api\SchoolInfoController::class, 'achievements']);
-    Route::get('/school-info/facilities', [\App\Http\Controllers\Api\SchoolInfoController::class, 'facilities']);
 
     // Contact Info API routes
     Route::get('/contact-info/type/{type}', [\App\Http\Controllers\Api\ContactInfoController::class, 'byType']);
@@ -74,6 +97,32 @@ Route::prefix('api/admin')->as('admin.')->middleware(['auth', 'admin.auth'])->gr
 
         // Admin events (school calendar management)
         Route::apiResource('events', AdminEventController::class);
+
+        // History Management
+        Route::apiResource('history-milestones', \App\Http\Controllers\Admin\HistoryMilestoneController::class);
+        Route::apiResource('history-achievements', \App\Http\Controllers\Admin\HistoryAchievementController::class);
+
+        // Mission & Vision Management
+        Route::apiResource('missions', \App\Http\Controllers\Admin\MissionController::class);
+        Route::apiResource('visions', \App\Http\Controllers\Admin\VisionController::class);
+        Route::apiResource('core-values', \App\Http\Controllers\Admin\CoreValueController::class);
+        Route::apiResource('guiding-principles', \App\Http\Controllers\Admin\GuidingPrincipleController::class);
+        Route::apiResource('goal-objectives', \App\Http\Controllers\Admin\GoalObjectiveController::class);
+
+        // School Seal Management
+        Route::apiResource('school-seal-info', \App\Http\Controllers\Admin\SchoolSealInfoController::class);
+        Route::apiResource('school-seal-symbolic-elements', \App\Http\Controllers\Admin\SchoolSealSymbolicElementController::class);
+        Route::apiResource('school-seal-core-values', \App\Http\Controllers\Admin\SchoolSealCoreValueController::class);
+
+        // Toggle active status routes
+        Route::post('/missions/{mission}/toggle-active', [\App\Http\Controllers\Admin\MissionController::class, 'toggleActive']);
+        Route::post('/visions/{vision}/toggle-active', [\App\Http\Controllers\Admin\VisionController::class, 'toggleActive']);
+        Route::post('/core-values/{coreValue}/toggle-active', [\App\Http\Controllers\Admin\CoreValueController::class, 'toggleActive']);
+        Route::post('/guiding-principles/{guidingPrinciple}/toggle-active', [\App\Http\Controllers\Admin\GuidingPrincipleController::class, 'toggleActive']);
+        Route::post('/goal-objectives/{goalObjective}/toggle-active', [\App\Http\Controllers\Admin\GoalObjectiveController::class, 'toggleActive']);
+        Route::post('/school-seal-info/{schoolSealInfo}/toggle-active', [\App\Http\Controllers\Admin\SchoolSealInfoController::class, 'toggleActive']);
+        Route::post('/school-seal-symbolic-elements/{schoolSealSymbolicElement}/toggle-active', [\App\Http\Controllers\Admin\SchoolSealSymbolicElementController::class, 'toggleActive']);
+        Route::post('/school-seal-core-values/{schoolSealCoreValue}/toggle-active', [\App\Http\Controllers\Admin\SchoolSealCoreValueController::class, 'toggleActive']);
 });
 
 // Authentication routes

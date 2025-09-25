@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
     Target,
@@ -10,69 +10,97 @@ import {
     Globe,
     Lightbulb,
 } from "lucide-react";
+import { publicService } from "../../services/publicService";
 
 const AboutMission = () => {
+    const [missions, setMissions] = useState([]);
+    const [visions, setVisions] = useState([]);
+    const [coreValues, setCoreValues] = useState([]);
+    const [principles, setPrinciples] = useState([]);
+    const [goals, setGoals] = useState([]);
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
         window.scrollTo(0, 0);
+        fetchData();
     }, []);
 
-    const coreValues = [
-        {
-            icon: Heart,
-            title: "MAKA-DIYOS",
-            description:
-                "God-centered education that instills spiritual values and moral integrity in every student.",
-            color: "from-red-500 to-pink-500",
-        },
-        {
-            icon: Users,
-            title: "MAKA-TAO",
-            description:
-                "Human-centered approach that promotes respect, empathy, and service to others.",
-            color: "from-blue-500 to-cyan-500",
-        },
-        {
-            icon: Globe,
-            title: "MAKAKALIKASAN",
-            description:
-                "Environment-conscious education that fosters stewardship and sustainability.",
-            color: "from-green-500 to-emerald-500",
-        },
-        {
-            icon: Award,
-            title: "MAKABANSA",
-            description:
-                "Nation-building through patriotic education and civic responsibility.",
-            color: "from-yellow-500 to-orange-500",
-        },
-    ];
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const [
+                missionsData,
+                visionsData,
+                coreValuesData,
+                principlesData,
+                goalsData,
+            ] = await Promise.all([
+                publicService.missions.getPublic(),
+                publicService.visions.getPublic(),
+                publicService.coreValues.getPublic(),
+                publicService.guidingPrinciples.getPublic(),
+                publicService.goals.getPublic(),
+            ]);
 
-    const principles = [
-        {
-            icon: BookOpen,
-            title: "Academic Excellence",
-            description:
-                "Maintaining high standards of teaching and learning to ensure quality education for all students.",
-        },
-        {
-            icon: Users,
-            title: "Student-Centered",
-            description:
-                "Placing students at the heart of all educational decisions and activities.",
-        },
-        {
-            icon: Lightbulb,
-            title: "Innovation",
-            description:
-                "Embracing new technologies and methodologies to enhance learning experiences.",
-        },
-        {
-            icon: Globe,
-            title: "Community Engagement",
-            description:
-                "Building strong partnerships with families and the community for holistic development.",
-        },
-    ];
+            setMissions(missionsData);
+            setVisions(visionsData);
+            setCoreValues(coreValuesData);
+            setPrinciples(principlesData);
+            setGoals(goalsData);
+        } catch (error) {
+            console.error("Error fetching mission & vision data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Icon mapping for dynamic icons
+    const iconMap = {
+        Heart,
+        Users,
+        Globe,
+        Award,
+        BookOpen,
+        Lightbulb,
+        Target,
+        Eye,
+    };
+
+    // Get current mission and vision (first active ones)
+    const currentMission = missions.find((m) => m.is_active) || {
+        title: "Our Mission",
+        content:
+            "To provide quality secondary education that develops students' intellectual, moral, and social capabilities, preparing them to become productive citizens who contribute to the development of their community and the nation.",
+    };
+
+    const currentVision = visions.find((v) => v.is_active) || {
+        title: "Our Vision",
+        content:
+            "To be a leading educational institution that produces globally competitive graduates who are morally upright, academically excellent, and socially responsible citizens committed to nation-building.",
+    };
+
+    // Group goals by category
+    const academicGoals = goals.filter(
+        (g) => g.category === "academic" && g.is_active
+    );
+    const characterGoals = goals.filter(
+        (g) => g.category === "character" && g.is_active
+    );
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 pt-24 pb-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                        <p className="mt-4 text-gray-600">
+                            Loading Mission & Vision...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 pt-24 pb-20">
@@ -99,11 +127,7 @@ const AboutMission = () => {
                             <h2 className="text-3xl font-bold">Our Mission</h2>
                         </div>
                         <p className="text-lg leading-relaxed text-blue-100">
-                            To provide quality secondary education that develops
-                            students' intellectual, moral, and social
-                            capabilities, preparing them to become productive
-                            citizens who contribute to the development of their
-                            community and the nation.
+                            {currentMission.content}
                         </p>
                     </div>
 
@@ -116,11 +140,7 @@ const AboutMission = () => {
                             <h2 className="text-3xl font-bold">Our Vision</h2>
                         </div>
                         <p className="text-lg leading-relaxed text-green-100">
-                            To be a leading educational institution that
-                            produces globally competitive graduates who are
-                            morally upright, academically excellent, and
-                            socially responsible citizens committed to
-                            nation-building.
+                            {currentVision.content}
                         </p>
                     </div>
                 </div>
@@ -132,11 +152,14 @@ const AboutMission = () => {
                     </h2>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {coreValues.map((value, index) => {
-                            const IconComponent = value.icon;
+                            const IconComponent = iconMap[value.icon] || Heart;
                             return (
                                 <div key={index} className="text-center">
                                     <div
-                                        className={`w-20 h-20 bg-gradient-to-r ${value.color} rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg`}
+                                        className={`w-20 h-20 bg-gradient-to-r ${
+                                            value.color ||
+                                            "from-blue-500 to-green-500"
+                                        } rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg`}
                                     >
                                         <IconComponent className="w-10 h-10 text-white" />
                                     </div>
@@ -159,7 +182,8 @@ const AboutMission = () => {
                     </h2>
                     <div className="grid md:grid-cols-2 gap-8">
                         {principles.map((principle, index) => {
-                            const IconComponent = principle.icon;
+                            const IconComponent =
+                                iconMap[principle.icon] || BookOpen;
                             return (
                                 <div
                                     key={index}
@@ -193,34 +217,17 @@ const AboutMission = () => {
                                 Academic Goals
                             </h3>
                             <ul className="space-y-2">
-                                <li className="flex items-start space-x-2">
-                                    <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0"></div>
-                                    <span className="text-purple-100">
-                                        Achieve 100% passing rate in national
-                                        examinations
-                                    </span>
-                                </li>
-                                <li className="flex items-start space-x-2">
-                                    <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0"></div>
-                                    <span className="text-purple-100">
-                                        Maintain high academic standards across
-                                        all subjects
-                                    </span>
-                                </li>
-                                <li className="flex items-start space-x-2">
-                                    <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0"></div>
-                                    <span className="text-purple-100">
-                                        Develop critical thinking and
-                                        problem-solving skills
-                                    </span>
-                                </li>
-                                <li className="flex items-start space-x-2">
-                                    <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0"></div>
-                                    <span className="text-purple-100">
-                                        Prepare students for higher education
-                                        and career paths
-                                    </span>
-                                </li>
+                                {academicGoals.map((goal, index) => (
+                                    <li
+                                        key={index}
+                                        className="flex items-start space-x-2"
+                                    >
+                                        <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0"></div>
+                                        <span className="text-purple-100">
+                                            {goal.title}
+                                        </span>
+                                    </li>
+                                ))}
                             </ul>
                         </div>
                         <div>
@@ -228,33 +235,17 @@ const AboutMission = () => {
                                 Character Development
                             </h3>
                             <ul className="space-y-2">
-                                <li className="flex items-start space-x-2">
-                                    <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0"></div>
-                                    <span className="text-purple-100">
-                                        Instill moral values and ethical
-                                        behavior
-                                    </span>
-                                </li>
-                                <li className="flex items-start space-x-2">
-                                    <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0"></div>
-                                    <span className="text-purple-100">
-                                        Promote respect for diversity and
-                                        inclusion
-                                    </span>
-                                </li>
-                                <li className="flex items-start space-x-2">
-                                    <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0"></div>
-                                    <span className="text-purple-100">
-                                        Develop leadership and teamwork skills
-                                    </span>
-                                </li>
-                                <li className="flex items-start space-x-2">
-                                    <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0"></div>
-                                    <span className="text-purple-100">
-                                        Foster environmental consciousness and
-                                        civic responsibility
-                                    </span>
-                                </li>
+                                {characterGoals.map((goal, index) => (
+                                    <li
+                                        key={index}
+                                        className="flex items-start space-x-2"
+                                    >
+                                        <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0"></div>
+                                        <span className="text-purple-100">
+                                            {goal.title}
+                                        </span>
+                                    </li>
+                                ))}
                             </ul>
                         </div>
                     </div>

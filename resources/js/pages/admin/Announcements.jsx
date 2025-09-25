@@ -257,12 +257,12 @@ const AdminAnnouncements = () => {
             {/* Header
             <div className="bg-gradient-to-r from-blue-900 to-blue-700 rounded-xl px-6 py-4 text-white shadow-lg">
                 <div className="flex items-center justify-between">
-                    <div>
+        <div>
                         <h1 className="text-2xl font-bold">School Highlights</h1>
                         <p className="text-blue-100 text-sm">
-                            Manage school announcements and updates
-                        </p>
-                    </div>
+                    Manage school announcements and updates
+                </p>
+            </div>
                 </div>
             </div> */}
 

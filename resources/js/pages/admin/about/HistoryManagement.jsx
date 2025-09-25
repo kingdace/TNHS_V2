@@ -73,12 +73,13 @@ const HistoryManagement = () => {
                 ]);
 
             if (overviewData) {
+                // For now, content is stored as plain text
                 setOverview({
                     title: overviewData.title || "Our History",
                     description: overviewData.content || "",
-                    established: overviewData.established || "2003",
-                    location: overviewData.location || "Surigao City",
-                    facts: overviewData.facts || [
+                    established: "2003", // Default values since we're not storing these separately yet
+                    location: "Surigao City",
+                    facts: [
                         "Over 20 years of service",
                         "Thousands of graduates",
                         "K-12 compliant",
@@ -99,10 +100,13 @@ const HistoryManagement = () => {
     const saveOverview = async () => {
         try {
             setSaving(true);
-            await historyService.updateOverview(overview);
-            // Show success message
+            console.log("Saving overview with data:", overview);
+            const result = await historyService.updateOverview(overview);
+            console.log("Save result:", result);
+            alert("History overview saved successfully!");
         } catch (error) {
             console.error("Error saving overview:", error);
+            alert("Error saving overview: " + error.message);
         } finally {
             setSaving(false);
         }

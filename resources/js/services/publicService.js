@@ -108,4 +108,169 @@ export const publicService = {
             }
         },
     },
+
+    /**
+     * Mission & Vision - Public endpoints
+     */
+    missions: {
+        async getPublic() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/missions/public`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.success ? data.data : [];
+            } catch (error) {
+                console.error("Error fetching missions:", error);
+                return [];
+            }
+        },
+    },
+
+    visions: {
+        async getPublic() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/visions/public`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.success ? data.data : [];
+            } catch (error) {
+                console.error("Error fetching visions:", error);
+                return [];
+            }
+        },
+    },
+
+    coreValues: {
+        async getPublic() {
+            try {
+                const response = await fetch(
+                    `${API_BASE_URL}/core-values/public`
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.success ? data.data : [];
+            } catch (error) {
+                console.error("Error fetching core values:", error);
+                return [];
+            }
+        },
+    },
+
+    guidingPrinciples: {
+        async getPublic() {
+            try {
+                const response = await fetch(
+                    `${API_BASE_URL}/guiding-principles/public`
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.success ? data.data : [];
+            } catch (error) {
+                console.error("Error fetching guiding principles:", error);
+                return [];
+            }
+        },
+    },
+
+    goals: {
+        async getPublic(filters = {}) {
+            try {
+                const query = new URLSearchParams(filters).toString();
+                const response = await fetch(
+                    `${API_BASE_URL}/goal-objectives/public?${query}`
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.success ? data.data : [];
+            } catch (error) {
+                console.error("Error fetching goals:", error);
+                return [];
+            }
+        },
+    },
+
+    /**
+     * School Seal - Public endpoints
+     */
+    schoolSealInfo: {
+        async getPublic() {
+            try {
+                const response = await fetch(
+                    `${API_BASE_URL}/school-seal-info/public`
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.success ? data.data : [];
+            } catch (error) {
+                console.error("Error fetching school seal info:", error);
+                return [];
+            }
+        },
+        async getByType(type) {
+            try {
+                const response = await fetch(
+                    `${API_BASE_URL}/school-seal-info/type/${type}`
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.success ? data.data : [];
+            } catch (error) {
+                console.error(
+                    "Error fetching school seal info by type:",
+                    error
+                );
+                return [];
+            }
+        },
+    },
+
+    schoolSealSymbolicElements: {
+        async getPublic() {
+            try {
+                const response = await fetch(
+                    `${API_BASE_URL}/school-seal-symbolic-elements/public`
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.success ? data.data : [];
+            } catch (error) {
+                console.error("Error fetching symbolic elements:", error);
+                return [];
+            }
+        },
+    },
+
+    schoolSealCoreValues: {
+        async getPublic() {
+            try {
+                const response = await fetch(
+                    `${API_BASE_URL}/school-seal-core-values/public`
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.success ? data.data : [];
+            } catch (error) {
+                console.error("Error fetching school seal core values:", error);
+                return [];
+            }
+        },
+    },
 };

@@ -95,7 +95,23 @@ class SchoolInfoController extends Controller
      */
     public function history(): JsonResponse
     {
-        return $this->byType('history');
+        $schoolInfo = SchoolInfo::active()
+            ->byType('history')
+            ->ordered()
+            ->first(); // Return only the first record
+
+        if (!$schoolInfo) {
+            return response()->json([
+                'success' => false,
+                'message' => 'History information not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $schoolInfo,
+            'message' => 'History information retrieved successfully'
+        ]);
     }
 
     public function mission(): JsonResponse

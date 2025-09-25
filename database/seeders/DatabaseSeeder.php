@@ -18,6 +18,14 @@ class DatabaseSeeder extends Seeder
             AcademicProgramSeeder::class,
             SchoolInfoSeeder::class,
             ContactInfoSeeder::class,
+            MissionSeeder::class,
+            VisionSeeder::class,
+            CoreValueSeeder::class,
+            GuidingPrincipleSeeder::class,
+            GoalObjectiveSeeder::class,
+            SchoolSealInfoSeeder::class,
+            SchoolSealSymbolicElementSeeder::class,
+            SchoolSealCoreValueSeeder::class,
         ]);
     }
 }

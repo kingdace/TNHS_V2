@@ -31,7 +31,7 @@ const Header = () => {
             ],
         },
         {
-            name: "About",
+            name: "About Us",
             href: "/about",
             hasDropdown: true,
             submenu: [
@@ -104,7 +104,7 @@ const Header = () => {
                                 {item.hasDropdown ? (
                                     item.name === "Academics" ? (
                                         // Academics: Clickable text (navigate to overview page only)
-                                        <Link
+                                        <div
                                             to={item.href}
                                             className={`px-4 py-2 rounded font-medium transition-all duration-300 ${
                                                 isActive(item.href)
@@ -113,7 +113,7 @@ const Header = () => {
                                             }`}
                                         >
                                             {item.name}
-                                        </Link>
+                                        </div>
                                     ) : (
                                         // Other dropdowns: Dropdown only (not clickable to main page)
                                         <div
@@ -124,7 +124,7 @@ const Header = () => {
                                             }`}
                                         >
                                             <span>{item.name}</span>
-                                            <ChevronDown className="h-4 w-4" />
+                                            {/* <ChevronDown className="h-4 w-4" /> */}
                                         </div>
                                     )
                                 ) : (
@@ -150,7 +150,7 @@ const Header = () => {
 
                                 {/* Dropdown Menu */}
                                 {item.hasDropdown && (
-                                    <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                                    <div className="absolute top-full left-0 mt-1 w-[170px] bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                                         {item.submenu.map((subItem) => (
                                             <Link
                                                 key={subItem.name}
@@ -188,20 +188,19 @@ const Header = () => {
                                     {item.hasDropdown ? (
                                         <div>
                                             {item.name === "Academics" ? (
-                                                // Academics: Clickable text (no dropdown arrow, but dropdown functionality)
-                                                <Link
-                                                    to={item.href}
-                                                    onClick={() =>
-                                                        setIsMenuOpen(false)
-                                                    }
-                                                    className={`w-full text-left px-3 py-2 rounded-lg text-base font-medium transition-all duration-300 ${
-                                                        isActive(item.href)
-                                                            ? "bg-white/20 text-white"
-                                                            : "text-blue-100 hover:bg-white/10 hover:text-white"
-                                                    }`}
+                                                <div
+                                                    className={`
+          w-full text-left px-3 py-2 rounded-lg text-base font-medium
+          transition-all duration-300 flex items-center justify-between
+          ${
+              isActive(item.href)
+                  ? "bg-white/20 text-white"
+                  : "text-blue-100 hover:bg-white/10 hover:text-white"
+          }
+        `}
                                                 >
-                                                    {item.name}
-                                                </Link>
+                                                    <span>{item.name}</span>
+                                                </div>
                                             ) : (
                                                 // Other dropdowns: Dropdown only (not clickable to main page)
                                                 <div
@@ -212,7 +211,7 @@ const Header = () => {
                                                     }`}
                                                 >
                                                     <span>{item.name}</span>
-                                                    <ChevronDown className="h-4 w-4" />
+                                                    {/* <ChevronDown className="h-4 w-4" /> */}
                                                 </div>
                                             )}
                                         </div>
