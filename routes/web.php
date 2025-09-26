@@ -50,6 +50,12 @@ Route::prefix('api')->group(function () {
     Route::get('/school-seal-info/type/{type}', [\App\Http\Controllers\Api\SchoolSealInfoController::class, 'getByType']);
     Route::get('/school-seal-symbolic-elements/public', [\App\Http\Controllers\Api\SchoolSealSymbolicElementController::class, 'public']);
     Route::get('/school-seal-core-values/public', [\App\Http\Controllers\Api\SchoolSealCoreValueController::class, 'public']);
+
+    // Public Quality Policy API routes
+    Route::get('/quality-policies/public', [\App\Http\Controllers\Api\QualityPolicyController::class, 'public']);
+
+    // Public Privacy Policy API routes
+    Route::get('/privacy-policies/public', [\App\Http\Controllers\Api\PrivacyPolicyController::class, 'public']);
     Route::get('/school-info/mission', [\App\Http\Controllers\Api\SchoolInfoController::class, 'mission']);
     Route::get('/school-info/vision', [\App\Http\Controllers\Api\SchoolInfoController::class, 'vision']);
     Route::get('/school-info/values', [\App\Http\Controllers\Api\SchoolInfoController::class, 'values']);
@@ -74,10 +80,9 @@ Route::prefix('api')->group(function () {
     Route::get('/contact-info/phones', [\App\Http\Controllers\Api\ContactInfoController::class, 'phones']);
     Route::get('/contact-info/addresses', [\App\Http\Controllers\Api\ContactInfoController::class, 'addresses']);
     Route::get('/contact-info/hours', [\App\Http\Controllers\Api\ContactInfoController::class, 'hours']);
-});
 
-// Admin API routes - protected with admin authentication middleware
-Route::prefix('api/admin')->as('admin.')->middleware(['auth', 'admin.auth'])->group(function () {
+    // Admin API routes - protected with admin authentication middleware
+    Route::prefix('admin')->as('admin.')->middleware(['auth', 'admin.auth'])->group(function () {
         Route::apiResource('hero-carousel', AdminHeroCarouselController::class);
         Route::get('/hero-carousel-trashed', [AdminHeroCarouselController::class, 'trashed']);
         Route::post('/hero-carousel/{id}/restore', [AdminHeroCarouselController::class, 'restore']);
@@ -114,6 +119,12 @@ Route::prefix('api/admin')->as('admin.')->middleware(['auth', 'admin.auth'])->gr
         Route::apiResource('school-seal-symbolic-elements', \App\Http\Controllers\Admin\SchoolSealSymbolicElementController::class);
         Route::apiResource('school-seal-core-values', \App\Http\Controllers\Admin\SchoolSealCoreValueController::class);
 
+        // Quality Policy Management
+        Route::apiResource('quality-policies', \App\Http\Controllers\Admin\QualityPolicyController::class);
+
+        // Privacy Policy Management
+        Route::apiResource('privacy-policies', \App\Http\Controllers\Admin\PrivacyPolicyController::class);
+
         // Toggle active status routes
         Route::post('/missions/{mission}/toggle-active', [\App\Http\Controllers\Admin\MissionController::class, 'toggleActive']);
         Route::post('/visions/{vision}/toggle-active', [\App\Http\Controllers\Admin\VisionController::class, 'toggleActive']);
@@ -123,6 +134,9 @@ Route::prefix('api/admin')->as('admin.')->middleware(['auth', 'admin.auth'])->gr
         Route::post('/school-seal-info/{schoolSealInfo}/toggle-active', [\App\Http\Controllers\Admin\SchoolSealInfoController::class, 'toggleActive']);
         Route::post('/school-seal-symbolic-elements/{schoolSealSymbolicElement}/toggle-active', [\App\Http\Controllers\Admin\SchoolSealSymbolicElementController::class, 'toggleActive']);
         Route::post('/school-seal-core-values/{schoolSealCoreValue}/toggle-active', [\App\Http\Controllers\Admin\SchoolSealCoreValueController::class, 'toggleActive']);
+        Route::post('/quality-policies/{qualityPolicy}/toggle-active', [\App\Http\Controllers\Admin\QualityPolicyController::class, 'toggleActive']);
+        Route::post('/privacy-policies/{privacyPolicy}/toggle-active', [\App\Http\Controllers\Admin\PrivacyPolicyController::class, 'toggleActive']);
+    });
 });
 
 // Authentication routes

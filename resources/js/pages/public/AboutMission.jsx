@@ -67,17 +67,9 @@ const AboutMission = () => {
     };
 
     // Get current mission and vision (first active ones)
-    const currentMission = missions.find((m) => m.is_active) || {
-        title: "Our Mission",
-        content:
-            "To provide quality secondary education that develops students' intellectual, moral, and social capabilities, preparing them to become productive citizens who contribute to the development of their community and the nation.",
-    };
+    const currentMission = missions.find((m) => m.is_active) || null;
 
-    const currentVision = visions.find((v) => v.is_active) || {
-        title: "Our Vision",
-        content:
-            "To be a leading educational institution that produces globally competitive graduates who are morally upright, academically excellent, and socially responsible citizens committed to nation-building.",
-    };
+    const currentVision = visions.find((v) => v.is_active) || null;
 
     // Group goals by category
     const academicGoals = goals.filter(
@@ -119,30 +111,38 @@ const AboutMission = () => {
                 {/* Mission & Vision Cards */}
                 <div className="grid lg:grid-cols-2 gap-8 mb-16">
                     {/* Mission */}
-                    <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl shadow-xl p-8 text-white">
-                        <div className="flex items-center space-x-4 mb-6">
-                            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                                <Target className="w-8 h-8 text-white" />
+                    {currentMission && (
+                        <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl shadow-xl p-8 text-white">
+                            <div className="flex items-center space-x-4 mb-6">
+                                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                                    <Target className="w-8 h-8 text-white" />
+                                </div>
+                                <h2 className="text-3xl font-bold">
+                                    Our Mission
+                                </h2>
                             </div>
-                            <h2 className="text-3xl font-bold">Our Mission</h2>
+                            <p className="text-lg leading-relaxed text-blue-100">
+                                {currentMission.content}
+                            </p>
                         </div>
-                        <p className="text-lg leading-relaxed text-blue-100">
-                            {currentMission.content}
-                        </p>
-                    </div>
+                    )}
 
                     {/* Vision */}
-                    <div className="bg-gradient-to-br from-green-600 to-green-800 rounded-2xl shadow-xl p-8 text-white">
-                        <div className="flex items-center space-x-4 mb-6">
-                            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                                <Eye className="w-8 h-8 text-white" />
+                    {currentVision && (
+                        <div className="bg-gradient-to-br from-green-600 to-green-800 rounded-2xl shadow-xl p-8 text-white">
+                            <div className="flex items-center space-x-4 mb-6">
+                                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                                    <Eye className="w-8 h-8 text-white" />
+                                </div>
+                                <h2 className="text-3xl font-bold">
+                                    Our Vision
+                                </h2>
                             </div>
-                            <h2 className="text-3xl font-bold">Our Vision</h2>
+                            <p className="text-lg leading-relaxed text-green-100">
+                                {currentVision.content}
+                            </p>
                         </div>
-                        <p className="text-lg leading-relaxed text-green-100">
-                            {currentVision.content}
-                        </p>
-                    </div>
+                    )}
                 </div>
 
                 {/* Core Values */}

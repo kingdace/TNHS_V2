@@ -296,7 +296,7 @@ const Login = () => {
                     </div>
                 </div>
 
-                {/* Security Notice */}
+                {/* Security Notice
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                     <div className="flex items-start">
                         <div className="flex-shrink-0">
@@ -324,7 +324,7 @@ const Login = () => {
                             </p>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Footer */}
                 <div className="text-center mt-6">

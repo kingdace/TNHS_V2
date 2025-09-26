@@ -54,8 +54,8 @@ class SchoolSealSymbolicElementController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = $image->storeAs('public/school-seal/elements', $imageName);
-            $data['image_path'] = Storage::url($imagePath);
+            $imagePath = $image->storeAs('school-seal/elements', $imageName, 'public');
+            $data['image_path'] = '/storage/' . $imagePath;
         }
 
         $element = SchoolSealSymbolicElement::create($data);
@@ -113,14 +113,14 @@ class SchoolSealSymbolicElementController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($element->image_path) {
-                $oldImagePath = str_replace('/storage/', 'public/', $element->image_path);
-                Storage::delete($oldImagePath);
+                $oldImagePath = str_replace('/storage/', '', $element->image_path);
+                Storage::disk('public')->delete($oldImagePath);
             }
 
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = $image->storeAs('public/school-seal/elements', $imageName);
-            $data['image_path'] = Storage::url($imagePath);
+            $imagePath = $image->storeAs('school-seal/elements', $imageName, 'public');
+            $data['image_path'] = '/storage/' . $imagePath;
         }
 
         $element->update($data);

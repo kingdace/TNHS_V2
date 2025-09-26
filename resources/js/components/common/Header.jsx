@@ -35,10 +35,10 @@ const Header = () => {
             href: "/about",
             hasDropdown: true,
             submenu: [
+                { name: "Mission & Vision", href: "/about/mission" },
+                { name: "Our History", href: "/about/history" },
                 { name: "School Seal", href: "/about/school-seal" },
                 { name: "Privacy Policy", href: "/about/privacy-policy" },
-                { name: "Our History", href: "/about/history" },
-                { name: "Mission & Vision", href: "/about/mission" },
                 { name: "Quality Policy", href: "/about/quality-policy" },
             ],
         },

@@ -52,8 +52,8 @@ class SchoolSealCoreValueController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = $image->storeAs('public/school-seal/values', $imageName);
-            $data['image_path'] = Storage::url($imagePath);
+            $imagePath = $image->storeAs('school-seal/values', $imageName, 'public');
+            $data['image_path'] = '/storage/' . $imagePath;
         }
 
         $coreValue = SchoolSealCoreValue::create($data);
@@ -109,14 +109,14 @@ class SchoolSealCoreValueController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($coreValue->image_path) {
-                $oldImagePath = str_replace('/storage/', 'public/', $coreValue->image_path);
-                Storage::delete($oldImagePath);
+                $oldImagePath = str_replace('/storage/', '', $coreValue->image_path);
+                Storage::disk('public')->delete($oldImagePath);
             }
 
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = $image->storeAs('public/school-seal/values', $imageName);
-            $data['image_path'] = Storage::url($imagePath);
+            $imagePath = $image->storeAs('school-seal/values', $imageName, 'public');
+            $data['image_path'] = '/storage/' . $imagePath;
         }
 
         $coreValue->update($data);

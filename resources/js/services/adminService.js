@@ -197,15 +197,13 @@ export const adminService = {
                     body: form,
                 });
 
+                const data = await response.json();
+
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(
-                        errorData.message ||
-                            `HTTP error! status: ${response.status}`
-                    );
+                    // Return the error data so validation errors can be displayed
+                    return data;
                 }
 
-                const data = await response.json();
                 return data;
             } catch (error) {
                 console.error("Error creating hero carousel slide:", error);
@@ -891,19 +889,34 @@ export const adminService = {
         },
         async create(payload) {
             try {
-                const form = new FormData();
-                Object.entries(payload).forEach(([k, v]) => {
-                    if (v === undefined || v === null || v === "") return;
-                    if (typeof v === "boolean") form.append(k, v ? "1" : "0");
-                    else form.append(k, v);
-                });
+                // Support passing a ready FormData directly
+                const form =
+                    payload instanceof FormData
+                        ? payload
+                        : (() => {
+                              const f = new FormData();
+                              Object.entries(payload).forEach(([k, v]) => {
+                                  if (v === undefined || v === null || v === "")
+                                      return;
+                                  if (typeof v === "boolean")
+                                      f.append(k, v ? "1" : "0");
+                                  else f.append(k, v);
+                              });
+                              return f;
+                          })();
+
                 const response = await fetch("/api/admin/missions", {
                     method: "POST",
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document
+                                .querySelector('meta[name="csrf-token"]')
+                                ?.getAttribute("content") || "",
+                    },
                     body: form,
                     credentials: "include",
                 });
-                if (!response.ok)
-                    throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 return data;
             } catch (error) {
@@ -913,20 +926,34 @@ export const adminService = {
         },
         async update(id, payload) {
             try {
-                const form = new FormData();
-                form.append("_method", "PUT");
-                Object.entries(payload).forEach(([k, v]) => {
-                    if (v === undefined || v === null || v === "") return;
-                    if (typeof v === "boolean") form.append(k, v ? "1" : "0");
-                    else form.append(k, v);
-                });
+                const form =
+                    payload instanceof FormData
+                        ? payload
+                        : (() => {
+                              const f = new FormData();
+                              Object.entries(payload).forEach(([k, v]) => {
+                                  if (v === undefined || v === null || v === "")
+                                      return;
+                                  if (typeof v === "boolean")
+                                      f.append(k, v ? "1" : "0");
+                                  else f.append(k, v);
+                              });
+                              return f;
+                          })();
+                if (!form.has("_method")) form.append("_method", "PUT");
+
                 const response = await fetch(`/api/admin/missions/${id}`, {
                     method: "POST",
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document
+                                .querySelector('meta[name="csrf-token"]')
+                                ?.getAttribute("content") || "",
+                    },
                     body: form,
                     credentials: "include",
                 });
-                if (!response.ok)
-                    throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 return data;
             } catch (error) {
@@ -994,19 +1021,33 @@ export const adminService = {
         },
         async create(payload) {
             try {
-                const form = new FormData();
-                Object.entries(payload).forEach(([k, v]) => {
-                    if (v === undefined || v === null || v === "") return;
-                    if (typeof v === "boolean") form.append(k, v ? "1" : "0");
-                    else form.append(k, v);
-                });
+                const form =
+                    payload instanceof FormData
+                        ? payload
+                        : (() => {
+                              const f = new FormData();
+                              Object.entries(payload).forEach(([k, v]) => {
+                                  if (v === undefined || v === null || v === "")
+                                      return;
+                                  if (typeof v === "boolean")
+                                      f.append(k, v ? "1" : "0");
+                                  else f.append(k, v);
+                              });
+                              return f;
+                          })();
+
                 const response = await fetch("/api/admin/visions", {
                     method: "POST",
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document
+                                .querySelector('meta[name="csrf-token"]')
+                                ?.getAttribute("content") || "",
+                    },
                     body: form,
                     credentials: "include",
                 });
-                if (!response.ok)
-                    throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 return data;
             } catch (error) {
@@ -1016,20 +1057,34 @@ export const adminService = {
         },
         async update(id, payload) {
             try {
-                const form = new FormData();
-                form.append("_method", "PUT");
-                Object.entries(payload).forEach(([k, v]) => {
-                    if (v === undefined || v === null || v === "") return;
-                    if (typeof v === "boolean") form.append(k, v ? "1" : "0");
-                    else form.append(k, v);
-                });
+                const form =
+                    payload instanceof FormData
+                        ? payload
+                        : (() => {
+                              const f = new FormData();
+                              Object.entries(payload).forEach(([k, v]) => {
+                                  if (v === undefined || v === null || v === "")
+                                      return;
+                                  if (typeof v === "boolean")
+                                      f.append(k, v ? "1" : "0");
+                                  else f.append(k, v);
+                              });
+                              return f;
+                          })();
+                if (!form.has("_method")) form.append("_method", "PUT");
+
                 const response = await fetch(`/api/admin/visions/${id}`, {
                     method: "POST",
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document
+                                .querySelector('meta[name="csrf-token"]')
+                                ?.getAttribute("content") || "",
+                    },
                     body: form,
                     credentials: "include",
                 });
-                if (!response.ok)
-                    throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 return data;
             } catch (error) {
@@ -1399,6 +1454,40 @@ export const adminService = {
         },
         async create(payload) {
             try {
+                // Support passing a ready FormData directly
+                if (payload instanceof FormData) {
+                    // Ensure CSRF token is in FormData
+                    if (!payload.has("_token")) {
+                        const csrfToken = document
+                            .querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute("content");
+                        if (csrfToken) {
+                            payload.append("_token", csrfToken);
+                        }
+                    }
+
+                    const response = await fetch(
+                        "/api/admin/school-seal-info",
+                        {
+                            method: "POST",
+                            headers: {
+                                Accept: "application/json",
+                                "X-CSRF-TOKEN":
+                                    document
+                                        .querySelector(
+                                            'meta[name="csrf-token"]'
+                                        )
+                                        ?.getAttribute("content") || "",
+                            },
+                            credentials: "include",
+                            body: payload,
+                        }
+                    );
+                    const data = await response.json();
+                    if (!response.ok) return data;
+                    return data;
+                }
+
                 // If payload contains image (File), use FormData; else JSON
                 if (payload.image instanceof File) {
                     const form = new FormData();
@@ -1425,11 +1514,13 @@ export const adminService = {
                             body: form,
                         }
                     );
-                    if (!response.ok)
-                        throw new Error(
-                            `HTTP error! status: ${response.status}`
-                        );
                     const data = await response.json();
+
+                    if (!response.ok) {
+                        // Return the error data so validation errors can be displayed
+                        return data;
+                    }
+
                     return data;
                 } else {
                     const response = await fetch(
@@ -1441,11 +1532,13 @@ export const adminService = {
                             body: JSON.stringify(payload),
                         }
                     );
-                    if (!response.ok)
-                        throw new Error(
-                            `HTTP error! status: ${response.status}`
-                        );
                     const data = await response.json();
+
+                    if (!response.ok) {
+                        // Return the error data so validation errors can be displayed
+                        return data;
+                    }
+
                     return data;
                 }
             } catch (error) {
@@ -1455,16 +1548,21 @@ export const adminService = {
         },
         async update(id, payload) {
             try {
-                // If payload contains image (File), use FormData; else JSON
-                if (payload.image instanceof File) {
-                    const form = new FormData();
-                    Object.entries(payload).forEach(([k, v]) => {
-                        if (v === undefined || v === null || v === "") return;
-                        if (typeof v === "boolean")
-                            form.append(k, v ? "1" : "0");
-                        else form.append(k, v);
-                    });
-                    form.append("_method", "PUT");
+                // Support passing a ready FormData directly
+                if (payload instanceof FormData) {
+                    if (!payload.has("_method"))
+                        payload.append("_method", "PUT");
+
+                    // Ensure CSRF token is in FormData
+                    if (!payload.has("_token")) {
+                        const csrfToken = document
+                            .querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute("content");
+                        if (csrfToken) {
+                            payload.append("_token", csrfToken);
+                        }
+                    }
+
                     const response = await fetch(
                         `/api/admin/school-seal-info/${id}`,
                         {
@@ -1479,32 +1577,47 @@ export const adminService = {
                                         ?.getAttribute("content") || "",
                             },
                             credentials: "include",
-                            body: form,
+                            body: payload,
                         }
                     );
-                    if (!response.ok)
-                        throw new Error(
-                            `HTTP error! status: ${response.status}`
-                        );
                     const data = await response.json();
-                    return data;
-                } else {
-                    const response = await fetch(
-                        `/api/admin/school-seal-info/${id}`,
-                        {
-                            method: "PUT",
-                            headers: getHeaders(),
-                            credentials: "include",
-                            body: JSON.stringify(payload),
-                        }
-                    );
-                    if (!response.ok)
-                        throw new Error(
-                            `HTTP error! status: ${response.status}`
-                        );
-                    const data = await response.json();
+                    if (!response.ok) return data;
                     return data;
                 }
+
+                // Use FormData for all updates to ensure consistency with backend
+                const form = new FormData();
+                form.append("_method", "PUT");
+
+                Object.entries(payload).forEach(([k, v]) => {
+                    if (v === undefined || v === null || v === "") return;
+                    if (typeof v === "boolean") form.append(k, v ? "1" : "0");
+                    else form.append(k, v);
+                });
+
+                const response = await fetch(
+                    `/api/admin/school-seal-info/${id}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN":
+                                document
+                                    .querySelector('meta[name="csrf-token"]')
+                                    ?.getAttribute("content") || "",
+                        },
+                        credentials: "include",
+                        body: form,
+                    }
+                );
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Return the error data so validation errors can be displayed
+                    return data;
+                }
+
+                return data;
             } catch (error) {
                 console.error("Error updating school seal info:", error);
                 throw error;
@@ -1575,6 +1688,35 @@ export const adminService = {
         },
         async create(payload) {
             try {
+                // Support passing a ready FormData directly
+                if (payload instanceof FormData) {
+                    // Ensure CSRF token is in FormData
+                    if (!payload.has("_token")) {
+                        const csrfToken = document
+                            .querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute("content");
+                        if (csrfToken) {
+                            payload.append("_token", csrfToken);
+                        }
+                    }
+
+                    const response = await fetch(
+                        "/api/admin/school-seal-symbolic-elements",
+                        {
+                            method: "POST",
+                            headers: {
+                                Accept: "application/json",
+                                "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
+                            },
+                            credentials: "include",
+                            body: payload,
+                        }
+                    );
+                    const data = await response.json();
+                    if (!response.ok) return data;
+                    return data;
+                }
+
                 // If payload contains image (File), use FormData; else JSON
                 if (payload.image instanceof File) {
                     const form = new FormData();
@@ -1584,28 +1726,34 @@ export const adminService = {
                             form.append(k, v ? "1" : "0");
                         else form.append(k, v);
                     });
+
+                    // Add CSRF token
+                    const csrfToken = document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute("content");
+                    if (csrfToken) {
+                        form.append("_token", csrfToken);
+                    }
+
                     const response = await fetch(
                         "/api/admin/school-seal-symbolic-elements",
                         {
                             method: "POST",
                             headers: {
                                 Accept: "application/json",
-                                "X-CSRF-TOKEN":
-                                    document
-                                        .querySelector(
-                                            'meta[name="csrf-token"]'
-                                        )
-                                        ?.getAttribute("content") || "",
+                                "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
                             },
                             credentials: "include",
                             body: form,
                         }
                     );
-                    if (!response.ok)
-                        throw new Error(
-                            `HTTP error! status: ${response.status}`
-                        );
                     const data = await response.json();
+
+                    if (!response.ok) {
+                        // Return the error data so validation errors can be displayed
+                        return data;
+                    }
+
                     return data;
                 } else {
                     const response = await fetch(
@@ -1617,11 +1765,13 @@ export const adminService = {
                             body: JSON.stringify(payload),
                         }
                     );
-                    if (!response.ok)
-                        throw new Error(
-                            `HTTP error! status: ${response.status}`
-                        );
                     const data = await response.json();
+
+                    if (!response.ok) {
+                        // Return the error data so validation errors can be displayed
+                        return data;
+                    }
+
                     return data;
                 }
             } catch (error) {
@@ -1631,56 +1781,39 @@ export const adminService = {
         },
         async update(id, payload) {
             try {
-                // If payload contains image (File), use FormData; else JSON
-                if (payload.image instanceof File) {
-                    const form = new FormData();
-                    Object.entries(payload).forEach(([k, v]) => {
-                        if (v === undefined || v === null || v === "") return;
-                        if (typeof v === "boolean")
-                            form.append(k, v ? "1" : "0");
-                        else form.append(k, v);
-                    });
-                    form.append("_method", "PUT");
-                    const response = await fetch(
-                        `/api/admin/school-seal-symbolic-elements/${id}`,
-                        {
-                            method: "POST",
-                            headers: {
-                                Accept: "application/json",
-                                "X-CSRF-TOKEN":
-                                    document
-                                        .querySelector(
-                                            'meta[name="csrf-token"]'
-                                        )
-                                        ?.getAttribute("content") || "",
-                            },
-                            credentials: "include",
-                            body: form,
-                        }
-                    );
-                    if (!response.ok)
-                        throw new Error(
-                            `HTTP error! status: ${response.status}`
-                        );
-                    const data = await response.json();
-                    return data;
-                } else {
-                    const response = await fetch(
-                        `/api/admin/school-seal-symbolic-elements/${id}`,
-                        {
-                            method: "PUT",
-                            headers: getHeaders(),
-                            credentials: "include",
-                            body: JSON.stringify(payload),
-                        }
-                    );
-                    if (!response.ok)
-                        throw new Error(
-                            `HTTP error! status: ${response.status}`
-                        );
-                    const data = await response.json();
+                // Use FormData for all updates to ensure consistency with backend
+                const form = new FormData();
+                form.append("_method", "PUT");
+
+                Object.entries(payload).forEach(([k, v]) => {
+                    if (v === undefined || v === null || v === "") return;
+                    if (typeof v === "boolean") form.append(k, v ? "1" : "0");
+                    else form.append(k, v);
+                });
+
+                const response = await fetch(
+                    `/api/admin/school-seal-symbolic-elements/${id}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN":
+                                document
+                                    .querySelector('meta[name="csrf-token"]')
+                                    ?.getAttribute("content") || "",
+                        },
+                        credentials: "include",
+                        body: form,
+                    }
+                );
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Return the error data so validation errors can be displayed
                     return data;
                 }
+
+                return data;
             } catch (error) {
                 console.error("Error updating symbolic element:", error);
                 throw error;
@@ -1751,6 +1884,35 @@ export const adminService = {
         },
         async create(payload) {
             try {
+                // Support passing a ready FormData directly
+                if (payload instanceof FormData) {
+                    // Ensure CSRF token is in FormData
+                    if (!payload.has("_token")) {
+                        const csrfToken = document
+                            .querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute("content");
+                        if (csrfToken) {
+                            payload.append("_token", csrfToken);
+                        }
+                    }
+
+                    const response = await fetch(
+                        "/api/admin/school-seal-core-values",
+                        {
+                            method: "POST",
+                            headers: {
+                                Accept: "application/json",
+                                "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
+                            },
+                            credentials: "include",
+                            body: payload,
+                        }
+                    );
+                    const data = await response.json();
+                    if (!response.ok) return data;
+                    return data;
+                }
+
                 // If payload contains image (File), use FormData; else JSON
                 if (payload.image instanceof File) {
                     const form = new FormData();
@@ -1760,28 +1922,34 @@ export const adminService = {
                             form.append(k, v ? "1" : "0");
                         else form.append(k, v);
                     });
+
+                    // Add CSRF token
+                    const csrfToken = document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute("content");
+                    if (csrfToken) {
+                        form.append("_token", csrfToken);
+                    }
+
                     const response = await fetch(
                         "/api/admin/school-seal-core-values",
                         {
                             method: "POST",
                             headers: {
                                 Accept: "application/json",
-                                "X-CSRF-TOKEN":
-                                    document
-                                        .querySelector(
-                                            'meta[name="csrf-token"]'
-                                        )
-                                        ?.getAttribute("content") || "",
+                                "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
                             },
                             credentials: "include",
                             body: form,
                         }
                     );
-                    if (!response.ok)
-                        throw new Error(
-                            `HTTP error! status: ${response.status}`
-                        );
                     const data = await response.json();
+
+                    if (!response.ok) {
+                        // Return the error data so validation errors can be displayed
+                        return data;
+                    }
+
                     return data;
                 } else {
                     const response = await fetch(
@@ -1793,11 +1961,13 @@ export const adminService = {
                             body: JSON.stringify(payload),
                         }
                     );
-                    if (!response.ok)
-                        throw new Error(
-                            `HTTP error! status: ${response.status}`
-                        );
                     const data = await response.json();
+
+                    if (!response.ok) {
+                        // Return the error data so validation errors can be displayed
+                        return data;
+                    }
+
                     return data;
                 }
             } catch (error) {
@@ -1807,56 +1977,39 @@ export const adminService = {
         },
         async update(id, payload) {
             try {
-                // If payload contains image (File), use FormData; else JSON
-                if (payload.image instanceof File) {
-                    const form = new FormData();
-                    Object.entries(payload).forEach(([k, v]) => {
-                        if (v === undefined || v === null || v === "") return;
-                        if (typeof v === "boolean")
-                            form.append(k, v ? "1" : "0");
-                        else form.append(k, v);
-                    });
-                    form.append("_method", "PUT");
-                    const response = await fetch(
-                        `/api/admin/school-seal-core-values/${id}`,
-                        {
-                            method: "POST",
-                            headers: {
-                                Accept: "application/json",
-                                "X-CSRF-TOKEN":
-                                    document
-                                        .querySelector(
-                                            'meta[name="csrf-token"]'
-                                        )
-                                        ?.getAttribute("content") || "",
-                            },
-                            credentials: "include",
-                            body: form,
-                        }
-                    );
-                    if (!response.ok)
-                        throw new Error(
-                            `HTTP error! status: ${response.status}`
-                        );
-                    const data = await response.json();
-                    return data;
-                } else {
-                    const response = await fetch(
-                        `/api/admin/school-seal-core-values/${id}`,
-                        {
-                            method: "PUT",
-                            headers: getHeaders(),
-                            credentials: "include",
-                            body: JSON.stringify(payload),
-                        }
-                    );
-                    if (!response.ok)
-                        throw new Error(
-                            `HTTP error! status: ${response.status}`
-                        );
-                    const data = await response.json();
+                // Use FormData for all updates to ensure consistency with backend
+                const form = new FormData();
+                form.append("_method", "PUT");
+
+                Object.entries(payload).forEach(([k, v]) => {
+                    if (v === undefined || v === null || v === "") return;
+                    if (typeof v === "boolean") form.append(k, v ? "1" : "0");
+                    else form.append(k, v);
+                });
+
+                const response = await fetch(
+                    `/api/admin/school-seal-core-values/${id}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN":
+                                document
+                                    .querySelector('meta[name="csrf-token"]')
+                                    ?.getAttribute("content") || "",
+                        },
+                        credentials: "include",
+                        body: form,
+                    }
+                );
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Return the error data so validation errors can be displayed
                     return data;
                 }
+
+                return data;
             } catch (error) {
                 console.error("Error updating core value:", error);
                 throw error;

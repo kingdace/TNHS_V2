@@ -52,8 +52,8 @@ class SchoolSealInfoController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = $image->storeAs('public/school-seal', $imageName);
-            $data['image_path'] = Storage::url($imagePath);
+            $imagePath = $image->storeAs('school-seal', $imageName, 'public');
+            $data['image_path'] = '/storage/' . $imagePath;
         }
 
         $sealInfo = SchoolSealInfo::create($data);
@@ -109,14 +109,14 @@ class SchoolSealInfoController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($sealInfo->image_path) {
-                $oldImagePath = str_replace('/storage/', 'public/', $sealInfo->image_path);
-                Storage::delete($oldImagePath);
+                $oldImagePath = str_replace('/storage/', '', $sealInfo->image_path);
+                Storage::disk('public')->delete($oldImagePath);
             }
 
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = $image->storeAs('public/school-seal', $imageName);
-            $data['image_path'] = Storage::url($imagePath);
+            $imagePath = $image->storeAs('school-seal', $imageName, 'public');
+            $data['image_path'] = '/storage/' . $imagePath;
         }
 
         $sealInfo->update($data);

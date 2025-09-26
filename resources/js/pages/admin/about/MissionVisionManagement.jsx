@@ -231,22 +231,29 @@ const MissionVisionManagement = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const formDataToSend = new FormData();
-
-            // Add common fields
-            if (formData.title) formDataToSend.append("title", formData.title);
-            if (formData.content)
-                formDataToSend.append("content", formData.content);
-            if (formData.description)
-                formDataToSend.append("description", formData.description);
-            if (formData.icon) formDataToSend.append("icon", formData.icon);
-            if (formData.color) formDataToSend.append("color", formData.color);
-            if (formData.category)
-                formDataToSend.append("category", formData.category);
-            if (formData.image) formDataToSend.append("image", formData.image);
-            if (formData.type) formDataToSend.append("type", formData.type);
-            formDataToSend.append("display_order", formData.display_order);
-            formDataToSend.append("is_active", formData.is_active ? "1" : "0");
+            const isMissionsTab = activeTab === "missions";
+            // Build payload depending on tab
+            const formDataToSend = isMissionsTab
+                ? (() => {
+                      const fd = new FormData();
+                      if (formData.title) fd.append("title", formData.title);
+                      if (formData.content)
+                          fd.append("content", formData.content);
+                      if (formData.image) fd.append("image", formData.image);
+                      if (formData.type) fd.append("type", formData.type);
+                      fd.append("display_order", formData.display_order);
+                      fd.append("is_active", formData.is_active ? "1" : "0");
+                      return fd;
+                  })()
+                : {
+                      title: formData.title,
+                      description: formData.description,
+                      icon: formData.icon || undefined,
+                      color: formData.color || undefined,
+                      category: formData.category || undefined,
+                      display_order: formData.display_order,
+                      is_active: formData.is_active,
+                  };
 
             let response;
             // Determine if it's a mission or vision based on editingItem or form data
