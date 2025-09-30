@@ -16,7 +16,7 @@ const Header = () => {
                 { name: "Junior High", href: "/academics/junior-high" },
                 { name: "Senior High", href: "/academics/senior-high" },
                 {
-                    name: "Special Programs",
+                    name: "ALS Program",
                     href: "/academics/special-programs",
                 },
             ],

@@ -379,42 +379,6 @@ const Home = () => {
                         </h1>
                     </div>
 
-                    {/* Information For Section */}
-                    <div className="mb-8">
-                        <h2 className="text-lg font-semibold text-royal-blue mb-6 tracking-wide">
-                            INFORMATION FOR:
-                        </h2>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <Button
-                                asChild
-                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold h-12 px-5 rounded-lg transition-colors flex items-center justify-center"
-                            >
-                                <Link to="/admissions">ADMISSION</Link>
-                            </Button>
-                            <Button
-                                asChild
-                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold h-12 px-5 rounded-lg transition-colors flex items-center justify-center"
-                            >
-                                <Link to="/students">STUDENTS</Link>
-                            </Button>
-                            <Button
-                                asChild
-                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold h-12 px-5 rounded-lg transition-colors flex items-center justify-center"
-                            >
-                                <Link to="/faculty">FACULTY & STAFF</Link>
-                            </Button>
-                            <Button
-                                asChild
-                                className="bg-royal-blue hover:bg-blue-700 text-white font-semibold h-12 px-5 rounded-lg transition-colors flex items-center justify-center"
-                            >
-                                <Link to="/donate">
-                                    <span>DONATE TO TNHS</span>
-                                    <span></span>
-                                </Link>
-                            </Button>
-                        </div>
-                    </div>
-
                     {/* Explore Section */}
                     <div>
                         <h2 className="text-lg font-semibold text-royal-blue mb-4 tracking-wide">

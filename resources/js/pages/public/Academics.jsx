@@ -232,7 +232,7 @@ const Academics = () => {
                                             </div>
                                             <div>
                                                 <h3 className="font-bold text-lg text-gray-800">
-                                                    Special Programs
+                                                    ALS Programs
                                                 </h3>
                                                 <p className="text-gray-600 text-sm flex items-center">
                                                     <span className="mr-1">

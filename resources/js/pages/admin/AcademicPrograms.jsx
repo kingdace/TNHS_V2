@@ -256,7 +256,7 @@ const AcademicPrograms = () => {
                             <option value="">All Types</option>
                             <option value="junior_high">Junior High</option>
                             <option value="senior_high">Senior High</option>
-                            <option value="special">Special Programs</option>
+                            <option value="special">ALS Program</option>
                         </select>
                     </div>
                 </div>
@@ -490,7 +490,7 @@ const AcademicPrograms = () => {
                                                 Senior High School
                                             </option>
                                             <option value="special">
-                                                Special Programs
+                                                ALS Program
                                             </option>
                                         </select>
                                     </div>

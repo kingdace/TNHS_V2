@@ -273,7 +273,7 @@ const AcademicsSpecialProgramDetail = () => {
                         className="inline-flex items-center px-6 py-3 bg-royal-blue text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-300"
                     >
                         <ArrowLeft className="h-5 w-5 mr-2" />
-                        Back to Special Programs
+                        Back to ALS Programs
                     </Link>
                 </div>
             </div>
@@ -292,7 +292,7 @@ const AcademicsSpecialProgramDetail = () => {
                         className="flex items-center text-royal-blue hover:text-blue-700 transition-colors mr-4 group"
                     >
                         <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-                        Back to Special Programs
+                        Back to ALS Program
                     </Link>
                 </div>
 

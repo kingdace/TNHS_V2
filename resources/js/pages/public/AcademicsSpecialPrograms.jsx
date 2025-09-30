@@ -106,7 +106,7 @@ const AcademicsSpecialPrograms = () => {
                         </div>
                     </div>
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-royal-blue to-blue-600 bg-clip-text text-transparent mb-3">
-                        ⭐ Special Programs
+                        ⭐ ALS Programs
                     </h1>
                     <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-4">
                         Alternative learning opportunities designed to provide

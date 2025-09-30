@@ -6,14 +6,79 @@
 const API_BASE_URL = "/api";
 
 // Helper function to get headers with CSRF token
-const getHeaders = () => ({
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    "X-CSRF-TOKEN":
-        document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute("content") || "",
-});
+const getHeaders = () => {
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute("content");
+
+    if (!csrfToken) {
+        console.warn("CSRF token not found in meta tag");
+    }
+
+    return {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-TOKEN": csrfToken || "",
+    };
+};
+
+// Helper function to refresh CSRF token
+const refreshCSRFToken = async () => {
+    try {
+        const response = await fetch("/api/csrf-token", {
+            method: "GET",
+            credentials: "include",
+        });
+        if (response.ok) {
+            const data = await response.json();
+            // Update the meta tag with the new token
+            const metaTag = document.querySelector('meta[name="csrf-token"]');
+            if (metaTag && data.csrf_token) {
+                metaTag.setAttribute("content", data.csrf_token);
+            }
+            return data.csrf_token;
+        }
+    } catch (error) {
+        console.warn("Failed to refresh CSRF token:", error);
+    }
+    return null;
+};
+
+// Helper function to handle API requests with CSRF retry
+const makeRequest = async (url, options = {}) => {
+    try {
+        const response = await fetch(url, {
+            credentials: "include",
+            ...options,
+        });
+
+        // If we get a 419 CSRF error, try refreshing the token and retry once
+        if (response.status === 419) {
+            console.log("CSRF token expired, refreshing...");
+            const newToken = await refreshCSRFToken();
+            if (newToken) {
+                // Update headers with new token
+                const updatedHeaders = {
+                    ...options.headers,
+                    "X-CSRF-TOKEN": newToken,
+                };
+                
+                // Retry the request with the new token
+                const retryResponse = await fetch(url, {
+                    ...options,
+                    headers: updatedHeaders,
+                    credentials: "include",
+                });
+                return retryResponse;
+            }
+        }
+
+        return response;
+    } catch (error) {
+        console.error("Request failed:", error);
+        throw error;
+    }
+};
 
 export const adminService = {
     /**
@@ -873,10 +938,9 @@ export const adminService = {
         async getAll(filters = {}) {
             try {
                 const query = new URLSearchParams(filters).toString();
-                const response = await fetch(`/api/admin/missions?${query}`, {
+                const response = await makeRequest(`/api/admin/missions?${query}`, {
                     method: "GET",
                     headers: getHeaders(),
-                    credentials: "include",
                 });
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -905,18 +969,16 @@ export const adminService = {
                               return f;
                           })();
 
-                const response = await fetch("/api/admin/missions", {
+                const response = await makeRequest("/api/admin/missions", {
                     method: "POST",
                     headers: {
                         Accept: "application/json",
-                        "X-CSRF-TOKEN":
-                            document
-                                .querySelector('meta[name="csrf-token"]')
-                                ?.getAttribute("content") || "",
+                        "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
                     },
                     body: form,
-                    credentials: "include",
                 });
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 return data;
             } catch (error) {
@@ -942,18 +1004,16 @@ export const adminService = {
                           })();
                 if (!form.has("_method")) form.append("_method", "PUT");
 
-                const response = await fetch(`/api/admin/missions/${id}`, {
+                const response = await makeRequest(`/api/admin/missions/${id}`, {
                     method: "POST",
                     headers: {
                         Accept: "application/json",
-                        "X-CSRF-TOKEN":
-                            document
-                                .querySelector('meta[name="csrf-token"]')
-                                ?.getAttribute("content") || "",
+                        "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
                     },
                     body: form,
-                    credentials: "include",
                 });
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 return data;
             } catch (error) {
@@ -963,10 +1023,9 @@ export const adminService = {
         },
         async delete(id) {
             try {
-                const response = await fetch(`/api/admin/missions/${id}`, {
+                const response = await makeRequest(`/api/admin/missions/${id}`, {
                     method: "DELETE",
                     headers: getHeaders(),
-                    credentials: "include",
                 });
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -979,12 +1038,11 @@ export const adminService = {
         },
         async toggleActive(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/missions/${id}/toggle-active`,
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
                 if (!response.ok)
@@ -1005,10 +1063,9 @@ export const adminService = {
         async getAll(filters = {}) {
             try {
                 const query = new URLSearchParams(filters).toString();
-                const response = await fetch(`/api/admin/visions?${query}`, {
+                const response = await makeRequest(`/api/admin/visions?${query}`, {
                     method: "GET",
                     headers: getHeaders(),
-                    credentials: "include",
                 });
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1036,18 +1093,16 @@ export const adminService = {
                               return f;
                           })();
 
-                const response = await fetch("/api/admin/visions", {
+                const response = await makeRequest("/api/admin/visions", {
                     method: "POST",
                     headers: {
                         Accept: "application/json",
-                        "X-CSRF-TOKEN":
-                            document
-                                .querySelector('meta[name="csrf-token"]')
-                                ?.getAttribute("content") || "",
+                        "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
                     },
                     body: form,
-                    credentials: "include",
                 });
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 return data;
             } catch (error) {
@@ -1073,18 +1128,16 @@ export const adminService = {
                           })();
                 if (!form.has("_method")) form.append("_method", "PUT");
 
-                const response = await fetch(`/api/admin/visions/${id}`, {
+                const response = await makeRequest(`/api/admin/visions/${id}`, {
                     method: "POST",
                     headers: {
                         Accept: "application/json",
-                        "X-CSRF-TOKEN":
-                            document
-                                .querySelector('meta[name="csrf-token"]')
-                                ?.getAttribute("content") || "",
+                        "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
                     },
                     body: form,
-                    credentials: "include",
                 });
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 return data;
             } catch (error) {
@@ -1094,10 +1147,9 @@ export const adminService = {
         },
         async delete(id) {
             try {
-                const response = await fetch(`/api/admin/visions/${id}`, {
+                const response = await makeRequest(`/api/admin/visions/${id}`, {
                     method: "DELETE",
                     headers: getHeaders(),
-                    credentials: "include",
                 });
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1110,12 +1162,11 @@ export const adminService = {
         },
         async toggleActive(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/visions/${id}/toggle-active`,
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
                 if (!response.ok)
@@ -1136,12 +1187,11 @@ export const adminService = {
         async getAll(filters = {}) {
             try {
                 const query = new URLSearchParams(filters).toString();
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/core-values?${query}`,
                     {
                         method: "GET",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
                 if (!response.ok)
@@ -1155,10 +1205,9 @@ export const adminService = {
         },
         async create(payload) {
             try {
-                const response = await fetch("/api/admin/core-values", {
+                const response = await makeRequest("/api/admin/core-values", {
                     method: "POST",
                     headers: getHeaders(),
-                    credentials: "include",
                     body: JSON.stringify(payload),
                 });
                 if (!response.ok)
@@ -1172,10 +1221,9 @@ export const adminService = {
         },
         async update(id, payload) {
             try {
-                const response = await fetch(`/api/admin/core-values/${id}`, {
+                const response = await makeRequest(`/api/admin/core-values/${id}`, {
                     method: "PUT",
                     headers: getHeaders(),
-                    credentials: "include",
                     body: JSON.stringify(payload),
                 });
                 if (!response.ok)
@@ -1189,10 +1237,9 @@ export const adminService = {
         },
         async delete(id) {
             try {
-                const response = await fetch(`/api/admin/core-values/${id}`, {
+                const response = await makeRequest(`/api/admin/core-values/${id}`, {
                     method: "DELETE",
                     headers: getHeaders(),
-                    credentials: "include",
                 });
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1205,12 +1252,11 @@ export const adminService = {
         },
         async toggleActive(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/core-values/${id}/toggle-active`,
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
                 if (!response.ok)
@@ -1234,12 +1280,11 @@ export const adminService = {
         async getAll(filters = {}) {
             try {
                 const query = new URLSearchParams(filters).toString();
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/guiding-principles?${query}`,
                     {
                         method: "GET",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
                 if (!response.ok)
@@ -1253,10 +1298,9 @@ export const adminService = {
         },
         async create(payload) {
             try {
-                const response = await fetch("/api/admin/guiding-principles", {
+                const response = await makeRequest("/api/admin/guiding-principles", {
                     method: "POST",
                     headers: getHeaders(),
-                    credentials: "include",
                     body: JSON.stringify(payload),
                 });
                 if (!response.ok)
@@ -1270,12 +1314,11 @@ export const adminService = {
         },
         async update(id, payload) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/guiding-principles/${id}`,
                     {
                         method: "PUT",
                         headers: getHeaders(),
-                        credentials: "include",
                         body: JSON.stringify(payload),
                     }
                 );
@@ -1290,12 +1333,11 @@ export const adminService = {
         },
         async delete(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/guiding-principles/${id}`,
                     {
                         method: "DELETE",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
                 if (!response.ok)
@@ -1309,12 +1351,11 @@ export const adminService = {
         },
         async toggleActive(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/guiding-principles/${id}/toggle-active`,
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
                 if (!response.ok)
@@ -1338,12 +1379,11 @@ export const adminService = {
         async getAll(filters = {}) {
             try {
                 const query = new URLSearchParams(filters).toString();
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/goal-objectives?${query}`,
                     {
                         method: "GET",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
                 if (!response.ok)
@@ -1357,10 +1397,9 @@ export const adminService = {
         },
         async create(payload) {
             try {
-                const response = await fetch("/api/admin/goal-objectives", {
+                const response = await makeRequest("/api/admin/goal-objectives", {
                     method: "POST",
                     headers: getHeaders(),
-                    credentials: "include",
                     body: JSON.stringify(payload),
                 });
                 if (!response.ok)
@@ -1374,12 +1413,11 @@ export const adminService = {
         },
         async update(id, payload) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/goal-objectives/${id}`,
                     {
                         method: "PUT",
                         headers: getHeaders(),
-                        credentials: "include",
                         body: JSON.stringify(payload),
                     }
                 );
@@ -1394,12 +1432,11 @@ export const adminService = {
         },
         async delete(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/goal-objectives/${id}`,
                     {
                         method: "DELETE",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
                 if (!response.ok)
@@ -1413,12 +1450,11 @@ export const adminService = {
         },
         async toggleActive(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/goal-objectives/${id}/toggle-active`,
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
                 if (!response.ok)
