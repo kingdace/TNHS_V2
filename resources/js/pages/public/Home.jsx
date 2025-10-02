@@ -551,7 +551,7 @@ const Home = () => {
                                                 asChild
                                                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-3 py-1.5 text-xs rounded-lg transition-all duration-300"
                                             >
-                                                <Link to="/sports">
+                                                <Link to="/announcements?category=Sports&type=sports">
                                                     Explore Sports
                                                 </Link>
                                             </Button>
@@ -579,8 +579,64 @@ const Home = () => {
                                                 asChild
                                                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold px-3 py-1.5 text-xs rounded-lg transition-all duration-300"
                                             >
-                                                <Link to="/clubs-organizations">
+                                                <Link to="/announcements?category=Student%20Government&type=student">
                                                     Get Involved
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    {/* Academic Events */}
+                                    <div className="bg-white rounded-lg p-3">
+                                        <div className="mb-3 overflow-hidden rounded-md border border-gray-200 shadow-sm">
+                                            <img
+                                                src="/images/academic.jpg"
+                                                alt="Academic Events"
+                                                className="w-full h-30 object-cover"
+                                            />
+                                        </div>
+                                        <div className="text-center">
+                                            <h5 className="font-bold text-gray-800 mb-1 text-sm">
+                                                Academic Events
+                                            </h5>
+                                            <p className="text-gray-600 text-xs mb-2">
+                                                Exams, conferences, academic
+                                                competitions
+                                            </p>
+                                            <Button
+                                                asChild
+                                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 text-xs rounded-lg transition-all duration-300"
+                                            >
+                                                <Link to="/events?type=academic">
+                                                    View Events
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    {/* Cultural Events */}
+                                    <div className="bg-white rounded-lg p-3">
+                                        <div className="mb-3 overflow-hidden rounded-md border border-gray-200 shadow-sm">
+                                            <img
+                                                src="/images/cultural.jpg"
+                                                alt="Cultural Events"
+                                                className="w-full h-30 object-cover"
+                                            />
+                                        </div>
+                                        <div className="text-center">
+                                            <h5 className="font-bold text-gray-800 mb-1 text-sm">
+                                                Cultural Events
+                                            </h5>
+                                            <p className="text-gray-600 text-xs mb-2">
+                                                Festivals, performances,
+                                                cultural celebrations
+                                            </p>
+                                            <Button
+                                                asChild
+                                                className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold px-3 py-1.5 text-xs rounded-lg transition-all duration-300"
+                                            >
+                                                <Link to="/events?type=cultural">
+                                                    View Events
                                                 </Link>
                                             </Button>
                                         </div>

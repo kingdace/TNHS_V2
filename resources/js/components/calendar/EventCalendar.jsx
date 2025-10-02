@@ -340,7 +340,7 @@ const EventCalendar = () => {
                                     );
                                 }
 
-                                return monthEvents.map((event) => {
+                                return monthEvents.map((event, index) => {
                                     const eventDate = new Date(
                                         event.start_date
                                     );
@@ -351,7 +351,7 @@ const EventCalendar = () => {
 
                                     return (
                                         <div
-                                            key={event.id}
+                                            key={`${event.id}-${index}`}
                                             className="flex items-center gap-2 p-1.5 bg-white rounded border border-gray-200"
                                         >
                                             <div
@@ -442,7 +442,7 @@ const EventCalendar = () => {
                                             </div>
                                         ) : (
                                             <div className="space-y-3">
-                                                {dayEvents.map((ev) => {
+                                                {dayEvents.map((ev, index) => {
                                                     const start = ev.start_date
                                                         ? new Date(
                                                               ev.start_date
@@ -532,7 +532,7 @@ const EventCalendar = () => {
 
                                                     return (
                                                         <div
-                                                            key={ev.id}
+                                                            key={`${ev.id}-${index}`}
                                                             className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:border-gray-300"
                                                         >
                                                             {/* Event Header */}

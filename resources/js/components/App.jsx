@@ -55,6 +55,7 @@ import MoreResources from "../pages/public/MoreResources";
 import MoreDownloads from "../pages/public/MoreDownloads";
 import TestDynamic from "../pages/public/TestDynamic";
 import MoreLinks from "../pages/public/MoreLinks";
+import Gallery from "../pages/public/Gallery";
 
 // Auth Pages
 import Login from "../pages/Login";
@@ -89,14 +90,14 @@ const ScrollToTopWrapper = ({ children }) => {
 function App() {
     return (
         <AuthProvider>
-            <Router>
+            <Router
+                future={{
+                    v7_startTransition: true,
+                    v7_relativeSplatPath: true,
+                }}
+            >
                 <ScrollToTopWrapper>
-                    <Routes
-                        future={{
-                            v7_startTransition: true,
-                            v7_relativeSplatPath: true,
-                        }}
-                    >
+                    <Routes>
                         {/* Auth Routes - Outside of PublicLayout for clean login page */}
                         <Route
                             path="login"
@@ -153,6 +154,10 @@ function App() {
                                 element={<AcademicsSpecialProgramDetail />}
                             />
                             <Route path="admissions" element={<Admissions />} />
+                            <Route
+                                path="admissions/requirements"
+                                element={<Admissions />}
+                            />
                             {/* Redirect old routes to new ones */}
                             <Route
                                 path="news/announcements"
@@ -163,6 +168,12 @@ function App() {
                             <Route
                                 path="news/events"
                                 element={<Navigate to="/events" replace />}
+                            />
+                            <Route
+                                path="news"
+                                element={
+                                    <Navigate to="/announcements" replace />
+                                }
                             />
                             <Route
                                 path="announcements"
@@ -218,6 +229,7 @@ function App() {
                                 element={<MoreDownloads />}
                             />
                             <Route path="more/links" element={<MoreLinks />} />
+                            <Route path="gallery" element={<Gallery />} />
                             <Route
                                 path="test-dynamic"
                                 element={<TestDynamic />}

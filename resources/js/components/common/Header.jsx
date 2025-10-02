@@ -43,33 +43,41 @@ const Header = () => {
             ],
         },
         {
-            name: "Faculty",
+            name: "Faculty and Staff",
             href: "/faculty",
             hasDropdown: true,
             submenu: [
-                { name: "Principal", href: "/faculty/principal" },
                 { name: "Assistant", href: "/faculty/assistant-principal" },
                 { name: "Faculties", href: "/faculty/teaching-staff" },
-                { name: "And Staff", href: "/faculty/administrative-staff" },
+                { name: "Staff", href: "/faculty/administrative-staff" },
             ],
         },
+        { name: "Principal Corner", href: "/faculty/principal" },
         {
             name: "More",
             href: "/more",
             hasDropdown: true,
             submenu: [
+                {
+                    name: "Enrollment Guidelines & Requirements",
+                    href: "/admissions/requirements",
+                },
                 { name: "Contact Us", href: "/contact" },
                 { name: "Resources", href: "/more/resources" },
-                { name: "Downloads", href: "/more/downloads" },
-                { name: "Links", href: "/more/links" },
+                { name: "Media Gallery", href: "/gallery" },
             ],
         },
     ];
 
     const isActive = (path) => {
         if (path === "/" && location.pathname === "/") return true;
-        if (path !== "/" && location.pathname.startsWith(path)) return true;
+        if (path !== "/" && location.pathname === path) return true;
         return false;
+    };
+
+    const isParentActive = (submenu) => {
+        if (!submenu) return false;
+        return submenu.some((subItem) => location.pathname === subItem.href);
     };
 
     return (
@@ -104,7 +112,7 @@ const Header = () => {
                                 {item.hasDropdown ? (
                                     item.name === "Academics" ? (
                                         // Academics: Clickable text (navigate to overview page only)
-                                        <div
+                                        <Link
                                             to={item.href}
                                             className={`px-4 py-2 rounded font-medium transition-all duration-300 ${
                                                 isActive(item.href)
@@ -113,12 +121,12 @@ const Header = () => {
                                             }`}
                                         >
                                             {item.name}
-                                        </div>
+                                        </Link>
                                     ) : (
                                         // Other dropdowns: Dropdown only (not clickable to main page)
                                         <div
                                             className={`px-4 py-2 rounded font-medium transition-all duration-300 flex items-center space-x-1 ${
-                                                isActive(item.href)
+                                                isParentActive(item.submenu)
                                                     ? "bg-white/20 text-white"
                                                     : "text-blue-100 hover:bg-white/10 hover:text-white hover:rounded"
                                             }`}
@@ -205,7 +213,9 @@ const Header = () => {
                                                 // Other dropdowns: Dropdown only (not clickable to main page)
                                                 <div
                                                     className={`w-full text-left px-3 py-2 rounded-lg text-base font-medium transition-all duration-300 flex items-center justify-between ${
-                                                        isActive(item.href)
+                                                        isParentActive(
+                                                            item.submenu
+                                                        )
                                                             ? "bg-white/20 text-white"
                                                             : "text-blue-100 hover:bg-white/10 hover:text-white"
                                                     }`}

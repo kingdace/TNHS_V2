@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import {
     Calendar,
@@ -15,6 +15,7 @@ const Events = () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedType, setSelectedType] = useState("all");
+    const [searchParams, setSearchParams] = useSearchParams();
     const [pagination, setPagination] = useState({ total: 0, pages: 0 });
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,6 +26,30 @@ const Events = () => {
         "all",
         ...new Set(events.map((event) => event.event_type).filter(Boolean)),
     ];
+
+    // Initialize event type from URL parameters
+    useEffect(() => {
+        const typeFromUrl = searchParams.get("type");
+
+        if (typeFromUrl) {
+            setSelectedType(typeFromUrl);
+        }
+    }, [searchParams]);
+
+    // Handle event type change and update URL
+    const handleTypeChange = (type) => {
+        setSelectedType(type);
+        setCurrentPage(1); // Reset to first page when changing type
+
+        // Update URL parameters
+        const newSearchParams = new URLSearchParams(searchParams);
+        if (type === "all") {
+            newSearchParams.delete("type");
+        } else {
+            newSearchParams.set("type", type);
+        }
+        setSearchParams(newSearchParams);
+    };
 
     // Fetch events on component mount and when filters change
     useEffect(() => {
@@ -143,6 +168,21 @@ const Events = () => {
                         <h1 className="text-3xl font-bold text-royal-blue mb-2">
                             School Events
                         </h1>
+                        {selectedType !== "all" && (
+                            <div className="mt-2">
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                    Filtered by:{" "}
+                                    {selectedType.charAt(0).toUpperCase() +
+                                        selectedType.slice(1)}
+                                    <button
+                                        onClick={() => handleTypeChange("all")}
+                                        className="ml-2 text-green-600 hover:text-green-800"
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            </div>
+                        )}
                     </div>
 
                     {/* Loading State */}
@@ -187,10 +227,9 @@ const Events = () => {
                                     </span>
                                     <select
                                         value={selectedType}
-                                        onChange={(e) => {
-                                            setSelectedType(e.target.value);
-                                            setCurrentPage(1); // Reset to first page when filtering
-                                        }}
+                                        onChange={(e) =>
+                                            handleTypeChange(e.target.value)
+                                        }
                                         className="w-[140px] px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-royal-blue text-sm"
                                     >
                                         {eventTypes.map((type) => (

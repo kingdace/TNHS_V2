@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Home, Bell, ChevronLeft, ChevronRight } from "lucide-react";
 import { announcementService } from "../../services/announcementService";
@@ -9,6 +9,7 @@ const Announcements = () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedCategory, setSelectedCategory] = useState("all");
+    const [searchParams, setSearchParams] = useSearchParams();
     const announcementsPerPage = 6;
 
     // Get unique categories from announcements
@@ -16,6 +17,25 @@ const Announcements = () => {
         "all",
         ...new Set(announcements.map((ann) => ann.category).filter(Boolean)),
     ];
+
+    // Initialize category from URL parameters
+    useEffect(() => {
+        const categoryFromUrl = searchParams.get("category");
+        const typeFromUrl = searchParams.get("type");
+
+        if (categoryFromUrl) {
+            setSelectedCategory(categoryFromUrl);
+        } else if (typeFromUrl) {
+            // Map type to category if needed
+            const typeToCategoryMap = {
+                sports: "Sports",
+                student: "Student Government",
+                academic: "Academic",
+                general: "General",
+            };
+            setSelectedCategory(typeToCategoryMap[typeFromUrl] || "all");
+        }
+    }, [searchParams]);
 
     // Fetch announcements on component mount
     useEffect(() => {
@@ -38,6 +58,22 @@ const Announcements = () => {
         fetchAnnouncements();
         window.scrollTo(0, 0);
     }, []);
+
+    // Handle category change and update URL
+    const handleCategoryChange = (category) => {
+        setSelectedCategory(category);
+        setCurrentPage(1); // Reset to first page when changing category
+
+        // Update URL parameters
+        const newSearchParams = new URLSearchParams(searchParams);
+        if (category === "all") {
+            newSearchParams.delete("category");
+            newSearchParams.delete("type");
+        } else {
+            newSearchParams.set("category", category);
+        }
+        setSearchParams(newSearchParams);
+    };
 
     // Filter announcements by category
     const filteredAnnouncements =
@@ -72,6 +108,21 @@ const Announcements = () => {
                         <h1 className="text-3xl font-bold text-royal-blue mb-2">
                             School Highlights
                         </h1>
+                        {selectedCategory !== "all" && (
+                            <div className="mt-2">
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                    Filtered by: {selectedCategory}
+                                    <button
+                                        onClick={() =>
+                                            handleCategoryChange("all")
+                                        }
+                                        className="ml-2 text-blue-600 hover:text-blue-800"
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            </div>
+                        )}
                         {/* <div className="w-24 h-1 bg-gradient-to-r from-royal-blue to-blue-600 rounded-full mx-auto"></div> */}
                     </div>
 
@@ -121,10 +172,9 @@ const Announcements = () => {
                                     </span>
                                     <select
                                         value={selectedCategory}
-                                        onChange={(e) => {
-                                            setSelectedCategory(e.target.value);
-                                            setCurrentPage(1); // Reset to first page when filtering
-                                        }}
+                                        onChange={(e) =>
+                                            handleCategoryChange(e.target.value)
+                                        }
                                         className="w-[140px] px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-royal-blue text-sm"
                                     >
                                         {categories.map((category) => (

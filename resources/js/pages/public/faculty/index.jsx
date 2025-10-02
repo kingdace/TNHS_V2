@@ -9,18 +9,6 @@ const FacultyIndex = () => {
 
     const facultyCategories = [
         {
-            name: "Principal",
-            description: "School leadership and administration",
-            icon: User,
-            color: "blue",
-            href: "/faculty/principal",
-            features: [
-                "Educational Leadership",
-                "Strategic Planning",
-                "Academic Excellence",
-            ],
-        },
-        {
             name: "Assistant Principal",
             description: "Supporting leadership and student welfare",
             icon: Shield,
@@ -39,9 +27,9 @@ const FacultyIndex = () => {
             color: "purple",
             href: "/faculty/teaching-staff",
             features: [
-                "Subject Specialists",
-                "Grade Level Teachers",
-                "Academic Mentors",
+                "Grade 7-12 Teachers",
+                "ALS Teacher",
+                "Quick Navigation",
             ],
         },
         {
