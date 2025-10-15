@@ -40,6 +40,7 @@ import {
     Trophy,
     Eye,
     X,
+    ChevronRight,
 } from "lucide-react";
 
 const AcademicsSeniorHigh = () => {
@@ -187,14 +188,38 @@ const AcademicsSeniorHigh = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 pt-8 pb-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Navigation */}
-                <div className="flex items-center mb-8">
+                {/* Breadcrumbs */}
+                <nav className="mb-6">
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <Link
+                            to="/"
+                            className="hover:text-blue-600 transition-colors duration-200 flex items-center"
+                        >
+                            <Home className="h-4 w-4 mr-1" />
+                            Home
+                        </Link>
+                        <ChevronRight className="h-4 w-4 text-gray-400" />
+                        <Link
+                            to="/academics"
+                            className="hover:text-blue-600 transition-colors duration-200"
+                        >
+                            Academics
+                        </Link>
+                        <ChevronRight className="h-4 w-4 text-gray-400" />
+                        <span className="text-blue-600 font-medium">
+                            Senior High School
+                        </span>
+                    </div>
+                </nav>
+
+                {/* Back to Programs Overview */}
+                <div className="mb-6">
                     <Link
                         to="/academics"
                         className="flex items-center text-blue-600 hover:text-blue-700 transition-colors mr-4 group"
                     >
                         <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-                        Back to Academics
+                        Back to Programs Overview
                     </Link>
                 </div>
 

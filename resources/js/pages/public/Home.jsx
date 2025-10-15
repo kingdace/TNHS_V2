@@ -33,6 +33,7 @@ const Home = () => {
     const [announcements, setAnnouncements] = useState([]);
     const [heroSlides, setHeroSlides] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
 
     // Dynamic content hooks
     const { content: featuresContent } = useDynamicContent("home", "features");
@@ -68,6 +69,29 @@ const Home = () => {
 
         fetchData();
     }, []);
+
+    // Filter announcements based on search term
+    const filteredAnnouncements = announcements.filter((announcement) => {
+        if (!searchTerm.trim()) return true;
+
+        const searchLower = searchTerm.toLowerCase();
+        const titleMatch = announcement.title
+            .toLowerCase()
+            .includes(searchLower);
+        const categoryMatch =
+            announcement.category &&
+            announcement.category.toLowerCase().includes(searchLower);
+        const contentMatch =
+            announcement.excerpt &&
+            announcement.excerpt.toLowerCase().includes(searchLower);
+
+        // Special case: if user searches for "sports", show sports announcements
+        if (searchLower === "sports" || searchLower === "sport") {
+            return categoryMatch || titleMatch || contentMatch;
+        }
+
+        return titleMatch || categoryMatch || contentMatch;
+    });
 
     // Auto-advance slides every 10 seconds
     useEffect(() => {
@@ -404,6 +428,10 @@ const Home = () => {
                                 <input
                                     type="text"
                                     placeholder="Search..."
+                                    value={searchTerm}
+                                    onChange={(e) =>
+                                        setSearchTerm(e.target.value)
+                                    }
                                     className="w-full pl-12 pr-4 py-3 border-2 border-royal-blue rounded-2xl focus:border-blue-700 focus:outline-none text-gray-700"
                                 />
                             </div>
@@ -441,70 +469,81 @@ const Home = () => {
                                             </div>
                                         ))}
                                     </div>
-                                ) : announcements.length > 0 ? (
+                                ) : filteredAnnouncements.length > 0 ? (
                                     <div className="space-y-5">
-                                        {announcements.slice(0, 5).map((a) => (
-                                            <div
-                                                key={a.id}
-                                                className="bg-white rounded-xl border border-blue-100 shadow hover:shadow-md transition-all duration-200 overflow-hidden"
-                                            >
-                                                <div className="flex flex-col md:flex-row">
-                                                    {/* Image */}
-                                                    <div className="relative md:w-2/5 h-48 md:h-44">
-                                                        <img
-                                                            src={a.image}
-                                                            alt={a.title}
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                        <div className="absolute top-3 left-3">
-                                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow">
-                                                                <span>★</span>{" "}
-                                                                FEATURED
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    {/* Content */}
-                                                    <div className="md:w-3/5 p-5 flex flex-col">
-                                                        <div className="flex items-center justify-between text-xs text-gray-500 mb-2.5">
-                                                            <div className="inline-flex items-center gap-2">
-                                                                <span>📅</span>
-                                                                <span>
-                                                                    {a.date}
+                                        {filteredAnnouncements
+                                            .slice(0, 5)
+                                            .map((a) => (
+                                                <div
+                                                    key={a.id}
+                                                    className="bg-white rounded-xl border border-blue-100 shadow hover:shadow-md transition-all duration-200 overflow-hidden"
+                                                >
+                                                    <div className="flex flex-col md:flex-row">
+                                                        {/* Image */}
+                                                        <div className="relative md:w-2/5 h-48 md:h-44">
+                                                            <img
+                                                                src={a.image}
+                                                                alt={a.title}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                            <div className="absolute top-3 left-3">
+                                                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow">
+                                                                    <span>
+                                                                        ★
+                                                                    </span>{" "}
+                                                                    FEATURED
                                                                 </span>
                                                             </div>
-                                                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-royal-blue">
-                                                                {a.category}
-                                                            </span>
                                                         </div>
-                                                        <h3 className="text-xl font-bold text-gray-900 mb-1.5 line-clamp-2">
-                                                            {a.title}
-                                                        </h3>
-                                                        <p className="text-gray-600 text-sm line-clamp-3 mb-3">
-                                                            {a.excerpt}
-                                                        </p>
-                                                        <div className="mt-auto flex items-center justify-between text-xs text-gray-500">
-                                                            <span className="inline-flex items-center gap-2">
-                                                                <span>👤</span>
-                                                                <span className="font-medium">
-                                                                    {a.author}
+                                                        {/* Content */}
+                                                        <div className="md:w-3/5 p-5 flex flex-col">
+                                                            <div className="flex items-center justify-between text-xs text-gray-500 mb-2.5">
+                                                                <div className="inline-flex items-center gap-2">
+                                                                    <span>
+                                                                        📅
+                                                                    </span>
+                                                                    <span>
+                                                                        {a.date}
+                                                                    </span>
+                                                                </div>
+                                                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-royal-blue">
+                                                                    {a.category}
                                                                 </span>
-                                                            </span>
-                                                            <Button
-                                                                asChild
-                                                                className="bg-royal-blue hover:bg-blue-700 text-white px-3.5 py-2 h-9 rounded-lg"
-                                                            >
-                                                                <Link
-                                                                    to={`/announcements/${a.id}`}
-                                                                    className="inline-flex items-center"
+                                                            </div>
+                                                            <h3 className="text-xl font-bold text-gray-900 mb-1.5 line-clamp-2">
+                                                                {a.title}
+                                                            </h3>
+                                                            <p className="text-gray-600 text-sm line-clamp-3 mb-3">
+                                                                {a.excerpt}
+                                                            </p>
+                                                            <div className="mt-auto flex items-center justify-between text-xs text-gray-500">
+                                                                <span className="inline-flex items-center gap-2">
+                                                                    <span>
+                                                                        👤
+                                                                    </span>
+                                                                    <span className="font-medium">
+                                                                        {
+                                                                            a.author
+                                                                        }
+                                                                    </span>
+                                                                </span>
+                                                                <Button
+                                                                    asChild
+                                                                    className="bg-royal-blue hover:bg-blue-700 text-white px-3.5 py-2 h-9 rounded-lg"
                                                                 >
-                                                                    Read More
-                                                                </Link>
-                                                            </Button>
+                                                                    <Link
+                                                                        to={`/announcements/${a.id}`}
+                                                                        className="inline-flex items-center"
+                                                                    >
+                                                                        Read
+                                                                        More
+                                                                    </Link>
+                                                                </Button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            ))}
                                     </div>
                                 ) : (
                                     <div className="text-center py-8">
@@ -512,8 +551,9 @@ const Home = () => {
                                             <Newspaper className="w-8 h-8 text-gray-400" />
                                         </div>
                                         <p className="text-gray-600">
-                                            No announcements available at the
-                                            moment.
+                                            {searchTerm.trim()
+                                                ? `No announcements found for "${searchTerm}".`
+                                                : "No announcements available at the moment."}
                                         </p>
                                     </div>
                                 )}
