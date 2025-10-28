@@ -123,7 +123,29 @@ const AnnouncementDetail = () => {
                         </div>
                         <div className="flex items-center space-x-2">
                             <Calendar className="h-4 w-4 text-royal-blue" />
-                            <span>{announcement.date}</span>
+                            <span>
+                                {announcement.published_at
+                                    ? new Date(
+                                          announcement.published_at
+                                      ).toLocaleDateString("en-US", {
+                                          year: "numeric",
+                                          month: "long",
+                                          day: "numeric",
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                      })
+                                    : announcement.scheduled_publish_at
+                                    ? `Scheduled: ${new Date(
+                                          announcement.scheduled_publish_at
+                                      ).toLocaleDateString("en-US", {
+                                          year: "numeric",
+                                          month: "long",
+                                          day: "numeric",
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                      })}`
+                                    : "No date"}
+                            </span>
                         </div>
                     </div>
                 </div>

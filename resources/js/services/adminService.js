@@ -62,7 +62,7 @@ const makeRequest = async (url, options = {}) => {
                     ...options.headers,
                     "X-CSRF-TOKEN": newToken,
                 };
-                
+
                 // Retry the request with the new token
                 const retryResponse = await fetch(url, {
                     ...options,
@@ -938,10 +938,13 @@ export const adminService = {
         async getAll(filters = {}) {
             try {
                 const query = new URLSearchParams(filters).toString();
-                const response = await makeRequest(`/api/admin/missions?${query}`, {
-                    method: "GET",
-                    headers: getHeaders(),
-                });
+                const response = await makeRequest(
+                    `/api/admin/missions?${query}`,
+                    {
+                        method: "GET",
+                        headers: getHeaders(),
+                    }
+                );
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
@@ -1004,14 +1007,17 @@ export const adminService = {
                           })();
                 if (!form.has("_method")) form.append("_method", "PUT");
 
-                const response = await makeRequest(`/api/admin/missions/${id}`, {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json",
-                        "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
-                    },
-                    body: form,
-                });
+                const response = await makeRequest(
+                    `/api/admin/missions/${id}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
+                        },
+                        body: form,
+                    }
+                );
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
@@ -1023,10 +1029,13 @@ export const adminService = {
         },
         async delete(id) {
             try {
-                const response = await makeRequest(`/api/admin/missions/${id}`, {
-                    method: "DELETE",
-                    headers: getHeaders(),
-                });
+                const response = await makeRequest(
+                    `/api/admin/missions/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: getHeaders(),
+                    }
+                );
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
@@ -1063,10 +1072,13 @@ export const adminService = {
         async getAll(filters = {}) {
             try {
                 const query = new URLSearchParams(filters).toString();
-                const response = await makeRequest(`/api/admin/visions?${query}`, {
-                    method: "GET",
-                    headers: getHeaders(),
-                });
+                const response = await makeRequest(
+                    `/api/admin/visions?${query}`,
+                    {
+                        method: "GET",
+                        headers: getHeaders(),
+                    }
+                );
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
@@ -1221,11 +1233,14 @@ export const adminService = {
         },
         async update(id, payload) {
             try {
-                const response = await makeRequest(`/api/admin/core-values/${id}`, {
-                    method: "PUT",
-                    headers: getHeaders(),
-                    body: JSON.stringify(payload),
-                });
+                const response = await makeRequest(
+                    `/api/admin/core-values/${id}`,
+                    {
+                        method: "PUT",
+                        headers: getHeaders(),
+                        body: JSON.stringify(payload),
+                    }
+                );
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
@@ -1237,10 +1252,13 @@ export const adminService = {
         },
         async delete(id) {
             try {
-                const response = await makeRequest(`/api/admin/core-values/${id}`, {
-                    method: "DELETE",
-                    headers: getHeaders(),
-                });
+                const response = await makeRequest(
+                    `/api/admin/core-values/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: getHeaders(),
+                    }
+                );
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
@@ -1298,11 +1316,14 @@ export const adminService = {
         },
         async create(payload) {
             try {
-                const response = await makeRequest("/api/admin/guiding-principles", {
-                    method: "POST",
-                    headers: getHeaders(),
-                    body: JSON.stringify(payload),
-                });
+                const response = await makeRequest(
+                    "/api/admin/guiding-principles",
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                        body: JSON.stringify(payload),
+                    }
+                );
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
@@ -1397,11 +1418,14 @@ export const adminService = {
         },
         async create(payload) {
             try {
-                const response = await makeRequest("/api/admin/goal-objectives", {
-                    method: "POST",
-                    headers: getHeaders(),
-                    body: JSON.stringify(payload),
-                });
+                const response = await makeRequest(
+                    "/api/admin/goal-objectives",
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                        body: JSON.stringify(payload),
+                    }
+                );
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
@@ -2089,6 +2113,334 @@ export const adminService = {
                     "Error toggling core value active status:",
                     error
                 );
+                throw error;
+            }
+        },
+    },
+
+    /**
+     * Principal Corner Management
+     */
+    principalCorner: {
+        // Get all principal corner content
+        async getAll(filters = {}) {
+            try {
+                const queryParams = new URLSearchParams(filters);
+                const response = await fetch(
+                    `/api/admin/principal-corner?${queryParams}`,
+                    {
+                        method: "GET",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error(
+                    "Error fetching principal corner content:",
+                    error
+                );
+                throw error;
+            }
+        },
+
+        // Create new principal corner content
+        async create(contentData) {
+            try {
+                const response = await fetch("/api/admin/principal-corner", {
+                    method: "POST",
+                    headers: getHeaders(),
+                    credentials: "include",
+                    body: JSON.stringify(contentData),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message ||
+                            `HTTP error! status: ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error(
+                    "Error creating principal corner content:",
+                    error
+                );
+                throw error;
+            }
+        },
+
+        // Update principal corner content
+        async update(id, contentData) {
+            try {
+                const response = await fetch(
+                    `/api/admin/principal-corner/${id}`,
+                    {
+                        method: "PUT",
+                        headers: getHeaders(),
+                        credentials: "include",
+                        body: JSON.stringify(contentData),
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message ||
+                            `HTTP error! status: ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error(
+                    "Error updating principal corner content:",
+                    error
+                );
+                throw error;
+            }
+        },
+
+        // Delete principal corner content
+        async delete(id) {
+            try {
+                const response = await fetch(
+                    `/api/admin/principal-corner/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message ||
+                            `HTTP error! status: ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error(
+                    "Error deleting principal corner content:",
+                    error
+                );
+                throw error;
+            }
+        },
+
+        // Toggle active status
+        async toggleActive(id) {
+            try {
+                const response = await fetch(
+                    `/api/admin/principal-corner/${id}/toggle-active`,
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message ||
+                            `HTTP error! status: ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error(
+                    "Error toggling principal corner content status:",
+                    error
+                );
+                throw error;
+            }
+        },
+
+        // Toggle featured status
+        async toggleFeatured(id) {
+            try {
+                const response = await fetch(
+                    `/api/admin/principal-corner/${id}/toggle-featured`,
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message ||
+                            `HTTP error! status: ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error(
+                    "Error toggling principal corner featured status:",
+                    error
+                );
+                throw error;
+            }
+        },
+    },
+
+    /**
+     * Staff Profiles Management
+     */
+    staffProfiles: {
+        // Get all staff profiles
+        async getAll(filters = {}) {
+            try {
+                const queryParams = new URLSearchParams(filters);
+                const response = await fetch(
+                    `/api/admin/staff-profiles?${queryParams}`,
+                    {
+                        method: "GET",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error fetching staff profiles:", error);
+                throw error;
+            }
+        },
+
+        // Create new staff profile
+        async create(staffData) {
+            try {
+                const response = await fetch("/api/admin/staff-profiles", {
+                    method: "POST",
+                    headers: getHeaders(),
+                    credentials: "include",
+                    body: JSON.stringify(staffData),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message ||
+                            `HTTP error! status: ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error creating staff profile:", error);
+                throw error;
+            }
+        },
+
+        // Update staff profile
+        async update(id, staffData) {
+            try {
+                const response = await fetch(
+                    `/api/admin/staff-profiles/${id}`,
+                    {
+                        method: "PUT",
+                        headers: getHeaders(),
+                        credentials: "include",
+                        body: JSON.stringify(staffData),
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message ||
+                            `HTTP error! status: ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error updating staff profile:", error);
+                throw error;
+            }
+        },
+
+        // Delete staff profile
+        async delete(id) {
+            try {
+                const response = await fetch(
+                    `/api/admin/staff-profiles/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message ||
+                            `HTTP error! status: ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error deleting staff profile:", error);
+                throw error;
+            }
+        },
+
+        // Toggle active status
+        async toggleActive(id) {
+            try {
+                const response = await fetch(
+                    `/api/admin/staff-profiles/${id}/toggle-active`,
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message ||
+                            `HTTP error! status: ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error toggling staff profile status:", error);
                 throw error;
             }
         },

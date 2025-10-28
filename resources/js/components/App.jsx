@@ -42,7 +42,7 @@ import ContactAdmissions from "../pages/public/ContactAdmissions";
 import ContactSupport from "../pages/public/ContactSupport";
 
 // Faculty Pages
-import FacultyIndex from "../pages/public/faculty/index";
+import Faculties from "../pages/public/Faculties";
 import Principal from "../pages/public/faculty/Principal";
 import AssistantPrincipal from "../pages/public/faculty/AssistantPrincipal";
 import TeachingStaff from "../pages/public/faculty/TeachingStaff";
@@ -73,6 +73,8 @@ import AdminPageContent from "../pages/admin/PageContent";
 import AdminEvents from "../pages/admin/Events.jsx";
 import AboutManagement from "../pages/admin/About";
 import NewsEventsManagement from "../pages/admin/NewsEvents";
+import PrincipalCorner from "../pages/admin/PrincipalCorner";
+import StaffProfiles from "../pages/admin/StaffProfiles";
 import HistoryManagement from "../pages/admin/about/HistoryManagement";
 import MissionVisionManagement from "../pages/admin/about/MissionVisionManagement";
 import SchoolSealManagement from "../pages/admin/about/SchoolSealManagement";
@@ -197,7 +199,7 @@ function App() {
                                 path="contact/support"
                                 element={<ContactSupport />}
                             />
-                            <Route path="faculty" element={<FacultyIndex />} />
+                            <Route path="faculty" element={<Faculties />} />
                             <Route
                                 path="faculty/principal"
                                 element={<Principal />}
@@ -336,6 +338,14 @@ function App() {
                                 <Route
                                     path="about/quality-policy"
                                     element={<QualityPolicyManagement />}
+                                />
+                                <Route
+                                    path="principal-corner"
+                                    element={<PrincipalCorner />}
+                                />
+                                <Route
+                                    path="staff-profiles"
+                                    element={<StaffProfiles />}
                                 />
                             </Route>
                         </Route>

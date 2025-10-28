@@ -1,714 +1,2394 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-    BookOpen,
-    Users,
-    Award,
-    Calendar,
-    MapPin,
-    Clock,
-    Briefcase,
-    GraduationCap,
-    Target,
-    Star,
-    Globe,
-    Heart,
-    Zap,
-    CheckCircle,
-    ArrowRight,
-    ChevronDown,
-    ChevronUp,
-    Brain,
-    Calculator,
-    Microscope,
-    Palette,
-    Music,
-    Dumbbell,
-    Wrench,
-    Home,
-    TreePine,
-    Building,
-    Laptop,
-    DollarSign,
-    Scale,
-    BookMarked,
-    TrendingUp,
-    Lightbulb,
-    Shield,
-    Compass,
-    ArrowLeft,
-    Trophy,
-    Eye,
-    X,
-    ChevronRight,
-} from "lucide-react";
+import { ChevronRight, ArrowLeft } from "lucide-react";
 
 const AcademicsSeniorHigh = () => {
-    const [selectedImage, setSelectedImage] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [direction, setDirection] = useState("next");
+    const [isAutoSwitching, setIsAutoSwitching] = useState(true);
+    const [userInteracted, setUserInteracted] = useState(false);
 
     useEffect(() => {
         window.scrollTo(0, 0);
-    }, []);
 
-    // Senior High School Academic Tracks and Strands
-    const academicTracks = [
+        // Auto-switch pages every 5 seconds with enhanced effects
+        const interval = setInterval(() => {
+            if (isAutoSwitching && !userInteracted) {
+                setIsTransitioning(true);
+                setDirection("next");
+
+                setTimeout(() => {
+                    setCurrentPage((prev) => (prev + 1) % strands.length);
+                    setIsTransitioning(false);
+                }, 300);
+            }
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [isAutoSwitching, userInteracted]);
+
+    // Handle manual navigation
+    const handleStrandClick = (index) => {
+        setUserInteracted(true);
+        setIsAutoSwitching(false);
+        setIsTransitioning(true);
+        setDirection(index > currentPage ? "next" : "prev");
+
+        setTimeout(() => {
+            setCurrentPage(index);
+            setIsTransitioning(false);
+        }, 300);
+    };
+
+    // Reset auto-switching after 10 seconds of no interaction
+    useEffect(() => {
+        if (userInteracted) {
+            const resetTimer = setTimeout(() => {
+                setUserInteracted(false);
+                setIsAutoSwitching(true);
+            }, 10000);
+
+            return () => clearTimeout(resetTimer);
+        }
+    }, [userInteracted]);
+
+    // Senior High School Strands Data
+    const strands = [
         {
             id: "stem",
-            name: "Science, Technology, Engineering & Mathematics (STEM)",
-            icon: Brain,
+            title: "Science, Technology, Engineering & Mathematics",
+            shortTitle: "STEM",
+            description:
+                "Advanced program focusing on science, technology, engineering, and mathematics. Prepare for college and university education in STEM fields.",
+                features: [
+                "Advanced Mathematics & Science",
+                "Research & Development Projects",
+                "Technology Integration",
+                "Engineering Design Process",
+                "College Preparation",
+            ],
             color: "from-purple-500 to-purple-600",
             bgColor: "bg-purple-50",
             borderColor: "border-purple-200",
-            track: "Academic Track",
-            description:
-                "Advanced program focusing on science, technology, engineering, and mathematics",
-            promotionalImage: "/images/STEM.jpg",
-            details: {
-                duration: "2 years (Grade 11-12)",
-                target: "Grade 10 completers with strong math and science background",
-                features: [
-                    "Advanced Mathematics and Science",
-                    "Research and Development projects",
-                    "Technology integration",
-                    "Engineering design process",
-                    "Data analysis and interpretation",
-                ],
-                benefits: [
-                    "College preparation for STEM fields",
-                    "Critical thinking development",
-                    "Problem-solving skills",
-                    "Innovation and creativity",
-                ],
-            },
+            icon: "🧬",
+            gradient: "from-purple-400 via-purple-500 to-purple-600",
+            image: "/images/STEM.jpg",
         },
         {
             id: "humss",
-            name: "Humanities and Social Sciences (HUMSS)",
-            icon: Globe,
+            title: "Humanities and Social Sciences",
+            shortTitle: "HUMSS",
+            description:
+                "Program focusing on human behavior, society, and cultural understanding. Develop critical thinking and communication skills.",
+                features: [
+                "Social & Behavioral Sciences",
+                "Communication Excellence",
+                "Research Methodology",
+                "Cultural Studies",
+                "Leadership Preparation",
+            ],
             color: "from-pink-500 to-pink-600",
             bgColor: "bg-pink-50",
             borderColor: "border-pink-200",
-            track: "Academic Track",
-            description:
-                "Program focusing on human behavior, society, and cultural understanding",
-            promotionalImage: "/images/humss-promo.jpg",
-            details: {
-                duration: "2 years (Grade 11-12)",
-                target: "Students interested in social sciences and humanities",
-                features: [
-                    "Social and behavioral sciences",
-                    "Communication skills",
-                    "Research methodology",
-                    "Cultural studies",
-                    "Public speaking and debate",
-                ],
-                benefits: [
-                    "Critical thinking development",
-                    "Communication excellence",
-                    "Social awareness",
-                    "Leadership preparation",
-                ],
-            },
+            icon: "🌍",
+            gradient: "from-pink-400 via-pink-500 to-pink-600",
+            image: "/images/HUMSS.jpg",
         },
         {
             id: "tvl",
-            name: "Technical-Vocational-Livelihood (TVL)",
-            icon: Wrench,
+            title: "Technical-Vocational-Livelihood",
+            shortTitle: "TVL",
+            description:
+                "Skills-based education with specialized strands for immediate employment and entrepreneurship opportunities.",
+                    features: [
+                "ICT Strand",
+                "Computer Systems Servicing",
+                "Hands-on Training",
+                "Industry Certification",
+                "Employment Ready",
+            ],
             color: "from-green-500 to-green-600",
             bgColor: "bg-green-50",
             borderColor: "border-green-200",
-            track: "Academic Track",
-            description:
-                "Skills-based education with specialized strands for immediate employment and entrepreneurship",
-            promotionalImage: "/images/tvl-promo.jpg",
-            hasSubStrands: true,
-            subStrands: [
-                {
-                    id: "ict",
-                    name: "Information and Communications Technology (ICT)",
-                    icon: Laptop,
-                    color: "from-indigo-500 to-indigo-600",
-                    description:
-                        "Comprehensive program covering computer systems, programming, and digital technologies",
-                    features: [
-                        "Computer programming",
-                        "Web development",
-                        "Database management",
-                        "Network administration",
-                        "Digital graphics and animation",
-                    ],
-                },
-                {
-                    id: "css",
-                    name: "Computer Systems Servicing (CSS)",
-                    icon: Shield,
-                    color: "from-orange-500 to-orange-600",
-                    description:
-                        "Specialized program for computer hardware and network maintenance",
-                    features: [
-                        "Computer hardware assembly",
-                        "Network installation and configuration",
-                        "System troubleshooting",
-                        "Preventive maintenance",
-                        "Customer service skills",
-                    ],
-                },
-            ],
-            details: {
-                duration: "2 years (Grade 11-12)",
-                target: "Students interested in technical and vocational skills",
-                features: [
-                    "Hands-on training",
-                    "Industry-standard equipment",
-                    "National Certification (NC) preparation",
-                    "Work immersion program",
-                    "Entrepreneurship training",
-                ],
-                benefits: [
-                    "Immediate employment opportunities",
-                    "Practical skills development",
-                    "Industry certification",
-                    "Entrepreneurship readiness",
-                ],
-            },
+            icon: "🔧",
+            gradient: "from-green-400 via-green-500 to-green-600",
+            image: "/images/CSS.jpg",
         },
     ];
 
-    // Combine all programs for display
-    const allPrograms = academicTracks;
-
-    const openImageModal = (program) => {
-        setSelectedImage(program);
-    };
-
-    const closeImageModal = () => {
-        setSelectedImage(null);
-    };
+    const currentStrand = strands[currentPage];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 pt-8 pb-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-white">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Breadcrumbs */}
-                <nav className="mb-6">
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <nav className="mb-8">
+                    <div className="flex items-center space-x-4 text-lg">
                         <Link
                             to="/"
-                            className="hover:text-blue-600 transition-colors duration-200 flex items-center"
+                            className="hover:text-blue-600 transition-all duration-300 font-bold text-gray-800 hover:underline hover:scale-105 transform"
                         >
-                            <Home className="h-4 w-4 mr-1" />
                             Home
                         </Link>
-                        <ChevronRight className="h-4 w-4 text-gray-400" />
+                        <ChevronRight className="h-6 w-6 text-gray-500" />
                         <Link
                             to="/academics"
-                            className="hover:text-blue-600 transition-colors duration-200"
+                            className="hover:text-blue-600 transition-all duration-300 font-bold text-gray-800 hover:underline hover:scale-105 transform"
                         >
                             Academics
                         </Link>
-                        <ChevronRight className="h-4 w-4 text-gray-400" />
-                        <span className="text-blue-600 font-medium">
+                        <ChevronRight className="h-6 w-6 text-gray-500" />
+                        <span className="text-blue-600 font-bold text-xl bg-blue-50 px-3 py-1 rounded-lg shadow-sm">
                             Senior High School
                         </span>
                     </div>
                 </nav>
 
                 {/* Back to Programs Overview */}
-                <div className="mb-6">
+                <div className="mb-8">
                     <Link
                         to="/academics"
-                        className="flex items-center text-blue-600 hover:text-blue-700 transition-colors mr-4 group"
+                        className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-all duration-300 font-bold text-lg hover:underline hover:scale-105 transform bg-blue-50 px-4 py-2 rounded-lg shadow-sm hover:shadow-md"
                     >
-                        <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+                        <ArrowLeft className="h-5 w-5 mr-3" />
                         Back to Programs Overview
                     </Link>
                 </div>
 
-                {/* Enhanced Header */}
-                <div className="text-center mb-8">
-                    <div className="relative inline-block">
-                        <div className="w-20 h-20 bg-gradient-to-br from-green-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl">
-                            <GraduationCap className="h-10 w-10 text-white" />
-                        </div>
-                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center animate-pulse">
-                            <span className="text-white text-xs font-bold">
-                                3
-                            </span>
-                        </div>
-                    </div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-3">
-                        🎓 Senior High School Strands
+                {/* Header Section - Same Size as JHS */}
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-green-800 mb-4">
+                        Senior High School Strands
                     </h1>
-                    <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-4">
-                        Choose from our comprehensive academic and
-                        technical-vocational tracks designed to prepare students
-                        for college and career success in Grades 11-12
+                    <p className="text-gray-600 text-lg leading-relaxed">
+                        Stay informed with the latest information about our{" "}
+                        <strong>Senior High School programs</strong>. Explore
+                        our three main strands designed to prepare students for
+                        college and career success!
                     </p>
-                    <div className="w-24 h-1 bg-gradient-to-r from-green-600 to-blue-600 rounded-full mx-auto"></div>
                 </div>
 
-                {/* Strands Overview */}
-                <div className="mb-16">
-                    <div className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 rounded-3xl p-10 border border-slate-200 shadow-2xl">
-                        {/* Decorative Background Elements */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full -translate-y-16 translate-x-16"></div>
-                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-green-400/20 to-blue-400/20 rounded-full translate-y-12 -translate-x-12"></div>
+                {/* Navigation Section - Same Size as JHS */}
+                <div className="mb-8">
+                    <div className="flex items-center space-x-3">
+                        <div className="bg-green-800 text-white px-3 py-1.5 rounded-md font-semibold text-sm">
+                            Available Strands
+                        </div>
+                        <div className="text-gray-500 italic text-sm">
+                            "Choose your path to success!"
+                        </div>
+                    </div>
+                    <div className="w-full h-px bg-gray-200 mb-6"></div>
+                </div>
 
-                        {/* Header Section */}
-                        <div className="text-center mb-10 relative z-10">
-                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-4 shadow-lg">
-                                <GraduationCap className="h-8 w-8 text-white" />
-                            </div>
-                            <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-3">
-                                Available Strands at TNHS
-                            </h2>
-                            <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-                                Choose your path to success with our
-                                comprehensive academic tracks
-                            </p>
-                            <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto mt-4"></div>
+                {/* Main Content - Bigger Image + Readable Text */}
+                <div className="grid lg:grid-cols-2 gap-8 items-start">
+                    {/* Left Column - Content with Readable Text */}
+                    <div
+                        className={`transform transition-all duration-500 ${
+                            isTransitioning
+                                ? direction === "next"
+                                    ? "translate-x-6 opacity-0"
+                                    : "-translate-x-6 opacity-0"
+                                : "translate-x-0 opacity-100"
+                        }`}
+                    >
+                        <div className="bg-gradient-to-br from-blue-50 to-green-50 p-8 rounded-xl shadow-lg">
+                            {/* Dynamic Career Matching Guide */}
+                <div className="text-center mb-8">
+                                {currentStrand.id === "tvl" && (
+                                    <>
+                                        <div className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white py-4 px-6 rounded-xl shadow-lg mb-4">
+                                            <h3 className="text-2xl font-black uppercase tracking-wide">
+                                                🔧 From Circuits to Careers -
+                                                CSS Begins at Taft NHS
+                                            </h3>
                         </div>
 
-                        {/* Academic Tracks Grid */}
-                        <div className="grid lg:grid-cols-3 gap-8 relative z-10">
-                            {/* STEM Track */}
-                            <div className="group relative">
-                                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-purple-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group-hover:border-purple-300">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                                                <Brain className="h-6 w-6 text-white" />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-xl font-bold text-purple-700">
-                                                    STEM
-                                                </h3>
-                                                <div className="flex items-center space-x-1">
-                                                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                                                    <span className="text-sm text-purple-600 font-medium">
-                                                        Academic Track
-                                                    </span>
+                                        {/* CSS Strands Information */}
+                                        <div className="mb-6">
+                                            <div className="bg-gradient-to-br from-yellow-50 to-orange-50 p-6 rounded-xl shadow-lg border border-yellow-200 max-w-md mx-auto">
+                                                <div className="text-center mb-4">
+                                                    <div className="w-12 h-12 bg-yellow-600 text-white rounded-full flex items-center justify-center mx-auto mb-3">
+                                                        <span className="text-xl">
+                                                            💻
+                                                        </span>
+                                                    </div>
+                                                    <h4 className="text-lg font-bold text-yellow-800">
+                                                        CSS Strand Overview
+                                                    </h4>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            1
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Computer Hardware
+                                                            Servicing
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            2
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Network
+                                                            Administration
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                3
+                            </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Software Development
+                            </span>
+                        </div>
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            4
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            ICT Teaching
+                                                        </span>
+                    </div>
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            5
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Business IT
+                                                            Integration
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <CheckCircle className="h-6 w-6 text-purple-500" />
+
+                                        <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-yellow-500">
+                                            <p className="text-gray-700 text-base leading-relaxed font-medium">
+                                                <span className="text-yellow-600 font-bold">
+                                                    📋 Career Matching Guide
+                                                </span>{" "}
+                                                for Computer System Servicing
+                                                (CSS) graduates, based on your{" "}
+                                                <span className="bg-yellow-200 px-2 py-1 rounded font-bold">
+                                                    specific interests
+                                                </span>{" "}
+                                                or{" "}
+                                                <span className="bg-green-200 px-2 py-1 rounded font-bold">
+                                                    technical skills
+                                                </span>
+                                                . This can help you choose a
+                                                college course or career path
+                                                that aligns with what you're
+                                                good at and passionate about:
+                                            </p>
+                </div>
+                                    </>
+                                )}
+
+                                {currentStrand.id === "humss" && (
+                                    <>
+                                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl shadow-lg mb-4">
+                                            <h3 className="text-2xl font-black uppercase tracking-wide">
+                                                🌍 HUMSS at Taft NHS: Shaping
+                                                Minds. Shaping Society.
+                                            </h3>
+                                        </div>
+
+                                        {/* HUMSS Strands Information */}
+                                        <div className="mb-6">
+                                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl shadow-lg border border-blue-200 max-w-md mx-auto">
+                                                <div className="text-center mb-4">
+                                                    <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-3">
+                                                        <span className="text-xl">
+                                                            🌍
+                                                        </span>
+                            </div>
+                                                    <h4 className="text-lg font-bold text-blue-800">
+                                                        HUMSS Strand Overview
+                                                    </h4>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            1
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Political Science &
+                                                            Leadership
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            2
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Communication &
+                                                            Media Studies
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            3
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Psychology & Social
+                                                            Work
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            4
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Education & Teaching
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            5
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Arts & Creative
+                                                            Expression
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
+                                            <p className="text-gray-700 text-base leading-relaxed font-medium">
+                                                <span className="text-blue-600 font-bold">
+                                                    📋 Career Matching Guide
+                                                </span>{" "}
+                                                for HUMSS students, based on
+                                                your{" "}
+                                                <span className="bg-yellow-200 px-2 py-1 rounded font-bold">
+                                                    specific interests
+                                                </span>{" "}
+                                                or{" "}
+                                                <span className="bg-purple-200 px-2 py-1 rounded font-bold">
+                                                    strengths
+                                                </span>
+                                                . Each interest category
+                                                includes recommended college
+                                                courses and possible career
+                                                paths:
+                                            </p>
+                        </div>
+                                    </>
+                                )}
+
+                                {currentStrand.id === "stem" && (
+                                    <>
+                                        <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 px-6 rounded-xl shadow-lg mb-4">
+                                            <h3 className="text-2xl font-black uppercase tracking-wide">
+                                                🧬 From Taft NHS to Tomorrow -
+                                                Choose STEM Today!
+                                            </h3>
+                                        </div>
+
+                                        {/* STEM Strands Information */}
+                                        <div className="mb-6">
+                                            <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl shadow-lg border border-green-200 max-w-md mx-auto">
+                                                <div className="text-center mb-4">
+                                                    <div className="w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto mb-3">
+                                                        <span className="text-xl">
+                                                            🧬
+                                                        </span>
+                                                    </div>
+                                                    <h4 className="text-lg font-bold text-green-800">
+                                                        STEM Strand Overview
+                                                    </h4>
+                                                </div>
+                                                <div className="space-y-3">
+                                        <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            1
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Biology & Life
+                                                            Sciences
+                                                        </span>
+                                            </div>
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            2
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Mathematics &
+                                                            Statistics
+                                                    </span>
+                                                </div>
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            3
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Computer Science &
+                                                            Technology
+                                                        </span>
+                                            </div>
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            4
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Engineering &
+                                                            Architecture
+                                                        </span>
+                                        </div>
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            5
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Environmental &
+                                                            Earth Sciences
+                                                        </span>
                                     </div>
-                                    <p className="text-slate-600 text-sm leading-relaxed mb-4">
-                                        Science, Technology, Engineering &
-                                        Mathematics
-                                    </p>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center text-xs text-slate-500">
-                                            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mr-2"></div>
-                                            <span>
-                                                Advanced Mathematics & Science
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            6
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            STEM Education &
+                                                            Teaching
                                             </span>
                                         </div>
-                                        <div className="flex items-center text-xs text-slate-500">
-                                            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mr-2"></div>
-                                            <span>Research & Development</span>
+                                                    <div className="flex items-center space-x-3">
+                                                        <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                            7
+                                                        </span>
+                                                        <span className="text-gray-700 font-medium">
+                                                            Design & Innovation
+                                                        </span>
                                         </div>
-                                        <div className="flex items-center text-xs text-slate-500">
-                                            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mr-2"></div>
-                                            <span>College Preparation</span>
                                         </div>
                                     </div>
                                 </div>
+
+                                        <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-green-500">
+                                            <p className="text-gray-700 text-base leading-relaxed font-medium">
+                                                <span className="text-green-600 font-bold">
+                                                    📋 Career Matching Guide
+                                                </span>{" "}
+                                                based on your{" "}
+                                                <span className="bg-yellow-200 px-2 py-1 rounded font-bold">
+                                                    specific interests
+                                                </span>{" "}
+                                                or{" "}
+                                                <span className="bg-blue-200 px-2 py-1 rounded font-bold">
+                                                    skills within STEM
+                                                </span>
+                                                . You can scan the categories
+                                                below to find the ones that best
+                                                describe you, then see the
+                                                recommended college courses and
+                                                careers that align with them:
+                                            </p>
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
-                            {/* TVL Track - CENTER POSITION */}
-                            <div className="group relative">
-                                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-green-300/60 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:-translate-y-2 group-hover:border-green-400 relative overflow-hidden">
-                                    {/* Special highlight for center card */}
-                                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500"></div>
-
-                                    <div className="flex items-center justify-between mb-4">
+                            {/* Dynamic Collapsible Sections */}
+                            <div
+                                className="space-y-4"
+                                onClick={() => setUserInteracted(true)}
+                            >
+                                {/* CSS Sections */}
+                                {currentStrand.id === "tvl" && (
+                                    <>
+                                        {/* CSS Section 1 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
                                         <div className="flex items-center space-x-3">
-                                            <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-xl">
-                                                <Wrench className="h-7 w-7 text-white" />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-2xl font-bold text-green-700">
-                                                    TVL
-                                                </h3>
-                                                <div className="flex items-center space-x-1">
-                                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                                    <span className="text-sm text-green-600 font-medium">
-                                                        Academic Track
+                                                    <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        1
+                                                    </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        You Enjoy Fixing
+                                                        Computers and Hardware
                                                     </span>
                                                 </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-blue-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            ⚡
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Azonbing PCs,
+                                                            troubleshooting
+                                                            hardware, replacing
+                                                            pans
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Tidest College Courses
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Information
+                                                                Technology
+                                                                (Handware macky)
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                DS Industrial
+                                                                Tochanlogy
+                                                                Computer et
+                                                                Electronics
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BTVTEA Computer
+                                                                Hardware
+                                                                Servicing
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            </div>
+                                            <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                    </span>
+                                                        Career Matches
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Computer Techn
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                IT Suppon
+                                                                Speciali
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Handware
+                                                                Fingineer
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Technical
+                                                                Trainer (TESDA
+                                                                SHS)
+                                                            </li>
+                                                        </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center space-x-1">
-                                            <CheckCircle className="h-6 w-6 text-green-500" />
-                                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                        </div>
-                                    </div>
-                                    <p className="text-slate-600 text-sm leading-relaxed mb-4 font-medium">
-                                        Technical-Vocational-Livelihood
-                                    </p>
+                                        </details>
 
-                                    {/* Enhanced Sub-strands */}
-                                    <div className="space-y-3">
-                                        <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-4 border border-indigo-200/60 shadow-md hover:shadow-lg transition-all duration-200">
-                                            <div className="flex items-center space-x-3 mb-2">
-                                                <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
-                                                    <Laptop className="h-4 w-4 text-white" />
+                                        {/* CSS Section 2 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        2
+                                        </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        You're Interested in
+                                                        Networking and Internet
+                                                        Systems
+                                                    </span>
+                                    </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-green-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🌐
+                                                        </span>
+                                                        Skills Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Setting up LAN WAN,
+                                                            configuring rounzes,
+                                                            understanding IP
+                                                            addresses
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <span className="font-bold text-indigo-700 text-base">
-                                                    ICT
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Ideal College Courses
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Infocuation
+                                                                Technology (with
+                                                                Netwinking or
+                                                                Cybaneerity
+                                                                major)
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Electronics
+                                                                and Commanctions
+                                                                Enger CE
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                85 Computer
+                                                                Engineering
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                DS formation Sy
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Career Matches
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Network Administ
+                                                                Network Technic
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Systems Support
+                                                                Specialist
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Cybersecurity
+                                                                Associate
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                H
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </details>
+
+                                        {/* CSS Section 3 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        3
+                                                </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        You're Curious About
+                                                        Software and Coding
                                                 </span>
                                             </div>
-                                            <p className="text-sm text-slate-600 font-medium">
-                                                Information & Communications
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-purple-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💻
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Programming basics,
+                                                            configuring apps,
+                                                            karming new software
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Ideal College Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Computer
+                                                                Science
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Infirmation
                                                 Technology
-                                            </p>
-                                        </div>
-
-                                        <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-4 border border-orange-200/60 shadow-md hover:shadow-lg transition-all duration-200">
-                                            <div className="flex items-center space-x-3 mb-2">
-                                                <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-md">
-                                                    <Shield className="h-4 w-4 text-white" />
+                                                                (Software or Web
+                                                                Dev track)
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS laformation
+                                                                Systems
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                                 </div>
-                                                <span className="font-bold text-orange-700 text-base">
-                                                    CSS
-                                                </span>
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Career Matches
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Software
+                                                                Developer
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Web Developer
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                App Sapport
+                                                                Specialist
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                QA Tester
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <p className="text-sm text-slate-600 font-medium">
-                                                Computer Systems Servicing
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                        </details>
 
-                            {/* HUMSS Track */}
-                            <div className="group relative">
-                                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-pink-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group-hover:border-pink-300">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-                                                <Globe className="h-6 w-6 text-white" />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-xl font-bold text-pink-700">
-                                                    HUMSS
-                                                </h3>
-                                                <div className="flex items-center space-x-1">
-                                                    <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
-                                                    <span className="text-sm text-pink-600 font-medium">
-                                                        Academic Track
+                                        {/* CSS Section 4 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        4
+                                                    </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        You Like Explaining or
+                                                        Teaching Tech to Others
                                                     </span>
                                                 </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-orange-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            👨‍🏫
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Helping classmates
+                                                            understand toch,
+                                                            guiding odors,
+                                                            patience in teaching
+                                            </p>
+                                        </div>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Ideal College Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                HTVTF-Information
+                                                                and
+                                                                Communication
+                                                                Technology (ICT)
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Infirmation
+                                                                Technology (with
+                                                                alacation or
+                                                                training
+                                                                clectives)
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Career Matches
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                TVI. Senior High
+                                                                School Teacher
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                TESDA Trainer
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Computer Lab
+                                                                Instructor
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Community Tech
+                                                                Trainer
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
                                             </div>
+                                        </details>
+
+                                        {/* CSS Section 5 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        5
+                                                </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        You're Organized and
+                                                        Want to Mix IT with
+                                                        Business
+                                                </span>
+                                            </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-red-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            📊
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Office tools,
+                                                            troubleshooting lech
+                                                            in offices, managing
+                                                            witems
+                                            </p>
                                         </div>
-                                        <CheckCircle className="h-6 w-6 text-pink-500" />
                                     </div>
-                                    <p className="text-slate-600 text-sm leading-relaxed mb-4">
-                                        Humanities and Social Sciences
-                                    </p>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center text-xs text-slate-500">
-                                            <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mr-2"></div>
-                                            <span>
-                                                Social & Behavioral Sciences
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center text-xs text-slate-500">
-                                            <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mr-2"></div>
-                                            <span>
-                                                Communication Excellence
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center text-xs text-slate-500">
-                                            <div className="w-1.5 h-1.5 bg-pink-400 rounded-full mr-2"></div>
-                                            <span>Leadership Preparation</span>
-                                        </div>
-                                    </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Ideal College Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Office
+                                                                Admitistration
+                                                                (with IT focus)
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                HS laformation
+                                                                Systems
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Business
+                                                                Administration
+                                                                (MIS or toch
+                                                                track)
+                                                            </li>
+                                                        </ul>
                                 </div>
                             </div>
-                        </div>
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Career Matches
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                IT Office
+                                                                Support
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                IT Coordinator
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Rusiness IT
+                                                                Comaltant
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Systems Analyst
+                                                                (with
+                                                                experience)
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </details>
+                                    </>
+                                )}
 
-                        {/* Bottom Note Section */}
-                        <div className="mt-10 text-center relative z-10">
-                            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/50 shadow-lg">
-                                <div className="flex items-center justify-center space-x-2 mb-3">
-                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                                        <BookOpen className="h-4 w-4 text-white" />
+                                {/* HUMSS Sections */}
+                                {currentStrand.id === "humss" && (
+                                    <>
+                                        {/* HUMSS Section 1 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                        <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-pink-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        1
+                                                    </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        You Love Debating,
+                                                        Public Speaking, or
+                                                        Leading
+                                                    </span>
+                                                </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-pink-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎤
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Arming a pent,
+                                                            lucership, critical
+                                                            thinking, organ.cing
+                                                            people
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Recommended Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BA Political
+                                                                Science
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BA
+                                                                Communication/Public
+                                                                Administration
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BA Legal
+                                                                Manageret
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                International
+                                                                Studies
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                            </div>
+                                            <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                    </span>
+                                                        Potential Careers:
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Lawyer,
+                                                                diplomat, public
+                                                                servant,
+                                                                politician,
+                                                                political
+                                                                analyst,
+                                                                debotertunanet
+                                                            </li>
+                                                        </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </details>
+
+                                        {/* HUMSS Section 2 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        2
                                     </div>
-                                    <h4 className="text-lg font-bold text-slate-700">
-                                        Program Overview
-                                    </h4>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        You're Into Writing,
+                                                        Storytelling, or Media
+                                                    </span>
+                                                </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-purple-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            ✍️
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Writing articles,
+                                                            aorytelling, wicial
+                                                            media, creative
+                                                            expression
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                            </span>
+                                                        Recommended Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BA Journalism
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                AB
+                                                                Communication/Broadcasting
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BA Creative
+                                                                Writing/Literature
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BA Multimedia
+                                                                Arts
+                                                                (Communication
+                                                                Track)
+                                                            </li>
+                                                        </ul>
+                                        </div>
+                                                </div>
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                            </span>
+                                                        Potential Careers:
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Jumalist, write,
+                                                                screenwriter,
+                                                                editor, content
+                                                                creator, pebbe
+                                                                relations
+                                                                officer
+                                                            </li>
+                                                        </ul>
+                                        </div>
+                                        </div>
+                                    </div>
+                                        </details>
+
+                                        {/* HUMSS Section 3 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        3
                                 </div>
-                                <p className="text-slate-600 text-sm leading-relaxed max-w-3xl mx-auto">
-                                    <span className="font-semibold text-slate-700">
-                                        All tracks are part of our comprehensive
-                                        Academic program.
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        You're Curious About
+                                                        Human Behavior or Mental
+                                                        Health
+                                                    </span>
+                            </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-blue-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🧠
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Observing people,
+                                                            empathy, giving
+                                                            advice, anclyriig
+                                                            zmotions
+                                                        </p>
+                        </div>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Recommended Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Psychology
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Social Work
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BA Sociology
+                                                                Anthropology
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Potential Careers:
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Psychologist
+                                                                (with graduane
+                                                                study), guidance
+                                                                counselor,
+                                                                social worker,
+                                                                therapist, human
+                                                                resource officer
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </details>
+
+                                        {/* HUMSS Section 4 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        4
+                                    </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        You Enjoy Teaching,
+                                                        Explaining Ideas, or
+                                                        Mentoring
+                                                    </span>
+                                </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
                                     </span>
-                                    TVL offers specialized technical strands
-                                    (ICT & CSS) for immediate employment
-                                    opportunities, while STEM and HUMSS prepare
-                                    students for college and university
-                                    education.
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-green-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            👨‍🏫
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Shering knowledge,
+                                                            classroom setap,
+                                                            lesson planning,
+                                                            helping others leam
                                 </p>
                             </div>
                         </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Recommended Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                Bachelor of
+                                                                Secondary
+                                                                Education major
+                                                                in English,
+                                                                Filipino, Social
+                                                                Studies
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                Bachelor of
+                                                                Elementary
+                                                                Education
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                Bachelor of
+                                                                Sperial Needs
+                                                                Education
+                                                            </li>
+                                                        </ul>
                     </div>
                 </div>
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Potential Careers:
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Teacher, school
+                                                                principal, SPFD
+                                                                specialist,
+                                                                curriculum
+                                                                developer, tulec
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </details>
 
-                {/* Academic Tracks Section */}
-                <div className="mb-12">
-                    <div className="text-center mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                            Academic Tracks
-                        </h2>
-                        <p className="text-gray-600">
-                            Comprehensive programs including STEM, HUMSS, and
-                            TVL with specialized strands
-                        </p>
-                        <div className="w-16 h-1 bg-gradient-to-r from-purple-500 to-green-500 rounded-full mx-auto mt-2"></div>
+                                        {/* HUMSS Section 5 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        5
+                                                    </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        You're Artistic,
+                                                        Expressive, or Love
+                                                        Performing
+                                                    </span>
+                                                </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-orange-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎨
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Acting, painting,
+                                                            music, cesign,
+                                                            creativity
+                                                        </p>
                     </div>
-                    <div className="grid lg:grid-cols-3 gap-6">
-                        {academicTracks.map((program) => {
-                            const Icon = program.icon;
+                                                </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Recommended Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BA Theater
+                                                                Arts/Fine Arts
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BA
+                                                                Literature/Creative
+                                                                Wriling
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BA Music
+                                                                Film/Visual
+                                                                Communication
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Potential Careers:
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Artist,
+                                                                performat,
+                                                                director,
+                                                                scriptwriter,
+                                                                creative
+                                                                director, noveli
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </details>
+                                    </>
+                                )}
 
-                            return (
-                                <Link
-                                    key={program.id}
-                                    to={`/academics/special-programs/${program.id}`}
-                                    className="block group"
-                                >
-                                    <div
-                                        className={`${program.bgColor} rounded-2xl shadow-lg border ${program.borderColor} overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-300`}
-                                    >
-                                        <div className="flex">
-                                            {/* Image Section - More Prominent */}
-                                            <div
-                                                className="w-2/3 h-48 relative cursor-pointer"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    openImageModal(program);
-                                                }}
-                                            >
-                                                <img
-                                                    src={
-                                                        program.promotionalImage ||
-                                                        `/images/BG${
-                                                            (allPrograms.indexOf(
-                                                                program
-                                                            ) %
-                                                                3) +
-                                                            1
-                                                        }.jpg`
-                                                    }
-                                                    alt={program.name}
-                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent"></div>
-
-                                                {/* Program Title Overlay */}
-                                                <div className="absolute bottom-4 left-4 right-4">
-                                                    <div className="mb-2">
-                                                        <span
-                                                            className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
-                                                                program.track ===
-                                                                "Academic Track"
-                                                                    ? "bg-purple-500/80 text-white"
-                                                                    : "bg-indigo-500/80 text-white"
-                                                            }`}
-                                                        >
-                                                            {program.track}
+                                {/* STEM Sections */}
+                                {currentStrand.id === "stem" && (
+                                    <>
+                                        {/* STEM Section 1 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        1
+                                                    </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        Love for Biology, Life
+                                                        Sciences, or Helping
+                                                        People
                                                         </span>
                                                     </div>
-                                                    <h3 className="text-lg font-bold text-white mb-1 drop-shadow-lg">
-                                                        {program.name}
-                                                    </h3>
-                                                    <p className="text-white/90 text-sm drop-shadow-md line-clamp-2">
-                                                        {program.description}
-                                                    </p>
-                                                    {program.hasSubStrands && (
-                                                        <div className="mt-2">
-                                                            <div className="text-white/80 text-xs">
-                                                                <span className="font-semibold">
-                                                                    Strands:
-                                                                </span>{" "}
-                                                                ICT, CSS
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-purple-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🧬
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Anatomy, lab work,
+                                                            mecheme,
+                                                            planesanumas,
+                                                            henithcare,
+                                                            community service
+                                                        </p>
                                                             </div>
                                                         </div>
-                                                    )}
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Recommended Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Biology
+                                                                Molecular
+                                                                Biology
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Nutsatt BS
+                                                                Medicsi
+                                                                Tachecology
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Pharmacy
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                B5 Psychology
+                                                                (Pre-Med or
+                                                                Clinccal)
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Public Health
+                                                                Nutricion
+                                                            </li>
+                                                        </ul>
                                                 </div>
+                                                    </div>
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Potential Careers:
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Doctor, mine,
+                                                                pharmacist, lab
+                                                                technologist,
+                                                                geneticist,
+                                                                scalh researcher
+                                                            </li>
+                                                        </ul>
+                                                </div>
+                                                </div>
+                                            </div>
+                                        </details>
 
-                                                {/* Program Icon */}
-                                                <div className="absolute top-4 left-4">
-                                                    <div
-                                                        className={`w-12 h-12 bg-gradient-to-br ${program.color} rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm bg-white/20`}
-                                                    >
-                                                        <Icon className="h-6 w-6 text-white" />
+                                        {/* STEM Section 2 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        2
+                                                    </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        Strong in Math, Logic,
+                                                        or Problem-Solving
+                                                    </span>
+                                                </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-blue-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🧮
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Crealstom,
+                                                            analytics, patterns,
+                                                            theoretical thinking
+                                                        </p>
+                                            </div>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Recommended Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Mathematics
+                                                                Applied Math
+                                                                Statistics
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Dua Scienc
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Acturrial
+                                                                Scimec
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS-Physics
+                                                            </li>
+                                                        </ul>
                                                     </div>
                                                 </div>
-
-                                                {/* Click to view overlay */}
-                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-                                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 rounded-full p-3">
-                                                        <Eye className="h-8 w-8 text-gray-700" />
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Potential Careers:
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Data analyst,
+                                                                actuary,
+                                                                statistician,
+                                                                Cumatal malyst,
+                                                                Alinmachine
+                                                                leating exрел
+                                                            </li>
+                                                        </ul>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </details>
 
-                                            {/* Content Section */}
-                                            <div className="w-1/3 p-3 flex flex-col justify-between bg-white/95 backdrop-blur-sm">
-                                                {/* Quick Info */}
-                                                <div className="space-y-2">
-                                                    <div className="flex items-center space-x-1 text-xs text-gray-600">
-                                                        <Clock className="h-3 w-3 text-blue-600" />
-                                                        <span className="font-medium">
-                                                            {
-                                                                program.details
-                                                                    .duration
-                                                            }
+                                        {/* STEM Section 3 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        3
+                                                    </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        Passionate About
+                                                        Computers, Tech, or
+                                                        Coding
                                                         </span>
                                                     </div>
-                                                    <div className="flex items-start space-x-1 text-xs text-gray-600">
-                                                        <Target className="h-3 w-3 text-blue-600 mt-0.5" />
-                                                        <span className="font-medium leading-tight">
-                                                            {
-                                                                program.details.target.split(
-                                                                    ","
-                                                                )[0]
-                                                            }
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
                                                         </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-green-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💻
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Prognarining,
+                                                            gameapp developeren,
+                                                            digital systems,
+                                                            cybersesarily
+                                                        </p>
                                                     </div>
                                                 </div>
-
-                                                {/* Action Button */}
-                                                <div className="mt-3">
-                                                    <div className="flex items-center justify-center space-x-1 text-blue-600 group-hover:text-blue-700 transition-colors duration-200">
-                                                        <span className="text-xs font-semibold">
-                                                            Learn More
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
                                                         </span>
-                                                        <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform duration-200" />
+                                                        Recommended Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Computer
+                                                                Science
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                85 done
+                                                                onchnologs
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Compuer
+                                                                Engneering
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Informacion
+                                                                Systems
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Potential Careers:
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Software
+                                                                emircet,
+                                                                cybersecurity
+                                                                spooin sr. IT
+                                                                analyst, wale
+                                                                mobile devolopar
+                                                            </li>
+                                                        </ul>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </details>
+
+                                        {/* STEM Section 4 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        4
+                                                    </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        Interested in Building,
+                                                        Designing, or
+                                                        Engineering Systems
+                                                        </span>
+                                                    </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-orange-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🏗️
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Mechanics,
+                                                            electronics,
+                                                            hectare, ictures,
+                                                            problem-solving
+                                                        </p>
+                                                </div>
+                                            </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Recommended Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS
+                                                                Civil/Mechanical
+                                                                Electrical
+                                                                Engineering
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                85 Archiccm
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                B5 Electronics
+                                                                und
+                                                                Communications
+                                                                Engineering
+                                                                (ECE)
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Industrial
+                                                                Engineering
+                                                            </li>
+                                                        </ul>
                                         </div>
                                     </div>
-                                </Link>
-                            );
-                        })}
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Potential Careers:
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Engincer
+                                                                rvarious fields,
+                                                                architect,
+                                                                conatction
+                                                                manage, synzes
+                                                                designer
+                                                            </li>
+                                                        </ul>
                     </div>
                 </div>
+                                            </div>
+                                        </details>
 
-                {/* Contact Section */}
-                <div className="text-center">
-                    <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                        <h2 className="text-xl font-bold text-gray-900 mb-3">
-                            Ready to Choose Your Senior High Strand?
-                        </h2>
-                        <p className="text-gray-600 mb-4 max-w-2xl mx-auto text-sm">
-                            Contact our academic department to learn more about
-                            admission requirements, strand selection process,
-                            and program schedules for Grades 11-12. Choose from
-                            our Academic Tracks: STEM, HUMSS, or TVL (with ICT &
-                            CSS strands).
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                            <Link
-                                to="/contact"
-                                className="inline-flex items-center justify-center px-6 py-2 bg-gradient-to-r from-green-600 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all duration-300 hover:scale-105 transform shadow-lg text-sm"
-                            >
-                                Contact Us for More Info
-                            </Link>
-                            <Link
-                                to="/admissions"
-                                className="inline-flex items-center justify-center px-6 py-2 border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white font-bold rounded-xl transition-all duration-300 text-sm"
-                            >
-                                View Admission Requirements
-                            </Link>
+                                        {/* STEM Section 5 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        5
+                                                    </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        Environmental or Earth
+                                                        Science Enthusiast
+                                                    </span>
+                                                </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-red-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🌍
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Natize, climate
+                                                            change
+                                                            sustenability,
+                                                            fieldwors
+                                                        </p>
                         </div>
+                    </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Recommended Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                15.
+                                                                Pavirenotontal
+                                                                Science
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Goolog
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS
+                                                                Agriculture/Forestry
+                                                                85 Marin,
+                                                                Biology
+                                                            </li>
+                                                        </ul>
+                </div>
+            </div>
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Potential Careers:
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Envirostens,
+                                                                conservscorist,
+                                                                manne biologiat,
+                                                                clirane
+                                                                sesesecher
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </details>
+
+                                        {/* STEM Section 6 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-pink-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        6
+                                                    </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        Want to Inspire Others
+                                                        Through Teaching
+                                                    </span>
+                                                </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-pink-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            👨‍🏫
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Explaining conecpes,
+                                                            mencoring, public
+                                                            speaking, ocucation
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Recommended Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS
+                                                                Mathensducacion
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Scene Human
+                                                                (Plys, Badugy
+                                                                Chemistry) BS
+                                                                Tochanlogy and
+                                                                Livelihood uzat
+                                                                on (TL)
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                </div>
+                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Potential Careers:
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                STEM eschat
+                                                                education
+                                                                consula,
+                                                                scadenie sch
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </details>
+
+                                        {/* STEM Section 7 */}
+                                        <details className="group">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
+                                                        7
+                                                    </div>
+                                                    <span className="font-semibold text-gray-800 text-lg">
+                                                        Creative Thinker with a
+                                                        Technical Edge
+                                                    </span>
+                                                </div>
+                                                <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
+                                                    ▼
+                                                </span>
+                                            </summary>
+                                            <div className="p-6 bg-white border-l-4 border-indigo-400 rounded-r-lg mt-2 shadow-sm">
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-blue-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💡
+                                                        </span>
+                                                        Skills/Interests:
+                                                    </h5>
+                                                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                                        <p className="text-gray-700 font-medium">
+                                                            Dowology, mesation,
+                                                            UIN, vants with logi
+                                    </p>
+                                </div>
+                            </div>
+                                                <div className="mb-4">
+                                                    <h5 className="font-bold text-green-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            🎓
+                                                        </span>
+                                                        Recommended Courses:
+                                                    </h5>
+                                                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Indeurial
+                                                                Design
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                85 Game
+                                                                Deve.cpen/Animation
+                                                                BS Architecture
+                                                            </li>
+                                                            <li className="flex items-center">
+                                                                <span className="text-green-500 mr-2 font-bold">
+                                                                    ✓
+                                                                </span>
+                                                                BS Multimedia
+                                                                Ans (Tedi Track)
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h5 className="font-bold text-purple-700 mb-2 flex items-center">
+                                                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
+                                                            💼
+                                                        </span>
+                                                        Potential Careers:
+                                                    </h5>
+                                                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                                        <ul className="text-gray-700 space-y-2">
+                                                            <li className="flex items-center">
+                                                                <span className="text-purple-500 mr-2 font-bold">
+                                                                    🚀
+                                                                </span>
+                                                                Pares del X
+                                                                designer, probat
+                                                                designer CAD dis
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </details>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                        </div>
+
+                    {/* Right Column - Original Size Image */}
+                    <div className="relative">
+                        <div
+                            className={`transform transition-all duration-500 ${
+                                isTransitioning
+                                    ? direction === "next"
+                                        ? "translate-x-6 scale-95 opacity-0"
+                                        : "-translate-x-6 scale-95 opacity-0"
+                                    : "translate-x-0 scale-100 opacity-100"
+                            }`}
+                        >
+                            {/* Original Size Image - Matches Content Height with Theme Colors */}
+                            <div className="text-center">
+                                <div
+                                    className={`w-full h-full mx-auto rounded-lg overflow-hidden shadow-xl ${
+                                        currentStrand.id === "stem"
+                                            ? "bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300"
+                                            : currentStrand.id === "humss"
+                                            ? "bg-gradient-to-br from-blue-100 to-indigo-100 border-2 border-blue-300"
+                                            : "bg-gradient-to-br from-yellow-100 to-orange-100 border-2 border-yellow-300"
+                                    }`}
+                                >
+                                    <img
+                                        src={currentStrand.image}
+                                        alt={currentStrand.shortTitle}
+                                        className="w-full h-full object-contain"
+                                    />
+                            </div>
+
+                                {/* Theme Color Overlay */}
+                                <div
+                                    className={`absolute inset-0 rounded-lg pointer-events-none ${
+                                        currentStrand.id === "stem"
+                                            ? "bg-gradient-to-br from-green-400/20 to-emerald-400/20"
+                                            : currentStrand.id === "humss"
+                                            ? "bg-gradient-to-br from-blue-400/20 to-indigo-400/20"
+                                            : "bg-gradient-to-br from-yellow-400/20 to-orange-400/20"
+                                    }`}
+                                ></div>
+
+                                {/* Strand Color Accent */}
+                                <div
+                                    className={`absolute top-4 right-4 w-8 h-8 rounded-full shadow-lg ${
+                                        currentStrand.id === "stem"
+                                            ? "bg-gradient-to-br from-green-500 to-emerald-500"
+                                            : currentStrand.id === "humss"
+                                            ? "bg-gradient-to-br from-blue-500 to-indigo-500"
+                                            : "bg-gradient-to-br from-yellow-500 to-orange-500"
+                                    }`}
+                                >
+                                    <div className="flex items-center justify-center h-full text-white font-bold text-sm">
+                                        {currentStrand.id === "stem"
+                                            ? "🧬"
+                                            : currentStrand.id === "humss"
+                                            ? "🌍"
+                                            : "💻"}
+                                </div>
+                                </div>
+
+                                {/* Additional Color Accents */}
+                                <div
+                                    className={`absolute bottom-4 left-4 w-6 h-6 rounded-full ${
+                                        currentStrand.id === "stem"
+                                            ? "bg-green-300"
+                                            : currentStrand.id === "humss"
+                                            ? "bg-blue-300"
+                                            : "bg-yellow-300"
+                                    }`}
+                                ></div>
+
+                                <div
+                                    className={`absolute top-1/2 left-4 w-4 h-4 rounded-full ${
+                                        currentStrand.id === "stem"
+                                            ? "bg-emerald-300"
+                                            : currentStrand.id === "humss"
+                                            ? "bg-indigo-300"
+                                            : "bg-orange-300"
+                                    }`}
+                                ></div>
+                            </div>
+                        </div>
+                                </div>
+                            </div>
+
+                {/* Page Indicators - Same Size as JHS */}
+                {/* Manual Navigation Controls */}
+                <div className="flex justify-center items-center mt-6 space-x-4">
+                    {/* Previous Button */}
+                    <button
+                        onClick={() =>
+                            handleStrandClick(
+                                (currentPage - 1 + strands.length) %
+                                    strands.length
+                            )
+                        }
+                        className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 text-gray-700 hover:text-gray-900"
+                    >
+                        <span className="text-lg">←</span>
+                        <span className="font-medium">Previous</span>
+                    </button>
+
+                    {/* Strand Selector */}
+                    <div className="flex space-x-2">
+                        {strands.map((strand, index) => (
+                            <button
+                                key={index}
+                                onClick={() => handleStrandClick(index)}
+                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                                    index === currentPage
+                                        ? "bg-green-600 text-white shadow-lg"
+                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900"
+                                }`}
+                            >
+                                {strand.shortTitle}
+                            </button>
+                        ))}
+                            </div>
+
+                    {/* Next Button */}
+                    <button
+                        onClick={() =>
+                            handleStrandClick(
+                                (currentPage + 1) % strands.length
+                            )
+                        }
+                        className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 text-gray-700 hover:text-gray-900"
+                    >
+                        <span className="font-medium">Next</span>
+                        <span className="text-lg">→</span>
+                    </button>
+                        </div>
+
+                {/* Auto-switch Status Indicator */}
+                <div className="flex justify-center mt-4">
+                    <div
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            isAutoSwitching && !userInteracted
+                                ? "bg-green-100 text-green-700"
+                                : "bg-gray-100 text-gray-600"
+                        }`}
+                    >
+                        {isAutoSwitching && !userInteracted
+                            ? "🔄 Auto-switching enabled"
+                            : "⏸️ Auto-switching paused"}
                     </div>
                 </div>
             </div>
-
-            {/* Image Modal */}
-            {selectedImage && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-                    <div className="relative max-w-4xl max-h-[85vh] bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col">
-                        {/* Modal Header - Fixed */}
-                        <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
-                            <div className="flex items-center">
-                                <div
-                                    className={`w-12 h-12 bg-gradient-to-br ${selectedImage.color} rounded-full flex items-center justify-center shadow-lg mr-4`}
-                                >
-                                    <selectedImage.icon className="h-6 w-6 text-white" />
-                                </div>
-                                <div>
-                                    <h2 className="text-2xl font-bold text-gray-900">
-                                        {selectedImage.name}
-                                    </h2>
-                                    <p className="text-gray-600">
-                                        {selectedImage.description}
-                                    </p>
-                                </div>
-                            </div>
-                            <button
-                                onClick={closeImageModal}
-                                className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-                            >
-                                <X className="h-6 w-6 text-gray-500" />
-                            </button>
-                        </div>
-
-                        {/* Modal Content - Scrollable */}
-                        <div className="flex-1 overflow-y-auto p-6">
-                            <div className="relative mb-6">
-                                <img
-                                    src={selectedImage.promotionalImage}
-                                    alt={selectedImage.name}
-                                    className="w-full h-auto rounded-lg shadow-lg"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
-                            </div>
-
-                            {/* Program Info */}
-                            <div className="grid md:grid-cols-2 gap-6 mb-6">
-                                <div className="bg-gray-50 rounded-xl p-4">
-                                    <h3 className="font-bold text-gray-900 mb-2 flex items-center">
-                                        <Clock className="h-4 w-4 text-blue-600 mr-2" />
-                                        Duration
-                                    </h3>
-                                    <p className="text-gray-700">
-                                        {selectedImage.details.duration}
-                                    </p>
-                                </div>
-                                <div className="bg-gray-50 rounded-xl p-4">
-                                    <h3 className="font-bold text-gray-900 mb-2 flex items-center">
-                                        <Target className="h-4 w-4 text-blue-600 mr-2" />
-                                        Target Audience
-                                    </h3>
-                                    <p className="text-gray-700">
-                                        {selectedImage.details.target}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <Link
-                                    to={`/academics/special-programs/${selectedImage.id}`}
-                                    className={`inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r ${selectedImage.color} hover:opacity-90 text-white font-bold rounded-xl transition-all duration-300 hover:scale-105 transform shadow-lg`}
-                                >
-                                    Learn More About This Program
-                                </Link>
-                                <Link
-                                    to="/contact"
-                                    className="inline-flex items-center justify-center px-8 py-3 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-bold rounded-xl transition-all duration-300"
-                                >
-                                    Contact Us
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

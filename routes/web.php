@@ -165,7 +165,7 @@ Route::middleware(['auth', 'admin.auth'])->group(function () {
     })->name('admin.dashboard');
 
     // Admin API Routes
-    Route::prefix('admin')->group(function () {
+    Route::prefix('api/admin')->group(function () {
         // Page Content Management
         Route::apiResource('page-content', \App\Http\Controllers\Admin\PageContentController::class);
         Route::post('page-content/reorder', [\App\Http\Controllers\Admin\PageContentController::class, 'reorder']);
@@ -188,6 +188,12 @@ Route::middleware(['auth', 'admin.auth'])->group(function () {
         Route::apiResource('staff-profiles', \App\Http\Controllers\Admin\StaffProfileController::class);
         Route::post('staff-profiles/{staffProfile}/toggle-active', [\App\Http\Controllers\Admin\StaffProfileController::class, 'toggleActive']);
         Route::post('staff-profiles/reorder', [\App\Http\Controllers\Admin\StaffProfileController::class, 'reorder']);
+
+        // Principal Corner Management
+        Route::apiResource('principal-corner', \App\Http\Controllers\Admin\PrincipalCornerController::class);
+        Route::post('principal-corner/{principalCorner}/toggle-active', [\App\Http\Controllers\Admin\PrincipalCornerController::class, 'toggleActive']);
+        Route::post('principal-corner/{principalCorner}/toggle-featured', [\App\Http\Controllers\Admin\PrincipalCornerController::class, 'toggleFeatured']);
+        Route::post('principal-corner/reorder', [\App\Http\Controllers\Admin\PrincipalCornerController::class, 'reorder']);
     });
 });
 
@@ -222,6 +228,14 @@ Route::get('/api/staff-profiles/type/{type}', function ($type) {
         'data' => \App\Models\StaffProfile::active()->byType($type)->ordered()->get()
     ]);
 });
+
+// Public API Routes for Principal Corner
+Route::get('/api/principal-corner', [\App\Http\Controllers\Api\PrincipalCornerController::class, 'index']);
+Route::get('/api/principal-corner/{principalCorner}', [\App\Http\Controllers\Api\PrincipalCornerController::class, 'show']);
+Route::get('/api/principal-corner/featured', [\App\Http\Controllers\Api\PrincipalCornerController::class, 'featured']);
+Route::get('/api/principal-corner/messages', [\App\Http\Controllers\Api\PrincipalCornerController::class, 'messages']);
+Route::get('/api/principal-corner/announcements', [\App\Http\Controllers\Api\PrincipalCornerController::class, 'announcements']);
+Route::get('/api/principal-corner/vision', [\App\Http\Controllers\Api\PrincipalCornerController::class, 'vision']);
 
 // React SPA route - all routes will be handled by React Router
 Route::get('/{any}', function () {

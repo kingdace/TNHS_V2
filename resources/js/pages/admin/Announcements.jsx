@@ -41,6 +41,8 @@ const AdminAnnouncements = () => {
         images: [],
         image_url: "",
         is_featured: false,
+        scheduled_publish_at: "",
+        scheduled_unpublish_at: "",
     });
     const [showTrash, setShowTrash] = useState(false);
     const [trashed, setTrashed] = useState([]);
@@ -135,9 +137,12 @@ const AdminAnnouncements = () => {
             images: [],
             image_url: "",
             is_featured: false,
+            scheduled_publish_at: "",
+            scheduled_unpublish_at: "",
         });
         setShowForm(true);
         setImagePreviewUrl("");
+        setError(""); // Clear any previous errors
     };
 
     const openEdit = (item) => {
@@ -153,8 +158,11 @@ const AdminAnnouncements = () => {
             images: [],
             image_url: item.external_link || "",
             is_featured: !!item.is_featured,
+            scheduled_publish_at: item.publish_date_for_form || "",
+            scheduled_unpublish_at: item.unpublish_date_for_form || "",
         });
         setShowForm(true);
+        setError(""); // Clear any previous errors
         // Set proper image preview URL
         const imageUrl = item.image_path
             ? item.image_path.startsWith("http")
@@ -167,6 +175,25 @@ const AdminAnnouncements = () => {
     const submit = async (e) => {
         e.preventDefault();
         try {
+            setError(""); // Clear any previous errors
+
+            // Basic validation
+            if (!form.title.trim()) {
+                setError("Title is required.");
+                return;
+            }
+            if (!form.content.trim()) {
+                setError("Content is required.");
+                return;
+            }
+            if (!form.author.trim()) {
+                setError("Author is required.");
+                return;
+            }
+
+            // Debug: Log the form data being sent
+            console.log("Submitting form data:", form);
+
             if (editing) {
                 await announcementService.update(editing.id, form);
             } else {
@@ -174,8 +201,9 @@ const AdminAnnouncements = () => {
             }
             setShowForm(false);
             await load();
-        } catch (e) {
-            setError("Save failed. Check required fields.");
+        } catch (error) {
+            console.error("Submit error:", error);
+            setError(error.message || "Save failed. Check required fields.");
         }
     };
 
@@ -544,11 +572,23 @@ const AdminAnnouncements = () => {
                                                 </span>
                                                 <span className="text-xs text-gray-500">
                                                     {item.published_at
-                                                        ? new Date(
+                                                        ? `Published: ${new Date(
                                                               item.published_at
-                                                          ).toLocaleString()
+                                                          ).toLocaleString()}`
+                                                        : item.scheduled_publish_at
+                                                        ? `Scheduled: ${new Date(
+                                                              item.scheduled_publish_at
+                                                          ).toLocaleString()}`
                                                         : "—"}
                                                 </span>
+                                                {item.scheduled_unpublish_at && (
+                                                    <span className="text-xs text-orange-500">
+                                                        • Unpublish:{" "}
+                                                        {new Date(
+                                                            item.scheduled_unpublish_at
+                                                        ).toLocaleString()}
+                                                    </span>
+                                                )}
                                                 <span className="text-xs text-gray-400 truncate">
                                                     • By {item.author}
                                                 </span>
@@ -1117,6 +1157,52 @@ const AdminAnnouncements = () => {
                                         >
                                             Feature on Home page
                                         </label>
+                                    </div>
+                                </div>
+
+                                {/* Date/Time Fields */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Scheduled Publish Date & Time
+                                        </label>
+                                        <input
+                                            type="datetime-local"
+                                            value={form.scheduled_publish_at}
+                                            onChange={(e) =>
+                                                setForm({
+                                                    ...form,
+                                                    scheduled_publish_at:
+                                                        e.target.value,
+                                                })
+                                            }
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            Leave empty to publish immediately
+                                            when status is set to "Published"
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Scheduled Unpublish Date & Time
+                                        </label>
+                                        <input
+                                            type="datetime-local"
+                                            value={form.scheduled_unpublish_at}
+                                            onChange={(e) =>
+                                                setForm({
+                                                    ...form,
+                                                    scheduled_unpublish_at:
+                                                        e.target.value,
+                                                })
+                                            }
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            Optional: Automatically unpublish
+                                            the announcement
+                                        </p>
                                     </div>
                                 </div>
 

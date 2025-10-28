@@ -48,7 +48,7 @@ const Header = () => {
             hasDropdown: true,
             submenu: [
                 { name: "Assistant", href: "/faculty/assistant-principal" },
-                { name: "Faculties", href: "/faculty/teaching-staff" },
+                { name: "Faculties", href: "/faculty" },
                 { name: "Staff", href: "/faculty/administrative-staff" },
             ],
         },

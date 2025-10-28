@@ -27,6 +27,7 @@ import {
     Shield,
     Target,
     Award,
+    Crown,
 } from "lucide-react";
 
 const AdminLayout = () => {
@@ -45,6 +46,21 @@ const AdminLayout = () => {
             icon: Home,
         },
         {
+            name: "Principal Corner",
+            href: "/admin/principal-corner",
+            icon: Crown,
+        },
+        {
+            name: "Faculty & Staff",
+            href: "/admin/staff-profiles",
+            icon: Users,
+        },
+        {
+            name: "Academic Programs",
+            href: "/admin/academic-programs",
+            icon: GraduationCap,
+        },
+        {
             name: "Announcements",
             href: "/admin/news-events",
             icon: Bell,
@@ -54,7 +70,6 @@ const AdminLayout = () => {
             href: "/admin/hero-carousel",
             icon: Image,
         },
-
         {
             name: "School Information",
             href: "/admin/school-info",
@@ -123,17 +138,18 @@ const AdminLayout = () => {
     const getCurrentPageTitle = () => {
         const path = location.pathname;
         if (path === "/admin") return "Dashboard";
+        if (path.includes("/admin/principal-corner")) return "Principal Corner";
+        if (path.includes("/admin/staff-profiles")) return "Faculty & Staff";
+        if (path.includes("/admin/academic-programs"))
+            return "Academic Programs";
         if (path.includes("/admin/news-events"))
             return "News & Events Management";
         if (path.includes("/admin/hero-carousel")) return "Hero Carousel";
-        if (path.includes("/admin/academic-programs"))
-            return "Academic Programs";
         if (path.includes("/admin/school-info")) return "School Information";
         if (path.includes("/admin/contact-info")) return "Contact Information";
         if (path.includes("/admin/about")) return "About Management";
         if (path.includes("/admin/page-content")) return "Page Content";
         if (path.includes("/admin/users")) return "User Management";
-        if (path.includes("/admin/staff-profiles")) return "Staff Profiles";
         if (path.includes("/admin/download-files")) return "Download Files";
         if (path.includes("/admin/external-links")) return "External Links";
 

@@ -27,18 +27,28 @@ class AnnouncementController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'content_html' => 'nullable|string',
-            'author' => 'required|string|max:255',
-            'status' => 'required|in:draft,published,archived',
-            'category' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'images.*' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'image_url' => 'nullable|url',
-            'is_featured' => 'nullable|boolean',
-        ]);
+        try {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'content' => 'required|string',
+                'content_html' => 'nullable|string',
+                'author' => 'required|string|max:255',
+                'status' => 'required|in:draft,published,archived',
+                'category' => 'nullable|string|max:255',
+                'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+                'images.*' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+                'image_url' => 'nullable|url',
+                'is_featured' => 'nullable|boolean',
+                'scheduled_publish_at' => 'nullable|date|after:now',
+                'scheduled_unpublish_at' => 'nullable|date|after:scheduled_publish_at',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        }
 
         $imagePath = null;
         $images = [];
@@ -69,7 +79,9 @@ class AnnouncementController extends Controller
             'category' => $request->category ?? 'General',
             'status' => $request->status,
             'is_featured' => (bool) $request->boolean('is_featured'),
-            'published_at' => $request->status === 'published' ? now() : null,
+            'published_at' => $request->status === 'published' && !$request->scheduled_publish_at ? now() : null,
+            'scheduled_publish_at' => $request->scheduled_publish_at,
+            'scheduled_unpublish_at' => $request->scheduled_unpublish_at,
         ]);
 
         return response()->json([
@@ -95,18 +107,28 @@ class AnnouncementController extends Controller
      */
     public function update(Request $request, Announcement $announcement): JsonResponse
     {
-        $validated = $request->validate([
-            'title' => 'sometimes|nullable|string|max:255',
-            'content' => 'sometimes|nullable|string',
-            'content_html' => 'sometimes|nullable|string',
-            'author' => 'sometimes|nullable|string|max:255',
-            'status' => 'sometimes|in:draft,published,archived',
-            'category' => 'sometimes|nullable|string|max:255',
-            'image' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'images.*' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'image_url' => 'sometimes|nullable|url',
-            'is_featured' => 'sometimes|boolean',
-        ]);
+        try {
+            $validated = $request->validate([
+                'title' => 'sometimes|nullable|string|max:255',
+                'content' => 'sometimes|nullable|string',
+                'content_html' => 'sometimes|nullable|string',
+                'author' => 'sometimes|nullable|string|max:255',
+                'status' => 'sometimes|in:draft,published,archived',
+                'category' => 'sometimes|nullable|string|max:255',
+                'image' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+                'images.*' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+                'image_url' => 'sometimes|nullable|url',
+                'is_featured' => 'sometimes|boolean',
+                'scheduled_publish_at' => 'sometimes|nullable|date',
+                'scheduled_unpublish_at' => 'sometimes|nullable|date|after:scheduled_publish_at',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        }
 
         $data = [];
         if ($request->has('title')) { $data['title'] = $request->title; }
@@ -116,10 +138,21 @@ class AnnouncementController extends Controller
         if ($request->has('category')) { $data['category'] = $request->category; }
         if ($request->has('status')) {
             $data['status'] = $request->status;
-            $data['published_at'] = $request->status === 'published' ? now() : null;
+            // Only set published_at if not using scheduled publishing
+            if ($request->status === 'published' && !$request->scheduled_publish_at) {
+                $data['published_at'] = now();
+            } elseif ($request->status !== 'published') {
+                $data['published_at'] = null;
+            }
         }
         if ($request->has('is_featured')) {
             $data['is_featured'] = (bool) $request->boolean('is_featured');
+        }
+        if ($request->has('scheduled_publish_at')) {
+            $data['scheduled_publish_at'] = $request->scheduled_publish_at;
+        }
+        if ($request->has('scheduled_unpublish_at')) {
+            $data['scheduled_unpublish_at'] = $request->scheduled_unpublish_at;
         }
 
         if ($request->hasFile('image')) {

@@ -103,12 +103,56 @@ export const announcementService = {
      * Format date for display
      */
     formatDate(dateString) {
+        if (!dateString) return "No date";
+
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    },
+
+    /**
+     * Format date for display (date only)
+     */
+    formatDateOnly(dateString) {
+        if (!dateString) return "No date";
+
         const date = new Date(dateString);
         return date.toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric",
         });
+    },
+
+    /**
+     * Format relative time (e.g., "2 hours ago", "3 days ago")
+     */
+    formatRelativeTime(dateString) {
+        if (!dateString) return "No date";
+
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+
+        if (diffInSeconds < 60) {
+            return "Just now";
+        } else if (diffInSeconds < 3600) {
+            const minutes = Math.floor(diffInSeconds / 60);
+            return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+        } else if (diffInSeconds < 86400) {
+            const hours = Math.floor(diffInSeconds / 3600);
+            return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+        } else if (diffInSeconds < 2592000) {
+            const days = Math.floor(diffInSeconds / 86400);
+            return `${days} day${days !== 1 ? "s" : ""} ago`;
+        } else {
+            return this.formatDateOnly(dateString);
+        }
     },
 
     /**
@@ -181,6 +225,8 @@ export const announcementService = {
      */
     async create(payload) {
         try {
+            console.log("Creating announcement with payload:", payload);
+
             let body;
             let headers = {
                 ...getHeaders(),
@@ -190,6 +236,8 @@ export const announcementService = {
             // Check if we have files (image or images array)
             const hasFiles =
                 payload.image || (payload.images && payload.images.length > 0);
+
+            console.log("Has files:", hasFiles);
 
             if (hasFiles) {
                 const formData = new FormData();
@@ -229,14 +277,40 @@ export const announcementService = {
                 body = JSON.stringify(data);
             }
 
+            console.log("Sending request to:", `${API_BASE_URL}/announcements`);
+            console.log("Request headers:", headers);
+            console.log(
+                "Request body type:",
+                body instanceof FormData ? "FormData" : typeof body
+            );
+
             const response = await fetch(`${API_BASE_URL}/announcements`, {
                 method: "POST",
                 headers,
                 credentials: "include",
                 body,
             });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            console.log("Response status:", response.status);
             const responseData = await response.json();
+            console.log("Response data:", responseData);
+
+            if (!response.ok) {
+                if (response.status === 422 && responseData.errors) {
+                    // Handle validation errors
+                    const errorMessages = Object.values(
+                        responseData.errors
+                    ).flat();
+                    throw new Error(
+                        `Validation failed: ${errorMessages.join(", ")}`
+                    );
+                } else {
+                    throw new Error(
+                        responseData.message || `HTTP ${response.status}`
+                    );
+                }
+            }
+
             return responseData.data;
         } catch (error) {
             console.error("Error creating announcement:", error);
@@ -316,16 +390,25 @@ export const announcementService = {
                     body,
                 }
             );
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error("Update failed:", response.status, errorData);
-                throw new Error(
-                    `HTTP ${response.status}: ${
-                        errorData.message || "Update failed"
-                    }`
-                );
-            }
+
             const responseData = await response.json();
+
+            if (!response.ok) {
+                if (response.status === 422 && responseData.errors) {
+                    // Handle validation errors
+                    const errorMessages = Object.values(
+                        responseData.errors
+                    ).flat();
+                    throw new Error(
+                        `Validation failed: ${errorMessages.join(", ")}`
+                    );
+                } else {
+                    throw new Error(
+                        responseData.message || `HTTP ${response.status}`
+                    );
+                }
+            }
+
             return responseData.data;
         } catch (error) {
             console.error("Error updating announcement:", error);

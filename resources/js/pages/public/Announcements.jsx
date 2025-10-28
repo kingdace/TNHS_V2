@@ -226,9 +226,33 @@ const Announcements = () => {
                                                             <div className="inline-flex items-center gap-2">
                                                                 <span>📅</span>
                                                                 <span>
-                                                                    {
-                                                                        announcement.date
-                                                                    }
+                                                                    {announcement.published_at
+                                                                        ? new Date(
+                                                                              announcement.published_at
+                                                                          ).toLocaleDateString(
+                                                                              "en-US",
+                                                                              {
+                                                                                  year: "numeric",
+                                                                                  month: "short",
+                                                                                  day: "numeric",
+                                                                                  hour: "2-digit",
+                                                                                  minute: "2-digit",
+                                                                              }
+                                                                          )
+                                                                        : announcement.scheduled_publish_at
+                                                                        ? `Scheduled: ${new Date(
+                                                                              announcement.scheduled_publish_at
+                                                                          ).toLocaleDateString(
+                                                                              "en-US",
+                                                                              {
+                                                                                  year: "numeric",
+                                                                                  month: "short",
+                                                                                  day: "numeric",
+                                                                                  hour: "2-digit",
+                                                                                  minute: "2-digit",
+                                                                              }
+                                                                          )}`
+                                                                        : "No date"}
                                                                 </span>
                                                             </div>
                                                             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-royal-blue">

@@ -32,6 +32,7 @@ import {
     X,
     Crown,
 } from "lucide-react";
+import { principalCornerService } from "../../../services/principalCornerService";
 
 const Principal = () => {
     const [selectedPressRelease, setSelectedPressRelease] = useState(null);
@@ -40,8 +41,44 @@ const Principal = () => {
     const [showAboutPrincipal, setShowAboutPrincipal] = useState(false);
     const [showPrincipalVision, setShowPrincipalVision] = useState(false);
 
+    // Dynamic data states
+    const [principalCornerData, setPrincipalCornerData] = useState([]);
+    const [featuredContent, setFeaturedContent] = useState([]);
+    const [principalVision, setPrincipalVision] = useState(null);
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
         window.scrollTo(0, 0);
+    }, []);
+
+    // Fetch Principal Corner data
+    useEffect(() => {
+        const fetchPrincipalCornerData = async () => {
+            try {
+                setLoading(true);
+
+                // Fetch all data in parallel
+                const [allData, featured, vision] = await Promise.all([
+                    principalCornerService.getAll(),
+                    principalCornerService.getFeatured(),
+                    principalCornerService.getVision(),
+                ]);
+
+                setPrincipalCornerData(allData.data || []);
+                setFeaturedContent(featured.data || []);
+                setPrincipalVision(vision.data || null);
+            } catch (error) {
+                console.error("Error fetching principal corner data:", error);
+                // Fallback to empty arrays if API fails
+                setPrincipalCornerData([]);
+                setFeaturedContent([]);
+                setPrincipalVision(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPrincipalCornerData();
     }, []);
 
     // Reset image index when selecting a new press release
@@ -51,186 +88,35 @@ const Principal = () => {
         }
     }, [selectedPressRelease]);
 
-    const newsUpdates = [
-        {
-            id: 1,
-            title: "TNHS launches new digital learning platform for enhanced education",
-            date: "August 20, 2024",
-            excerpt:
-                "The school administration led by Principal Dr. Maria Santos announced the implementation of a comprehensive digital learning platform...",
-            category: "Academic Innovation",
-            fullContent: `The school administration led by Principal Dr. Maria Santos announced the implementation of a comprehensive digital learning platform designed to enhance the educational experience for all students at Taft National High School.
+    // Format principal corner data for display
+    const formatPrincipalCornerData = (data) => {
+        return data.map((item, index) => ({
+            id: item.id,
+            title: item.title,
+            date: item.published_at
+                ? new Date(item.published_at).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                  })
+                : "Recent",
+            excerpt: item.excerpt || item.content.substring(0, 150) + "...",
+            category:
+                item.content_type.charAt(0).toUpperCase() +
+                item.content_type.slice(1),
+            fullContent: item.content,
+            image: item.image_path || "/images/default-principal.jpg",
+            images: item.image_path
+                ? [item.image_path]
+                : ["/images/default-principal.jpg"],
+            author: item.author || "Principal",
+            readTime: item.read_time || "3 min read",
+        }));
+    };
 
-This innovative platform integrates cutting-edge technology with traditional teaching methods, providing students with interactive learning modules, virtual laboratories, and personalized study plans. The initiative represents a significant investment in the future of education at TNHS.
-
-Key features of the new platform include:
-• Interactive multimedia content for all subjects
-• Real-time progress tracking and analytics
-• Virtual collaboration tools for group projects
-• Mobile accessibility for learning on-the-go
-• Integration with existing school systems
-
-Principal Dr. Maria Santos emphasized that this platform will help bridge the digital divide and ensure that all students have access to quality education resources, regardless of their background or circumstances.
-
-The implementation will be phased over the next academic year, with comprehensive training provided to all faculty members to ensure smooth integration into the curriculum.`,
-            image: "/images/digital-learning.jpg",
-            images: [
-                "/images/digital-learning-1.jpg",
-                "/images/digital-learning-2.jpg",
-                "/images/digital-learning-3.jpg",
-            ],
-            author: "TNHS Admin",
-            readTime: "5 min read",
-        },
-        {
-            id: 2,
-            title: "Principal leads community outreach program for student welfare",
-            date: "August 12, 2024",
-            excerpt:
-                "Dr. Maria Santos spearheaded a community outreach initiative focusing on student welfare and family support programs...",
-            category: "Community Service",
-            fullContent: `Dr. Maria Santos spearheaded a community outreach initiative focusing on student welfare and family support programs that has made a significant impact on the local community.
-
-The program, launched in collaboration with local government units and non-profit organizations, aims to provide comprehensive support to students and their families, addressing not just academic needs but also social and economic challenges.
-
-Program components include:
-• Free tutoring and homework assistance
-• Family counseling and support services
-• Nutrition programs for underprivileged students
-• Career guidance and job placement assistance
-• Mental health support and counseling
-
-Over the past six months, the program has served over 200 families and provided direct assistance to more than 500 students. The initiative has been recognized by the Department of Education as a model program for community engagement in education.
-
-Principal Dr. Maria Santos stated, "Education is not just about academics; it's about nurturing the whole child and supporting their families. This program embodies our commitment to creating a supportive community where every student can thrive."
-
-The program continues to expand, with plans to include additional services such as adult education classes for parents and skills training programs for family members.`,
-            image: "/images/community-outreach.jpg",
-            images: [
-                "/images/community-outreach-1.jpg",
-                "/images/community-outreach-2.jpg",
-                "/images/community-outreach-3.jpg",
-            ],
-            author: "TNHS Admin",
-            readTime: "4 min read",
-        },
-        {
-            id: 3,
-            title: "TNHS receives recognition for academic excellence under new leadership",
-            date: "August 11, 2024",
-            excerpt:
-                "The Department of Education recognized TNHS for outstanding academic performance and innovative educational programs...",
-            category: "Achievement",
-            fullContent: `The Department of Education recognized TNHS for outstanding academic performance and innovative educational programs under the leadership of Principal Dr. Maria Santos.
-
-This prestigious recognition comes after a comprehensive evaluation of the school's performance across multiple metrics, including student achievement, teacher effectiveness, curriculum innovation, and community engagement.
-
-Key achievements that led to this recognition include:
-• 95% graduation rate, up from 78% the previous year
-• 40% improvement in standardized test scores
-• Implementation of innovative teaching methodologies
-• Strong community partnerships and engagement
-• Excellent teacher retention and professional development
-
-The recognition includes a special commendation for the school's innovative approach to blended learning, which has proven particularly effective during challenging times. The school's commitment to equity and inclusion was also highlighted as a model for other institutions.
-
-Principal Dr. Maria Santos expressed gratitude for the recognition, stating, "This achievement reflects the hard work and dedication of our entire school community - students, teachers, staff, and parents. Together, we have created an environment where excellence is not just a goal, but a daily practice."
-
-The recognition comes with additional funding for further program development and the opportunity to serve as a mentor school for other institutions seeking to improve their educational outcomes.`,
-            image: "/images/academic-excellence.jpg",
-            images: [
-                "/images/academic-excellence-1.jpg",
-                "/images/academic-excellence-2.jpg",
-                "/images/academic-excellence-3.jpg",
-            ],
-            author: "TNHS Admin",
-            readTime: "6 min read",
-        },
-        {
-            id: 4,
-            title: "New STEM laboratory facilities inaugurated at TNHS",
-            date: "August 5, 2024",
-            excerpt:
-                "State-of-the-art Science, Technology, Engineering, and Mathematics facilities were officially opened...",
-            category: "Facilities",
-            fullContent: `State-of-the-art Science, Technology, Engineering, and Mathematics facilities were officially opened at Taft National High School, marking a significant milestone in the school's commitment to providing world-class education.
-
-The new STEM laboratory complex features modern equipment, interactive learning spaces, and cutting-edge technology designed to enhance students' understanding of scientific concepts and prepare them for future careers in STEM fields.
-
-Key features include:
-• Advanced chemistry and physics laboratories
-• Computer programming and robotics workstations
-• Mathematics visualization center
-• Engineering design and prototyping area
-• Collaborative learning spaces
-
-Principal Dr. Maria Santos emphasized that these facilities will help students develop critical thinking skills and prepare for the challenges of the 21st century. The investment represents the school's dedication to academic excellence and innovation.`,
-            image: "/images/stem-lab.jpg",
-            images: [
-                "/images/stem-lab-1.jpg",
-                "/images/stem-lab-2.jpg",
-                "/images/stem-lab-3.jpg",
-            ],
-            author: "TNHS Admin",
-            readTime: "3 min read",
-        },
-        {
-            id: 5,
-            title: "Student leadership conference promotes civic engagement",
-            date: "July 28, 2024",
-            excerpt:
-                "Over 200 student leaders from various organizations participated in the annual leadership conference...",
-            category: "Student Life",
-            fullContent: `Over 200 student leaders from various organizations participated in the annual leadership conference, focusing on civic engagement and community service.
-
-The conference featured workshops on leadership development, community organizing, and social responsibility. Students had the opportunity to learn from experienced community leaders and develop practical skills for making a positive impact in their communities.
-
-Conference highlights included:
-• Interactive workshops on leadership principles
-• Community service project planning sessions
-• Guest speakers from local government and NGOs
-• Networking opportunities with peer leaders
-• Action planning for school improvement initiatives
-
-The event was organized by the Student Government and supported by the school administration, demonstrating TNHS's commitment to developing responsible and engaged citizens.`,
-            image: "/images/leadership-conference.jpg",
-            images: [
-                "/images/leadership-conference-1.jpg",
-                "/images/leadership-conference-2.jpg",
-                "/images/leadership-conference-3.jpg",
-            ],
-            author: "TNHS Admin",
-            readTime: "4 min read",
-        },
-        {
-            id: 6,
-            title: "Teachers receive advanced training in modern pedagogy",
-            date: "July 15, 2024",
-            excerpt:
-                "Faculty members completed intensive training programs in innovative teaching methodologies...",
-            category: "Professional Development",
-            fullContent: `Faculty members completed intensive training programs in innovative teaching methodologies, enhancing their ability to deliver engaging and effective instruction.
-
-The training programs covered various aspects of modern pedagogy, including differentiated instruction, technology integration, and student-centered learning approaches. Teachers also received certification in new assessment techniques and classroom management strategies.
-
-Training components included:
-• Differentiated instruction techniques
-• Technology integration in the classroom
-• Student-centered learning approaches
-• Modern assessment strategies
-• Classroom management best practices
-
-Principal Dr. Maria Santos praised the faculty's commitment to continuous improvement and professional development, noting that these enhanced skills will directly benefit student learning outcomes.`,
-            image: "/images/teacher-training.jpg",
-            images: [
-                "/images/teacher-training-1.jpg",
-                "/images/teacher-training-2.jpg",
-                "/images/teacher-training-3.jpg",
-            ],
-            author: "TNHS Admin",
-            readTime: "3 min read",
-        },
-    ];
+    // Get formatted data for display
+    const newsUpdates = formatPrincipalCornerData(principalCornerData);
+    const featuredUpdates = formatPrincipalCornerData(featuredContent);
 
     const leadershipTeam = [
         {
