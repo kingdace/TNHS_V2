@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -70,11 +71,11 @@ class AnnouncementController extends Controller
                 'author' => 'required|string|max:255',
                 'status' => 'required|in:draft,published,archived',
                 'category' => 'nullable|string|max:255',
-                'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-                'images.*' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+                'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120', // 5MB = 5120KB
+                'images.*' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120', // 5MB = 5120KB
                 'image_url' => 'nullable|url',
                 'is_featured' => 'nullable|boolean',
-                'scheduled_publish_at' => 'nullable|date|after:now',
+                'scheduled_publish_at' => 'nullable|date', // Allow any valid date
                 'scheduled_unpublish_at' => 'nullable|date|after:scheduled_publish_at',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -83,6 +84,23 @@ class AnnouncementController extends Controller
                 'message' => 'Validation failed',
                 'errors' => $e->errors()
             ], 422);
+        }
+
+        // Additional custom validation for scheduling
+        if ($request->scheduled_publish_at) {
+            $scheduledTime = \Carbon\Carbon::parse($request->scheduled_publish_at);
+            $now = \Carbon\Carbon::now();
+
+            // Allow scheduling up to 5 minutes in the past to account for timezone/processing delays
+            if ($scheduledTime->lt($now->subMinutes(5))) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => [
+                        'scheduled_publish_at' => ['The scheduled publish date cannot be more than 5 minutes in the past.']
+                    ]
+                ], 422);
+            }
         }
 
         $imagePath = null;
@@ -122,6 +140,26 @@ class AnnouncementController extends Controller
             'scheduled_unpublish_at' => $request->scheduled_unpublish_at,
         ]);
 
+        // Create notification for immediate publishing
+        if ($request->status === 'published' && !$request->scheduled_publish_at) {
+            Notification::createNotification(
+                'announcement_published',
+                'Announcement Published',
+                "'{$announcement->title}' has been published immediately",
+                ['announcement_id' => $announcement->id, 'manual' => true]
+            );
+        }
+
+        // Create notification for scheduled publishing
+        if ($request->scheduled_publish_at) {
+            Notification::createNotification(
+                'announcement_scheduled',
+                'Announcement Scheduled',
+                "'{$announcement->title}' is scheduled to publish on " . \Carbon\Carbon::parse($request->scheduled_publish_at)->format('M j, Y \a\t g:i A'),
+                ['announcement_id' => $announcement->id, 'scheduled_for' => $request->scheduled_publish_at]
+            );
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Announcement created successfully',
@@ -153,8 +191,8 @@ class AnnouncementController extends Controller
                 'author' => 'sometimes|nullable|string|max:255',
                 'status' => 'sometimes|in:draft,published,archived',
                 'category' => 'sometimes|nullable|string|max:255',
-                'image' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-                'images.*' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+                'image' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120', // 5MB = 5120KB
+                'images.*' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120', // 5MB = 5120KB
                 'image_url' => 'sometimes|nullable|url',
                 'is_featured' => 'sometimes|boolean',
                 'scheduled_publish_at' => 'sometimes|nullable|date',
@@ -232,7 +270,39 @@ class AnnouncementController extends Controller
                 : null;
         }
 
+        // Store original status for comparison
+        $originalStatus = $announcement->status;
+
         $announcement->update($data);
+
+        // Create notifications for status changes
+        if ($request->has('status') && $originalStatus !== $request->status) {
+            if ($request->status === 'published' && !$request->scheduled_publish_at) {
+                Notification::createNotification(
+                    'announcement_published',
+                    'Announcement Published',
+                    "'{$announcement->title}' has been published",
+                    ['announcement_id' => $announcement->id, 'manual' => true]
+                );
+            } elseif ($request->status === 'archived' && $originalStatus === 'published') {
+                Notification::createNotification(
+                    'announcement_archived',
+                    'Announcement Archived',
+                    "'{$announcement->title}' has been archived manually",
+                    ['announcement_id' => $announcement->id, 'manual' => true]
+                );
+            }
+        }
+
+        // Create notification for new scheduled publishing
+        if ($request->has('scheduled_publish_at') && $request->scheduled_publish_at) {
+            Notification::createNotification(
+                'announcement_scheduled',
+                'Announcement Scheduled',
+                "'{$announcement->title}' is scheduled to publish on " . \Carbon\Carbon::parse($request->scheduled_publish_at)->format('M j, Y \a\t g:i A'),
+                ['announcement_id' => $announcement->id, 'scheduled_for' => $request->scheduled_publish_at]
+            );
+        }
 
         return response()->json([
             'success' => true,

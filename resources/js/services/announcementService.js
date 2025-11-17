@@ -227,6 +227,35 @@ export const announcementService = {
         try {
             console.log("Creating announcement with payload:", payload);
 
+            // Validate image sizes before sending (5MB = 5 * 1024 * 1024 bytes)
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+
+            if (payload.image && payload.image.size > maxSize) {
+                throw new Error(
+                    `Main image is too large. Maximum size is 5MB, but the selected image is ${(
+                        payload.image.size /
+                        1024 /
+                        1024
+                    ).toFixed(2)}MB.`
+                );
+            }
+
+            if (payload.images && Array.isArray(payload.images)) {
+                for (let i = 0; i < payload.images.length; i++) {
+                    if (payload.images[i].size > maxSize) {
+                        throw new Error(
+                            `Gallery image ${
+                                i + 1
+                            } is too large. Maximum size is 5MB, but the selected image is ${(
+                                payload.images[i].size /
+                                1024 /
+                                1024
+                            ).toFixed(2)}MB.`
+                        );
+                    }
+                }
+            }
+
             let body;
             let headers = {
                 ...getHeaders(),
@@ -323,6 +352,35 @@ export const announcementService = {
      */
     async update(id, payload) {
         try {
+            // Validate image sizes before sending (5MB = 5 * 1024 * 1024 bytes)
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+
+            if (payload.image && payload.image.size > maxSize) {
+                throw new Error(
+                    `Main image is too large. Maximum size is 5MB, but the selected image is ${(
+                        payload.image.size /
+                        1024 /
+                        1024
+                    ).toFixed(2)}MB.`
+                );
+            }
+
+            if (payload.images && Array.isArray(payload.images)) {
+                for (let i = 0; i < payload.images.length; i++) {
+                    if (payload.images[i].size > maxSize) {
+                        throw new Error(
+                            `Gallery image ${
+                                i + 1
+                            } is too large. Maximum size is 5MB, but the selected image is ${(
+                                payload.images[i].size /
+                                1024 /
+                                1024
+                            ).toFixed(2)}MB.`
+                        );
+                    }
+                }
+            }
+
             let body;
             let headers = {
                 ...getHeaders(),

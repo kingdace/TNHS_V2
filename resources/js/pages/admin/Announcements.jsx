@@ -191,6 +191,47 @@ const AdminAnnouncements = () => {
                 return;
             }
 
+            // Scheduling validation
+            const now = new Date();
+            if (form.scheduled_publish_at) {
+                const publishDate = new Date(form.scheduled_publish_at);
+                // Allow scheduling up to 5 minutes in the past to account for processing delays
+                const minTime = new Date(now.getTime() - 300000); // 5 minutes ago
+                if (publishDate < minTime) {
+                    setError(
+                        "Scheduled publish date cannot be more than 5 minutes in the past."
+                    );
+                    return;
+                }
+            }
+
+            if (form.scheduled_unpublish_at) {
+                const unpublishDate = new Date(form.scheduled_unpublish_at);
+                const publishDate = form.scheduled_publish_at
+                    ? new Date(form.scheduled_publish_at)
+                    : now;
+
+                if (unpublishDate <= publishDate) {
+                    setError("Unpublish date must be after the publish date.");
+                    return;
+                }
+            }
+
+            // Image size validation (frontend check)
+            if (form.image && form.image.size) {
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                if (form.image.size > maxSize) {
+                    setError(
+                        `Image is too large. Maximum size is 5MB, but selected image is ${(
+                            form.image.size /
+                            1024 /
+                            1024
+                        ).toFixed(2)}MB.`
+                    );
+                    return;
+                }
+            }
+
             // Debug: Log the form data being sent
             console.log("Submitting form data:", form);
 
@@ -564,7 +605,7 @@ const AdminAnnouncements = () => {
                                                             ? "bg-green-50 text-green-700 border-green-200"
                                                             : item.status ===
                                                               "archived"
-                                                            ? "bg-gray-50 text-gray-700 border-gray-200"
+                                                            ? "bg-gray-100 text-gray-700 border-gray-200"
                                                             : "bg-yellow-50 text-yellow-700 border-yellow-200"
                                                     }`}
                                                 >
@@ -1166,21 +1207,49 @@ const AdminAnnouncements = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Scheduled Publish Date & Time
                                         </label>
-                                        <input
-                                            type="datetime-local"
-                                            value={form.scheduled_publish_at}
-                                            onChange={(e) =>
-                                                setForm({
-                                                    ...form,
-                                                    scheduled_publish_at:
-                                                        e.target.value,
-                                                })
-                                            }
-                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                        />
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="datetime-local"
+                                                value={
+                                                    form.scheduled_publish_at
+                                                }
+                                                onChange={(e) =>
+                                                    setForm({
+                                                        ...form,
+                                                        scheduled_publish_at:
+                                                            e.target.value,
+                                                    })
+                                                }
+                                                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const futureDate =
+                                                        new Date();
+                                                    futureDate.setMinutes(
+                                                        futureDate.getMinutes() +
+                                                            10
+                                                    ); // 10 minutes from now
+                                                    const isoString = futureDate
+                                                        .toISOString()
+                                                        .slice(0, 16); // Format for datetime-local
+                                                    setForm({
+                                                        ...form,
+                                                        scheduled_publish_at:
+                                                            isoString,
+                                                    });
+                                                }}
+                                                className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-sm whitespace-nowrap"
+                                                title="Set to 10 minutes from now"
+                                            >
+                                                +10min
+                                            </button>
+                                        </div>
                                         <p className="text-xs text-gray-500 mt-1">
-                                            Leave empty to publish immediately
-                                            when status is set to "Published"
+                                            Leave empty to publish immediately.
+                                            Use +10min button for safe future
+                                            scheduling.
                                         </p>
                                     </div>
                                     <div>

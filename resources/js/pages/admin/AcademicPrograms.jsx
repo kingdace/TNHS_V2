@@ -289,7 +289,7 @@ const AcademicPrograms = () => {
                         {filteredPrograms.map((program) => (
                             <div
                                 key={program.id}
-                                className="p-6 hover:bg-gray-50 transition-colors"
+                                className="p-6 hover:bg-gray-100 transition-colors"
                             >
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">

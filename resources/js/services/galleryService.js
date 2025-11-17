@@ -7,6 +7,13 @@ const API_BASE_URL = "/api";
 
 export const galleryService = {
     /**
+     * Get all gallery images (alias for getAll for dashboard compatibility)
+     */
+    async list(filters = {}) {
+        return this.getAll(filters);
+    },
+
+    /**
      * Get all active gallery images
      */
     async getAll(filters = {}) {

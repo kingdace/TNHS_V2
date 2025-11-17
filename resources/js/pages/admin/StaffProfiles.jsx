@@ -39,25 +39,25 @@ const StaffProfiles = () => {
         staff_type: "assistant_principal",
         full_name: "",
         position: "",
+        section: "",
+        grade_levels: [],
+        profile_image: "",
+        contact_info: {
+            email: "",
+            phone: "",
+        },
+        is_active: true,
+        display_order: 0,
+        // Legacy fields (kept for backward compatibility)
         department: "",
         education: "",
         experience: "",
         achievements: "",
         specializations: "",
-        // New enhanced fields
-        grade_levels: [],
         subject_specialization: "",
         reports_to: "",
         is_department_head: false,
         position_level: 4,
-        profile_image: "",
-        contact_info: {
-            email: "",
-            phone: "",
-            address: "",
-        },
-        is_active: true,
-        display_order: 0,
     });
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
@@ -322,13 +322,21 @@ const StaffProfiles = () => {
             staff_type: activeTab,
             full_name: "",
             position: "",
+            section: "",
+            grade_levels: [],
+            profile_image: "",
+            contact_info: {
+                email: "",
+                phone: "",
+            },
+            is_active: true,
+            display_order: 0,
+            // Legacy fields (kept for backward compatibility)
             department: "",
             education: "",
             experience: "",
             achievements: "",
             specializations: "",
-            // New enhanced fields
-            grade_levels: [],
             subject_specialization: "",
             reports_to: "",
             is_department_head: false,
@@ -340,14 +348,6 @@ const StaffProfiles = () => {
                     : activeTab === "admin"
                     ? 5
                     : 6,
-            profile_image: "",
-            contact_info: {
-                email: "",
-                phone: "",
-                address: "",
-            },
-            is_active: true,
-            display_order: 0,
         });
         setImageFile(null);
         setImagePreview(null);
@@ -434,25 +434,25 @@ const StaffProfiles = () => {
             staff_type: item.staff_type,
             full_name: item.full_name,
             position: item.position || "",
+            section: item.section || "",
+            grade_levels: item.grade_levels || [],
+            profile_image: item.profile_image || "",
+            contact_info: item.contact_info || {
+                email: "",
+                phone: "",
+            },
+            is_active: item.is_active,
+            display_order: item.display_order,
+            // Legacy fields (kept for backward compatibility)
             department: item.department || "",
             education: item.education || "",
             experience: item.experience || "",
             achievements: item.achievements || "",
             specializations: specializations,
-            // New enhanced fields
-            grade_levels: item.grade_levels || [],
             subject_specialization: item.subject_specialization || "",
             reports_to: item.reports_to || "",
             is_department_head: item.is_department_head || false,
             position_level: item.position_level || 4,
-            profile_image: item.profile_image || "",
-            contact_info: item.contact_info || {
-                email: "",
-                phone: "",
-                address: "",
-            },
-            is_active: item.is_active,
-            display_order: item.display_order,
         });
 
         // Set image preview if exists
@@ -588,7 +588,7 @@ const StaffProfiles = () => {
                 </div>
 
                 {/* Search Bar and Filters */}
-                <div className="p-4 bg-gray-50 border-b">
+                <div className="p-4 bg-gray-100 border-b">
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="relative max-w-md">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -650,7 +650,7 @@ const StaffProfiles = () => {
                 {/* Staff List */}
                 <div className="overflow-x-auto">
                     <table className="w-full">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-100">
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Staff Member
@@ -677,7 +677,7 @@ const StaffProfiles = () => {
                                 return (
                                     <tr
                                         key={item.id}
-                                        className="hover:bg-gray-50"
+                                        className="hover:bg-gray-100"
                                     >
                                         <td className="px-6 py-4">
                                             <div className="flex items-center">
@@ -850,58 +850,394 @@ const StaffProfiles = () => {
                                 }
                                 className="space-y-6"
                             >
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Full Name *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={formData.full_name}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    full_name: e.target.value,
-                                                })
-                                            }
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Position
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={formData.position}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    position: e.target.value,
-                                                })
-                                            }
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
-                                    </div>
-                                </div>
+                                {/* TEACHER FORM - Simplified */}
+                                {formData.staff_type === "teacher" && (
+                                    <>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {/* Full Name */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Full Name *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.full_name}
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            full_name:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    required
+                                                />
+                                            </div>
+                                            {/* Position and Level */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Position and Level *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.position}
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            position:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    placeholder="e.g., Teacher I, Teacher II, Master Teacher I"
+                                                    required
+                                                />
+                                            </div>
+                                            {/* Section */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Section
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={
+                                                        formData.section || ""
+                                                    }
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            section:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    placeholder="e.g., Section A, Section B"
+                                                />
+                                            </div>
+                                        </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Department
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={formData.department}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                department: e.target.value,
-                                            })
-                                        }
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
-                                </div>
+                                        {/* Grade Levels */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Grade Levels
+                                            </label>
+                                            <div className="grid grid-cols-4 gap-2">
+                                                {[
+                                                    "7",
+                                                    "8",
+                                                    "9",
+                                                    "10",
+                                                    "11",
+                                                    "12",
+                                                    "ALS",
+                                                ].map((grade) => (
+                                                    <label
+                                                        key={grade}
+                                                        className="flex items-center space-x-2 p-2 border rounded-lg hover:bg-gray-100 cursor-pointer"
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={
+                                                                formData.grade_levels?.includes(
+                                                                    grade
+                                                                ) || false
+                                                            }
+                                                            onChange={(e) => {
+                                                                const currentGrades =
+                                                                    formData.grade_levels ||
+                                                                    [];
+                                                                if (
+                                                                    e.target
+                                                                        .checked
+                                                                ) {
+                                                                    setFormData(
+                                                                        {
+                                                                            ...formData,
+                                                                            grade_levels:
+                                                                                [
+                                                                                    ...currentGrades,
+                                                                                    grade,
+                                                                                ],
+                                                                        }
+                                                                    );
+                                                                } else {
+                                                                    setFormData(
+                                                                        {
+                                                                            ...formData,
+                                                                            grade_levels:
+                                                                                currentGrades.filter(
+                                                                                    (
+                                                                                        g
+                                                                                    ) =>
+                                                                                        g !==
+                                                                                        grade
+                                                                                ),
+                                                                        }
+                                                                    );
+                                                                }
+                                                            }}
+                                                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                        />
+                                                        <span className="text-sm">
+                                                            Grade {grade}
+                                                        </span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* ASSISTANT PRINCIPAL FORM - Full Form (Keep Original) */}
+                                {formData.staff_type ===
+                                    "assistant_principal" && (
+                                    <>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {/* Full Name */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Full Name *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={formData.full_name}
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            full_name:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                />
+                                            </div>
+                                            {/* Position */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Position
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.position}
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            position:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Department
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={formData.department}
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        department:
+                                                            e.target.value,
+                                                    })
+                                                }
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            />
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* ADMINISTRATIVE STAFF FORM - Simplified */}
+                                {formData.staff_type === "admin" && (
+                                    <>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {/* Full Name */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Full Name *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.full_name}
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            full_name:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    required
+                                                />
+                                            </div>
+                                            {/* Position and Level */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Position and Level *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.position}
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            position:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    placeholder="e.g., Administrative Officer II, Registrar"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* SUPPORT STAFF FORM - Simplified */}
+                                {formData.staff_type === "support" && (
+                                    <>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {/* Full Name */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Full Name *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.full_name}
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            full_name:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    required
+                                                />
+                                            </div>
+                                            {/* Position and Level */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Position and Level *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.position}
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            position:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    placeholder="e.g., Maintenance Staff, Security Guard, Janitor"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* Add Education, Experience, Achievements for ASSISTANT PRINCIPAL only */}
+                                {formData.staff_type ===
+                                    "assistant_principal" && (
+                                    <>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Education Background
+                                                </label>
+                                                <textarea
+                                                    value={formData.education}
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            education:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    rows={3}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    placeholder="Educational qualifications and degrees..."
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Experience
+                                                </label>
+                                                <textarea
+                                                    value={formData.experience}
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            experience:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    rows={3}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    placeholder="Professional experience and background..."
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Achievements & Leadership
+                                                Philosophy
+                                            </label>
+                                            <textarea
+                                                value={formData.achievements}
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        achievements:
+                                                            e.target.value,
+                                                    })
+                                                }
+                                                rows={3}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                placeholder="Awards, recognitions, achievements, and leadership philosophy..."
+                                            />
+                                        </div>
+
+                                        {formData.staff_type ===
+                                            "assistant_principal" && (
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Key
+                                                    Strengths/Specializations
+                                                    <span className="text-gray-500 text-xs ml-2">
+                                                        (One per line)
+                                                    </span>
+                                                </label>
+                                                <textarea
+                                                    value={
+                                                        formData.specializations
+                                                    }
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            specializations:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    rows={4}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    placeholder="Curriculum Development&#10;Student Mentorship&#10;Team Leadership&#10;Crisis Management"
+                                                />
+                                            </div>
+                                        )}
+                                    </>
+                                )}
 
                                 {/* Profile Image Upload */}
                                 <div>
@@ -946,7 +1282,7 @@ const StaffProfiles = () => {
 
                                         {/* File Input */}
                                         <div className="flex items-center justify-center w-full">
-                                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-100 hover:bg-gray-100">
                                                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                                     <Upload className="w-8 h-8 mb-4 text-gray-500" />
                                                     <p className="mb-2 text-sm text-gray-500">
@@ -971,333 +1307,150 @@ const StaffProfiles = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Education Background
-                                        </label>
-                                        <textarea
-                                            value={formData.education}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    education: e.target.value,
-                                                })
-                                            }
-                                            rows={3}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            placeholder="Educational qualifications and degrees..."
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Experience
-                                        </label>
-                                        <textarea
-                                            value={formData.experience}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    experience: e.target.value,
-                                                })
-                                            }
-                                            rows={3}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            placeholder="Professional experience and background..."
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Achievements & Leadership Philosophy
-                                    </label>
-                                    <textarea
-                                        value={formData.achievements}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                achievements: e.target.value,
-                                            })
-                                        }
-                                        rows={3}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="Awards, recognitions, achievements, and leadership philosophy..."
-                                    />
-                                </div>
-
-                                {(activeTab === "assistant_principal" ||
-                                    activeTab === "teacher") && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Key Strengths/Specializations
-                                            <span className="text-gray-500 text-xs ml-2">
-                                                (One per line)
-                                            </span>
-                                        </label>
-                                        <textarea
-                                            value={formData.specializations}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    specializations:
-                                                        e.target.value,
-                                                })
-                                            }
-                                            rows={4}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            placeholder="Curriculum Development&#10;Student Mentorship&#10;Team Leadership&#10;Crisis Management"
-                                        />
-                                    </div>
-                                )}
-
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Email
-                                        </label>
-                                        <input
-                                            type="email"
-                                            value={formData.contact_info.email}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    contact_info: {
-                                                        ...formData.contact_info,
-                                                        email: e.target.value,
-                                                    },
-                                                })
-                                            }
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Phone
-                                        </label>
-                                        <input
-                                            type="tel"
-                                            value={formData.contact_info.phone}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    contact_info: {
-                                                        ...formData.contact_info,
-                                                        phone: e.target.value,
-                                                    },
-                                                })
-                                            }
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Display Order
-                                        </label>
-                                        <input
-                                            type="number"
-                                            value={formData.display_order}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    display_order: parseInt(
-                                                        e.target.value
-                                                    ),
-                                                })
-                                            }
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Enhanced Fields for Teachers */}
-                                {activeTab === "teacher" && (
-                                    <>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                    Subject Specialization
-                                                </label>
+                                {/* Organizational Fields for ASSISTANT PRINCIPAL only */}
+                                {formData.staff_type ===
+                                    "assistant_principal" && (
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Position Level
+                                            </label>
+                                            <select
+                                                value={formData.position_level}
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        position_level:
+                                                            parseInt(
+                                                                e.target.value
+                                                            ),
+                                                    })
+                                                }
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            >
+                                                <option value={1}>
+                                                    Level 1 - Principal
+                                                </option>
+                                                <option value={2}>
+                                                    Level 2 - Assistant
+                                                    Principal
+                                                </option>
+                                                <option value={3}>
+                                                    Level 3 - Department Head
+                                                </option>
+                                                <option value={4}>
+                                                    Level 4 - Teacher
+                                                </option>
+                                                <option value={5}>
+                                                    Level 5 - Administrative
+                                                    Staff
+                                                </option>
+                                                <option value={6}>
+                                                    Level 6 - Support Staff
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Display Order
+                                            </label>
+                                            <input
+                                                type="number"
+                                                value={formData.display_order}
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        display_order: parseInt(
+                                                            e.target.value
+                                                        ),
+                                                    })
+                                                }
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            />
+                                        </div>
+                                        <div className="flex items-center">
+                                            <label className="flex items-center mt-6">
                                                 <input
-                                                    type="text"
-                                                    value={
-                                                        formData.subject_specialization
+                                                    type="checkbox"
+                                                    checked={
+                                                        formData.is_department_head
                                                     }
                                                     onChange={(e) =>
                                                         setFormData({
                                                             ...formData,
-                                                            subject_specialization:
-                                                                e.target.value,
+                                                            is_department_head:
+                                                                e.target
+                                                                    .checked,
                                                         })
                                                     }
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                    placeholder="e.g., Mathematics, English, Science"
+                                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                                 />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                    Grade Levels
-                                                    <span className="text-gray-500 text-xs ml-2">
-                                                        (Select multiple)
-                                                    </span>
-                                                </label>
-                                                <div className="grid grid-cols-4 gap-2">
-                                                    {[
-                                                        "7",
-                                                        "8",
-                                                        "9",
-                                                        "10",
-                                                        "11",
-                                                        "12",
-                                                        "ALS",
-                                                    ].map((grade) => (
-                                                        <label
-                                                            key={grade}
-                                                            className="flex items-center"
-                                                        >
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={formData.grade_levels.includes(
-                                                                    grade
-                                                                )}
-                                                                onChange={(
-                                                                    e
-                                                                ) => {
-                                                                    const newGradeLevels =
-                                                                        e.target
-                                                                            .checked
-                                                                            ? [
-                                                                                  ...formData.grade_levels,
-                                                                                  grade,
-                                                                              ]
-                                                                            : formData.grade_levels.filter(
-                                                                                  (
-                                                                                      g
-                                                                                  ) =>
-                                                                                      g !==
-                                                                                      grade
-                                                                              );
-                                                                    setFormData(
-                                                                        {
-                                                                            ...formData,
-                                                                            grade_levels:
-                                                                                newGradeLevels,
-                                                                        }
-                                                                    );
-                                                                }}
-                                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                            />
-                                                            <span className="ml-1 text-sm text-gray-700">
-                                                                {grade}
-                                                            </span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            </div>
+                                                <span className="ml-2 text-sm text-gray-700">
+                                                    Department Head
+                                                </span>
+                                            </label>
                                         </div>
-                                    </>
+                                    </div>
                                 )}
 
-                                {/* Organizational Fields */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Position Level
-                                        </label>
-                                        <select
-                                            value={formData.position_level}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    position_level: parseInt(
-                                                        e.target.value
-                                                    ),
-                                                })
-                                            }
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        >
-                                            <option value={1}>
-                                                Level 1 - Principal
-                                            </option>
-                                            <option value={2}>
-                                                Level 2 - Assistant Principal
-                                            </option>
-                                            <option value={3}>
-                                                Level 3 - Department Head
-                                            </option>
-                                            <option value={4}>
-                                                Level 4 - Teacher
-                                            </option>
-                                            <option value={5}>
-                                                Level 5 - Administrative Staff
-                                            </option>
-                                            <option value={6}>
-                                                Level 6 - Support Staff
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Reports To
-                                        </label>
-                                        <select
-                                            value={formData.reports_to}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    reports_to: e.target.value,
-                                                })
-                                            }
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        >
-                                            <option value="">
-                                                Select Supervisor
-                                            </option>
-                                            {staff
-                                                .filter(
-                                                    (s) =>
-                                                        s.id !==
-                                                            editingStaff?.id &&
-                                                        (s.staff_type ===
-                                                            "principal" ||
-                                                            s.staff_type ===
-                                                                "assistant_principal" ||
-                                                            s.is_department_head)
-                                                )
-                                                .map((supervisor) => (
-                                                    <option
-                                                        key={supervisor.id}
-                                                        value={supervisor.id}
-                                                    >
-                                                        {supervisor.full_name} (
-                                                        {supervisor.position})
-                                                    </option>
-                                                ))}
-                                        </select>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <label className="flex items-center mt-6">
+                                {/* Contact Information (Optional) */}
+                                <div>
+                                    <h3 className="text-lg font-medium text-gray-900 mb-4">
+                                        Contact Information (Optional)
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Email
+                                            </label>
                                             <input
-                                                type="checkbox"
-                                                checked={
-                                                    formData.is_department_head
+                                                type="email"
+                                                value={
+                                                    formData.contact_info
+                                                        ?.email || ""
                                                 }
                                                 onChange={(e) =>
                                                     setFormData({
                                                         ...formData,
-                                                        is_department_head:
-                                                            e.target.checked,
+                                                        contact_info: {
+                                                            ...formData.contact_info,
+                                                            email: e.target
+                                                                .value,
+                                                        },
                                                     })
                                                 }
-                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                placeholder="teacher@example.com"
                                             />
-                                            <span className="ml-2 text-sm text-gray-700">
-                                                Department Head
-                                            </span>
-                                        </label>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Phone
+                                            </label>
+                                            <input
+                                                type="tel"
+                                                value={
+                                                    formData.contact_info
+                                                        ?.phone || ""
+                                                }
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        contact_info: {
+                                                            ...formData.contact_info,
+                                                            phone: e.target
+                                                                .value,
+                                                        },
+                                                    })
+                                                }
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                placeholder="+63 912 345 6789"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
+                                {/* Status */}
                                 <div className="flex items-center space-x-6">
                                     <label className="flex items-center">
                                         <input

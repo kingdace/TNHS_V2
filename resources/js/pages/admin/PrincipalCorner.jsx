@@ -205,7 +205,7 @@ const PrincipalCorner = () => {
                                 <label className="block text-sm font-medium text-gray-500 mb-1">
                                     Leadership Profile
                                 </label>
-                                <div className="text-base text-gray-900 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div className="text-base text-gray-900 bg-gray-100 p-4 rounded-lg border border-gray-200">
                                     {profile.leadership_profile}
                                 </div>
                             </div>
@@ -221,7 +221,7 @@ const PrincipalCorner = () => {
                         <FileText className="h-5 w-5 text-teal-600" />
                         About the Principal
                     </h2>
-                    <div className="text-base text-gray-900 bg-gray-50 p-4 rounded-lg border border-gray-200 whitespace-pre-line">
+                    <div className="text-base text-gray-900 bg-gray-100 p-4 rounded-lg border border-gray-200 whitespace-pre-line">
                         {biography.content}
                     </div>
                 </div>
@@ -234,7 +234,7 @@ const PrincipalCorner = () => {
                         <FileText className="h-5 w-5 text-purple-600" />
                         Personal Data Sheet
                     </h2>
-                    <div className="text-base text-gray-900 bg-gray-50 p-4 rounded-lg border border-gray-200 whitespace-pre-line">
+                    <div className="text-base text-gray-900 bg-gray-100 p-4 rounded-lg border border-gray-200 whitespace-pre-line">
                         {pds.content}
                     </div>
                 </div>

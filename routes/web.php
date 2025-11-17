@@ -88,6 +88,16 @@ Route::prefix('api')->group(function () {
     Route::get('/contact-info/addresses', [\App\Http\Controllers\Api\ContactInfoController::class, 'addresses']);
     Route::get('/contact-info/hours', [\App\Http\Controllers\Api\ContactInfoController::class, 'hours']);
 
+    // Notification routes (no auth required for now - can be added later)
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\NotificationController::class, 'index']);
+        Route::get('/unread-count', [\App\Http\Controllers\Api\NotificationController::class, 'unreadCount']);
+        Route::post('/{id}/mark-read', [\App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
+        Route::post('/mark-all-read', [\App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
+        Route::delete('/{id}', [\App\Http\Controllers\Api\NotificationController::class, 'destroy']);
+        Route::post('/cleanup', [\App\Http\Controllers\Api\NotificationController::class, 'cleanup']);
+    });
+
     // Admin API routes - protected with admin authentication middleware
     Route::prefix('admin')->as('admin.')->middleware(['auth', 'admin.auth'])->group(function () {
         Route::apiResource('hero-carousel', AdminHeroCarouselController::class);

@@ -464,7 +464,7 @@ export default function AdminEvents() {
                                                     className={`text-[11px] px-2 py-0.5 rounded-full border ${
                                                         event.is_active
                                                             ? "bg-green-50 text-green-700 border-green-200"
-                                                            : "bg-gray-50 text-gray-700 border-gray-200"
+                                                            : "bg-gray-100 text-gray-700 border-gray-200"
                                                     }`}
                                                 >
                                                     {event.is_active

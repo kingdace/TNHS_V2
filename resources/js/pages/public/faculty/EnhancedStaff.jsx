@@ -139,16 +139,6 @@ const EnhancedStaff = () => {
                             {teacher.position}
                         </p>
 
-                        {/* Subject Specialization */}
-                        {teacher.subject_specialization && (
-                            <div className="flex items-center gap-1 mb-2">
-                                <BookOpen className="h-4 w-4 text-blue-500" />
-                                <span className="text-sm font-medium text-blue-700">
-                                    {teacher.subject_specialization}
-                                </span>
-                            </div>
-                        )}
-
                         {/* Grade Levels */}
                         {teacher.grade_levels &&
                             teacher.grade_levels.length > 0 && (
@@ -168,6 +158,16 @@ const EnhancedStaff = () => {
                                     </div>
                                 </div>
                             )}
+
+                        {/* Section */}
+                        {teacher.section && (
+                            <div className="flex items-center gap-1 mb-2">
+                                <BookOpen className="h-4 w-4 text-blue-500" />
+                                <span className="text-sm font-medium text-blue-700">
+                                    Section: {teacher.section}
+                                </span>
+                            </div>
+                        )}
 
                         {/* Contact Info */}
                         {teacher.contact_info && (
@@ -192,24 +192,6 @@ const EnhancedStaff = () => {
                         )}
                     </div>
                 </div>
-
-                {/* Education & Experience */}
-                {(teacher.education || teacher.experience) && (
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                        {teacher.education && (
-                            <p className="text-sm text-gray-600 mb-1">
-                                <span className="font-medium">Education:</span>{" "}
-                                {teacher.education}
-                            </p>
-                        )}
-                        {teacher.experience && (
-                            <p className="text-sm text-gray-600">
-                                <span className="font-medium">Experience:</span>{" "}
-                                {teacher.experience}
-                            </p>
-                        )}
-                    </div>
-                )}
             </div>
         </div>
     );

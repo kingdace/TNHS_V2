@@ -397,7 +397,7 @@ const Gallery = () => {
                                         className={`px-2 py-1 rounded-full text-xs font-medium ${
                                             image.is_active
                                                 ? "bg-green-500 text-white"
-                                                : "bg-gray-500 text-white"
+                                                : "bg-gray-1000 text-white"
                                         }`}
                                     >
                                         {image.is_active

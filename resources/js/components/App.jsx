@@ -81,6 +81,8 @@ import PrincipalManagement from "../pages/admin/PrincipalManagement";
 import StaffProfiles from "../pages/admin/StaffProfiles";
 import Resources from "../pages/admin/Resources";
 import AdminGallery from "../pages/admin/Gallery";
+import DownloadFiles from "../pages/admin/DownloadFiles";
+import ExternalLinks from "../pages/admin/ExternalLinks";
 import HistoryManagement from "../pages/admin/about/HistoryManagement";
 import MissionVisionManagement from "../pages/admin/about/MissionVisionManagement";
 import SchoolSealManagement from "../pages/admin/about/SchoolSealManagement";
@@ -375,6 +377,14 @@ function App() {
                                 <Route
                                     path="gallery"
                                     element={<AdminGallery />}
+                                />
+                                <Route
+                                    path="download-files"
+                                    element={<DownloadFiles />}
+                                />
+                                <Route
+                                    path="external-links"
+                                    element={<ExternalLinks />}
                                 />
                             </Route>
                         </Route>

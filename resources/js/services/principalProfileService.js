@@ -79,6 +79,23 @@ export const principalProfileService = {
     },
 
     /**
+     * Get all principal corner posts
+     */
+    async getCornerPosts() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/principal-corner`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            return data.success ? data.data : [];
+        } catch (error) {
+            console.error("Error fetching principal corner posts:", error);
+            return [];
+        }
+    },
+
+    /**
      * Get all principal data at once
      */
     async getAllData() {

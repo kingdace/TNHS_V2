@@ -3116,4 +3116,27 @@ export const adminService = {
             }
         },
     },
+
+    /**
+     * Staff Profiles Management
+     */
+    async getStaffProfiles() {
+        try {
+            const response = await fetch("/api/staff-profiles", {
+                method: "GET",
+                headers: getHeaders(),
+                credentials: "include",
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.success ? data.data : [];
+        } catch (error) {
+            console.error("Error fetching staff profiles:", error);
+            return [];
+        }
+    },
 };

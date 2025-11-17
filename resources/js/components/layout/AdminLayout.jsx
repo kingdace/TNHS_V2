@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import NotificationBell from "../NotificationBell";
 import {
     Menu,
     X,
@@ -40,53 +41,73 @@ const AdminLayout = () => {
     const userMenuRef = useRef(null);
 
     const navigation = [
+        // Core Management
         {
             name: "Dashboard",
+            description: "Overview and statistics",
             href: "/admin",
             icon: Home,
         },
-        {
-            name: "Principal Corner",
-            href: "/admin/principal-corner",
-            icon: Crown,
-        },
-        {
-            name: "Faculty & Staff",
-            href: "/admin/staff-profiles",
-            icon: Users,
-        },
-        {
-            name: "Academic Programs",
-            href: "/admin/academic-programs",
-            icon: GraduationCap,
-        },
+
+        // Content Management
         {
             name: "Announcements",
+            description: "News and events management",
             href: "/admin/news-events",
             icon: Bell,
         },
         {
+            name: "Principal Corner",
+            description: "Principal's messages",
+            href: "/admin/principal-corner",
+            icon: Crown,
+        },
+        {
             name: "Hero Carousel",
+            description: "Homepage slideshow",
             href: "/admin/hero-carousel",
             icon: Image,
         },
+
+        // People Management
         {
-            name: "School Information",
-            href: "/admin/school-info",
-            icon: School,
+            name: "Faculty & Staff",
+            description: "Staff management",
+            href: "/admin/staff-profiles",
+            icon: Users,
         },
-        {
-            name: "Resources",
-            href: "/admin/resources",
-            icon: Download,
-        },
+
+        // Media Management
         {
             name: "Gallery",
+            description: "Photo management",
             href: "/admin/gallery",
             icon: Image,
         },
         {
+            name: "Resources",
+            description: "File downloads",
+            href: "/admin/resources",
+            icon: Download,
+        },
+        // Hidden - Duplicate functionality with Resources
+        // {
+        //     name: "Download Files",
+        //     description: "Manage downloadable files",
+        //     href: "/admin/download-files",
+        //     icon: Download,
+        // },
+        // {
+        //     name: "External Links",
+        //     description: "Manage external links",
+        //     href: "/admin/external-links",
+        //     icon: ExternalLink,
+        // },
+
+        // Site Management
+        {
             name: "About Management",
+            description: "School information",
             href: "/admin/about",
             icon: FileText,
         },
@@ -148,20 +169,17 @@ const AdminLayout = () => {
     const getCurrentPageTitle = () => {
         const path = location.pathname;
         if (path === "/admin") return "Dashboard";
-        if (path.includes("/admin/principal-corner")) return "Principal Corner";
-        if (path.includes("/admin/staff-profiles")) return "Faculty & Staff";
-        if (path.includes("/admin/academic-programs"))
-            return "Academic Programs";
         if (path.includes("/admin/news-events"))
-            return "News & Events Management";
+            return "Announcements Management";
+        if (path.includes("/admin/principal-corner")) return "Principal Corner";
         if (path.includes("/admin/hero-carousel")) return "Hero Carousel";
-        if (path.includes("/admin/school-info")) return "School Information";
-        if (path.includes("/admin/contact-info")) return "Contact Information";
+        if (path.includes("/admin/staff-profiles")) return "Faculty & Staff";
+        if (path.includes("/admin/gallery")) return "Gallery Management";
+        if (path.includes("/admin/resources")) return "Resources Management";
         if (path.includes("/admin/about")) return "About Management";
+        if (path.includes("/admin/contact-info")) return "Contact Information";
         if (path.includes("/admin/page-content")) return "Page Content";
         if (path.includes("/admin/users")) return "User Management";
-        if (path.includes("/admin/resources")) return "Resources Management";
-        if (path.includes("/admin/gallery")) return "Gallery Management";
         if (path.includes("/admin/download-files")) return "Download Files";
         if (path.includes("/admin/external-links")) return "External Links";
 
@@ -169,15 +187,15 @@ const AdminLayout = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-100">
             {/* Full-width Header */}
-            <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-900 to-blue-700 shadow-lg border-b border-blue-800/20">
+            <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 shadow-xl border-b border-blue-700/30">
                 <div className="h-16 flex items-center justify-between px-4">
                     {/* Left side - Brand and Toggle */}
                     <div className="flex items-center space-x-3">
                         <button
                             type="button"
-                            className="h-10 w-10 inline-flex items-center justify-center rounded-lg text-blue-100 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-200/50 transition-all duration-200"
+                            className="h-10 w-10 inline-flex items-center justify-center rounded-lg text-blue-100 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-300/50 transition-all duration-200"
                             onClick={() =>
                                 setIsSidebarCollapsed(!isSidebarCollapsed)
                             }
@@ -196,38 +214,33 @@ const AdminLayout = () => {
                                 <h1 className="text-lg font-bold text-white">
                                     Taft National High School
                                 </h1>
-                                <p className="text-xs text-blue-100">
-                                    Content Management System
+                                <p className="text-xs text-blue-200">
+                                    School Management System
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right side - Essential Actions */}
-                    <div className="flex items-center space-x-3 ml-auto">
-                        {/* Search */}
-                        <div className="hidden lg:block">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-100 z-10" />
-                                <input
-                                    type="text"
-                                    placeholder="Search..."
-                                    className="pl-10 pr-4 py-2 w-48 bg-white/10 border border-blue-300/30 rounded-lg focus:ring-2 focus:ring-blue-300/50 focus:border-blue-300/50 text-sm text-white placeholder-blue-100/80"
-                                />
-                            </div>
-                        </div>
+                    {/* Center - Brand Tag & Date */}
+                    <div className="hidden md:flex flex-col items-center">
+                        <span className="text-lg font-bold text-white tracking-widest font-mono">
+                            PASEO. VERDE. STORM.
+                        </span>
+                        <p className="text-xs text-blue-200 -mt-1">
+                            {getCurrentDate()}
+                        </p>
+                    </div>
 
+                    {/* Right side - Essential Actions */}
+                    <div className="flex items-center space-x-3">
                         {/* Time */}
-                        <div className="hidden lg:flex items-center space-x-2 text-sm text-blue-100">
+                        <div className="hidden lg:flex items-center space-x-2 text-sm text-blue-100 bg-white/5 px-3 py-1.5 rounded-lg">
                             <Clock className="h-4 w-4" />
                             <span>{getCurrentTime()}</span>
                         </div>
 
                         {/* Notifications */}
-                        <button className="relative p-2 text-blue-100 hover:bg-white/10 rounded-lg transition-all duration-200">
-                            <Bell className="h-5 w-5" />
-                            <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border border-blue-900"></span>
-                        </button>
+                        <NotificationBell />
 
                         {/* User Menu */}
                         <div className="relative" ref={userMenuRef}>
@@ -235,7 +248,7 @@ const AdminLayout = () => {
                                 onClick={() =>
                                     setIsUserMenuOpen(!isUserMenuOpen)
                                 }
-                                className="flex items-center space-x-2 p-2 rounded-lg hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-200/50 transition-all duration-200"
+                                className="flex items-center space-x-2 p-2 rounded-lg hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-300/50 transition-all duration-200"
                             >
                                 <div className="h-8 w-8 rounded-full flex items-center justify-center shadow-sm overflow-hidden bg-white/10 backdrop-blur-sm">
                                     <img
@@ -249,7 +262,7 @@ const AdminLayout = () => {
                                         {user?.name || "Admin"}
                                     </div>
                                 </div>
-                                <ChevronDown className="h-4 w-4 text-blue-100" />
+                                <ChevronDown className="h-4 w-4 text-slate-300" />
                             </button>
 
                             {/* User dropdown */}
@@ -300,11 +313,17 @@ const AdminLayout = () => {
                     isSidebarCollapsed ? "w-16" : "w-72"
                 }`}
             >
-                <div className="h-full flex flex-col bg-blue-50/90 backdrop-blur-xl border-r border-blue-100 shadow-xl">
+                <div className="h-full flex flex-col bg-white border-r border-gray-200 shadow-sm">
                     {/* Navigation Content */}
                     <div className="flex-1 flex flex-col overflow-y-auto sidebar-scrollbar">
                         {/* Navigation */}
-                        <nav className="flex-1 px-4 py-6 space-y-2">
+                        <nav
+                            className={`flex-1 py-6 ${
+                                isSidebarCollapsed
+                                    ? "space-y-0.5 px-2"
+                                    : "space-y-1 px-4"
+                            }`}
+                        >
                             {navigation.map((item) => {
                                 const Icon = item.icon;
                                 const hasChildren =
@@ -314,98 +333,101 @@ const AdminLayout = () => {
                                     isParentActive(item.children);
 
                                 return (
-                                    <div key={item.name} className="space-y-1">
+                                    <div key={item.name}>
                                         <Link
                                             to={item.href}
                                             className={`${
-                                                isItemActive
-                                                    ? "bg-gradient-to-r from-royal-blue to-blue-600 text-white shadow-lg"
-                                                    : "text-royal-blue hover:bg-blue-50 hover:text-blue-800 hover:shadow-sm"
-                                            } group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                                                 isSidebarCollapsed
-                                                    ? "justify-center"
-                                                    : ""
-                                            }`}
+                                                    ? isItemActive
+                                                        ? "mx-2 rounded-xl relative"
+                                                        : "text-gray-600 hover:bg-white mx-2 rounded-xl"
+                                                    : isItemActive
+                                                    ? "bg-blue-50 text-blue-700 border-l-4 border-blue-500"
+                                                    : "text-gray-700 hover:bg-white"
+                                            } group flex items-center ${
+                                                isSidebarCollapsed
+                                                    ? "justify-center py-2 px-3"
+                                                    : "px-4 py-3"
+                                            } text-sm font-medium rounded-lg transition-all duration-200`}
                                             title={
                                                 isSidebarCollapsed
                                                     ? item.name
                                                     : ""
                                             }
                                         >
-                                            <Icon
-                                                className={`${
-                                                    isItemActive
-                                                        ? "text-white"
-                                                        : "text-blue-700 group-hover:text-blue-800"
-                                                } h-5 w-5 flex-shrink-0 ${
-                                                    isSidebarCollapsed
-                                                        ? ""
-                                                        : "mr-3"
-                                                }`}
-                                            />
-                                            {!isSidebarCollapsed && (
+                                            {isSidebarCollapsed ? (
+                                                <div
+                                                    className={`${
+                                                        isItemActive
+                                                            ? "bg-blue-500 shadow-lg shadow-blue-500/30"
+                                                            : "bg-gray-200"
+                                                    } p-2.5 rounded-xl`}
+                                                >
+                                                    <Icon
+                                                        className={`${
+                                                            isItemActive
+                                                                ? "text-white"
+                                                                : "text-gray-600"
+                                                        } h-5 w-5`}
+                                                    />
+                                                </div>
+                                            ) : (
                                                 <>
-                                                    <span className="flex-1 font-medium">
-                                                        {item.name}
-                                                    </span>
-                                                    {item.badge && (
-                                                        <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
-                                                            {item.badge}
-                                                        </span>
+                                                    <div
+                                                        className={`${
+                                                            isItemActive
+                                                                ? "bg-blue-100"
+                                                                : "bg-gray-100"
+                                                        } p-2 rounded-lg mr-3 flex-shrink-0`}
+                                                    >
+                                                        <Icon
+                                                            className={`${
+                                                                isItemActive
+                                                                    ? "text-blue-600"
+                                                                    : "text-gray-600"
+                                                            } h-5 w-5`}
+                                                        />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div
+                                                            className={`font-semibold ${
+                                                                isItemActive
+                                                                    ? "text-gray-900"
+                                                                    : "text-gray-900"
+                                                            }`}
+                                                        >
+                                                            {item.name}
+                                                        </div>
+                                                        <div
+                                                            className={`text-xs ${
+                                                                isItemActive
+                                                                    ? "text-gray-600"
+                                                                    : "text-gray-500"
+                                                            }`}
+                                                        >
+                                                            {item.description}
+                                                        </div>
+                                                    </div>
+                                                    {hasChildren && (
+                                                        <ChevronDown className="h-4 w-4 text-gray-400" />
                                                     )}
                                                 </>
                                             )}
                                         </Link>
-                                        {hasChildren &&
-                                            isItemActive &&
-                                            !isSidebarCollapsed && (
-                                                <div className="ml-4 space-y-1">
-                                                    {item.children.map(
-                                                        (child) => {
-                                                            const ChildIcon =
-                                                                child.icon;
-                                                            return (
-                                                                <Link
-                                                                    key={
-                                                                        child.name
-                                                                    }
-                                                                    to={
-                                                                        child.href
-                                                                    }
-                                                                    className={`${
-                                                                        isActive(
-                                                                            child.href
-                                                                        )
-                                                                            ? "bg-blue-50 text-blue-800 border-l-2 border-royal-blue"
-                                                                            : "text-blue-700 hover:text-blue-800 hover:bg-blue-50"
-                                                                    } flex items-center px-4 py-2 text-sm rounded-lg transition-all duration-200`}
-                                                                >
-                                                                    <ChildIcon className="mr-3 h-4 w-4 flex-shrink-0" />
-                                                                    <span className="font-medium">
-                                                                        {
-                                                                            child.name
-                                                                        }
-                                                                    </span>
-                                                                </Link>
-                                                            );
-                                                        }
-                                                    )}
-                                                </div>
-                                            )}
                                     </div>
                                 );
                             })}
                         </nav>
 
-                        {/* User Info - Only show when not collapsed */}
+                        {/* Bottom Section - Only show when not collapsed */}
                         {!isSidebarCollapsed && (
-                            <div className="px-4 py-4 border-t border-blue-100">
+                            <div className="px-4 py-4 border-t border-gray-100">
                                 <div className="text-center">
-                                    <p className="text-sm font-medium text-blue-900">
-                                        {user?.name || "Admin User"}
+                                    <p className="text-sm font-medium text-gray-700">
+                                        Taft National High School
                                     </p>
-                                    <p className="text-xs text-blue-700">
-                                        {user?.role || "Administrator"}
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        © 2025 All rights reserved.
                                     </p>
                                 </div>
                             </div>

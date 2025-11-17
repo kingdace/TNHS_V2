@@ -7,6 +7,13 @@ const API_BASE_URL = "/api";
 
 export const resourcesService = {
     /**
+     * Get all resources (alias for getAll for dashboard compatibility)
+     */
+    async list(filters = {}) {
+        return this.getAll(filters);
+    },
+
+    /**
      * Get all active resources
      */
     async getAll(filters = {}) {
