@@ -44,6 +44,26 @@ class HeroCarouselSeeder extends Seeder
                 'display_order' => 3,
                 'is_active' => true,
             ],
+            [
+                'title' => 'Quality Education at TNHS',
+                'subtitle' => 'BUILDING FUTURES',
+                'description' => 'Providing quality education with dedicated teachers and modern facilities to ensure every student reaches their full potential.',
+                'image_path' => '/images/BG4.jpg',
+                'cta_text' => 'Explore Programs',
+                'cta_link' => '/academics',
+                'display_order' => 4,
+                'is_active' => true,
+            ],
+            [
+                'title' => 'Welcome to TNHS',
+                'subtitle' => 'JOIN OUR COMMUNITY',
+                'description' => 'Become part of a vibrant learning community where students thrive academically and grow personally.',
+                'image_path' => '/images/BG5.jpg',
+                'cta_text' => 'Discover More',
+                'cta_link' => '/about',
+                'display_order' => 5,
+                'is_active' => true,
+            ],
         ];
 
         foreach ($slides as $slide) {

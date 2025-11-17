@@ -331,7 +331,7 @@ const AboutLeadership = () => {
                         <div className="flex items-center space-x-2 bg-purple-100 text-purple-800 px-4 py-2 rounded-full">
                             <MapPin className="w-4 h-4" />
                             <span className="text-sm font-medium">
-                                Taft, Eastern Samar
+                                Taft, Surigao City
                             </span>
                         </div>
                     </div>

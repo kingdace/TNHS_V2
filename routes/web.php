@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Api\AnnouncementController;
+use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
 use App\Http\Controllers\Api\HeroCarouselController;
 use App\Http\Controllers\Api\EventController as PublicEventController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\HeroCarouselController as AdminHeroCarouselController;
+use App\Http\Controllers\Admin\ImageUploadController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -23,11 +25,16 @@ Route::prefix('api')->group(function () {
         return response()->json(['csrf_token' => csrf_token()]);
     });
 
+    // Public announcements endpoint
     Route::get('/announcements/public', [AnnouncementController::class, 'public']);
-    Route::apiResource('announcements', AnnouncementController::class)->middleware(['auth', 'admin.auth']);
-    Route::get('/announcements-trashed', [AnnouncementController::class, 'trashed'])->middleware(['auth', 'admin.auth']);
-    Route::post('/announcements/{id}/restore', [AnnouncementController::class, 'restore'])->middleware(['auth', 'admin.auth']);
-    Route::delete('/announcements/{id}/force', [AnnouncementController::class, 'forceDelete'])->middleware(['auth', 'admin.auth']);
+
+    // Admin announcements endpoints (protected)
+    Route::middleware(['auth', 'admin.auth'])->group(function () {
+        Route::apiResource('announcements', AdminAnnouncementController::class);
+        Route::get('/announcements-trashed', [AdminAnnouncementController::class, 'trashed']);
+        Route::post('/announcements/{id}/restore', [AdminAnnouncementController::class, 'restore']);
+        Route::delete('/announcements/{id}/force', [AdminAnnouncementController::class, 'forceDelete']);
+    });
     Route::apiResource('hero-carousel', HeroCarouselController::class);
 
     // School Info API routes (must come before apiResource to avoid conflicts)
@@ -189,11 +196,36 @@ Route::middleware(['auth', 'admin.auth'])->group(function () {
         Route::post('staff-profiles/{staffProfile}/toggle-active', [\App\Http\Controllers\Admin\StaffProfileController::class, 'toggleActive']);
         Route::post('staff-profiles/reorder', [\App\Http\Controllers\Admin\StaffProfileController::class, 'reorder']);
 
+        // Image Upload
+        Route::post('upload-image', [ImageUploadController::class, 'upload']);
+        Route::delete('delete-image', [ImageUploadController::class, 'delete']);
+
         // Principal Corner Management
         Route::apiResource('principal-corner', \App\Http\Controllers\Admin\PrincipalCornerController::class);
         Route::post('principal-corner/{principalCorner}/toggle-active', [\App\Http\Controllers\Admin\PrincipalCornerController::class, 'toggleActive']);
         Route::post('principal-corner/{principalCorner}/toggle-featured', [\App\Http\Controllers\Admin\PrincipalCornerController::class, 'toggleFeatured']);
         Route::post('principal-corner/reorder', [\App\Http\Controllers\Admin\PrincipalCornerController::class, 'reorder']);
+        Route::get('principal-corner-trashed', [\App\Http\Controllers\Admin\PrincipalCornerController::class, 'trashed']);
+        Route::post('principal-corner/{id}/restore', [\App\Http\Controllers\Admin\PrincipalCornerController::class, 'restore']);
+        Route::delete('principal-corner/{id}/force', [\App\Http\Controllers\Admin\PrincipalCornerController::class, 'forceDelete']);
+
+        // Principal Profile Management
+        Route::apiResource('principal-profiles', \App\Http\Controllers\Admin\PrincipalProfileController::class);
+        Route::post('principal-profiles/{principalProfile}/toggle-active', [\App\Http\Controllers\Admin\PrincipalProfileController::class, 'toggleActive']);
+
+        // Principal Awards Management
+        Route::apiResource('principal-awards', \App\Http\Controllers\Admin\PrincipalAwardController::class);
+        Route::post('principal-awards/{principalAward}/toggle-active', [\App\Http\Controllers\Admin\PrincipalAwardController::class, 'toggleActive']);
+        Route::post('principal-awards/reorder', [\App\Http\Controllers\Admin\PrincipalAwardController::class, 'reorder']);
+
+        // Gallery Management
+        Route::apiResource('gallery', \App\Http\Controllers\Admin\GalleryController::class);
+        Route::post('gallery/{galleryImage}/toggle-active', [\App\Http\Controllers\Admin\GalleryController::class, 'toggleActive']);
+        Route::post('gallery/{galleryImage}/toggle-featured', [\App\Http\Controllers\Admin\GalleryController::class, 'toggleFeatured']);
+        Route::post('gallery/bulk-upload', [\App\Http\Controllers\Admin\GalleryController::class, 'bulkUpload']);
+        Route::get('gallery-trashed', [\App\Http\Controllers\Admin\GalleryController::class, 'trashed']);
+        Route::post('gallery/{id}/restore', [\App\Http\Controllers\Admin\GalleryController::class, 'restore']);
+        Route::delete('gallery/{id}/force', [\App\Http\Controllers\Admin\GalleryController::class, 'forceDelete']);
     });
 });
 
@@ -216,18 +248,16 @@ Route::get('/api/external-links/statistics', [\App\Http\Controllers\Api\External
 Route::post('/api/external-links/{id}/increment', [\App\Http\Controllers\Api\ExternalLinkController::class, 'incrementClick']);
 
 // Public API Routes for staff profiles
-Route::get('/api/staff-profiles', function () {
-    return response()->json([
-        'success' => true,
-        'data' => \App\Models\StaffProfile::active()->ordered()->get()
-    ]);
-});
-Route::get('/api/staff-profiles/type/{type}', function ($type) {
-    return response()->json([
-        'success' => true,
-        'data' => \App\Models\StaffProfile::active()->byType($type)->ordered()->get()
-    ]);
-});
+Route::get('/api/staff-profiles', [\App\Http\Controllers\Api\StaffProfileController::class, 'index']);
+Route::get('/api/staff-profiles/statistics', [\App\Http\Controllers\Api\StaffProfileController::class, 'getStatistics']);
+Route::get('/api/staff-profiles/type/{type}', [\App\Http\Controllers\Api\StaffProfileController::class, 'getByType']);
+Route::get('/api/staff-profiles/grade/{grade}', [\App\Http\Controllers\Api\StaffProfileController::class, 'getByGradeLevel']);
+Route::get('/api/staff-profiles/hierarchy', [\App\Http\Controllers\Api\StaffProfileController::class, 'getHierarchy']);
+Route::get('/api/staff-profiles/teachers-by-grades', [\App\Http\Controllers\Api\StaffProfileController::class, 'getTeachersByGrades']);
+Route::get('/api/staff-profiles/{id}', [\App\Http\Controllers\Api\StaffProfileController::class, 'show']);
+Route::get('/api/staff-statistics', [\App\Http\Controllers\Api\StaffProfileController::class, 'getStatistics']);
+Route::get('/api/staff-types', [\App\Http\Controllers\Api\StaffProfileController::class, 'getTypes']);
+Route::get('/api/staff-departments', [\App\Http\Controllers\Api\StaffProfileController::class, 'getDepartments']);
 
 // Public API Routes for Principal Corner
 Route::get('/api/principal-corner', [\App\Http\Controllers\Api\PrincipalCornerController::class, 'index']);
@@ -236,6 +266,19 @@ Route::get('/api/principal-corner/featured', [\App\Http\Controllers\Api\Principa
 Route::get('/api/principal-corner/messages', [\App\Http\Controllers\Api\PrincipalCornerController::class, 'messages']);
 Route::get('/api/principal-corner/announcements', [\App\Http\Controllers\Api\PrincipalCornerController::class, 'announcements']);
 Route::get('/api/principal-corner/vision', [\App\Http\Controllers\Api\PrincipalCornerController::class, 'vision']);
+
+// Public API Routes for Principal Profile
+Route::get('/api/principal-profiles', [\App\Http\Controllers\Api\PrincipalProfileController::class, 'index']);
+Route::get('/api/principal-awards', [\App\Http\Controllers\Api\PrincipalAwardController::class, 'index']);
+
+// Public API Routes for Gallery
+Route::get('/api/gallery', [\App\Http\Controllers\Api\GalleryController::class, 'index']);
+Route::get('/api/gallery/{id}', [\App\Http\Controllers\Api\GalleryController::class, 'show']);
+Route::get('/api/gallery/category/{category}', [\App\Http\Controllers\Api\GalleryController::class, 'getByCategory']);
+Route::get('/api/gallery-featured', [\App\Http\Controllers\Api\GalleryController::class, 'getFeatured']);
+Route::get('/api/gallery-categories', [\App\Http\Controllers\Api\GalleryController::class, 'getCategories']);
+Route::get('/api/gallery-statistics', [\App\Http\Controllers\Api\GalleryController::class, 'getStatistics']);
+Route::post('/api/gallery/{id}/like', [\App\Http\Controllers\Api\GalleryController::class, 'incrementLike']);
 
 // React SPA route - all routes will be handled by React Router
 Route::get('/{any}', function () {

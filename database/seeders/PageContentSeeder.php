@@ -25,7 +25,7 @@ class PageContentSeeder extends Seeder
                 'content_data' => json_encode([
                     'title' => 'Welcome to Taft National High School',
                     'subtitle' => 'Moving forward with strength, growth, and resilience',
-                    'description' => 'Empowering students with quality education, fostering academic excellence, and building character for a brighter future in Eastern Samar.',
+                    'description' => 'Empowering students with quality education, fostering academic excellence, and building character for a brighter future in Surigao City.',
                     'cta_text' => 'Explore Our Programs',
                     'cta_link' => '/academics',
                     'background_image' => '/images/BG1.jpg'

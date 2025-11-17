@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PrincipalCorner;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class PrincipalCornerController extends Controller
 {
@@ -15,10 +16,20 @@ class PrincipalCornerController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = PrincipalCorner::active()->published()->ordered();
+            Log::info('Public PrincipalCorner::index called', [
+                'type' => $request->get('type'),
+                'params' => $request->all(),
+            ]);
+
+            $query = PrincipalCorner::query();
+
+            // Only apply active filter - removed published() filter completely
+            $query->active();
+            $query->ordered();
 
             // Filter by content type if specified
             if ($request->has('type')) {
+                Log::info('Filtering by type:', ['type' => $request->type]);
                 $query->byType($request->type);
             }
 
@@ -34,6 +45,12 @@ class PrincipalCornerController extends Controller
             } else {
                 $content = $query->get();
             }
+
+            Log::info('Query results:', [
+                'count' => $content->count(),
+                'type' => $request->get('type'),
+                'ids' => $content->pluck('id')->toArray(),
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -104,54 +121,26 @@ class PrincipalCornerController extends Controller
     }
 
     /**
-     * Get principal messages.
+     * Get principal biography (About the Principal).
      */
-    public function messages(): JsonResponse
+    public function biography(): JsonResponse
     {
         try {
             $content = PrincipalCorner::active()
                 ->published()
-                ->byType('message')
+                ->byType('biography')
                 ->ordered()
-                ->limit(5)
-                ->get();
+                ->first();
 
             return response()->json([
                 'success' => true,
                 'data' => $content,
-                'message' => 'Principal messages retrieved successfully'
+                'message' => 'Principal biography retrieved successfully'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to retrieve principal messages',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Get principal announcements.
-     */
-    public function announcements(): JsonResponse
-    {
-        try {
-            $content = PrincipalCorner::active()
-                ->published()
-                ->byType('announcement')
-                ->ordered()
-                ->limit(5)
-                ->get();
-
-            return response()->json([
-                'success' => true,
-                'data' => $content,
-                'message' => 'Principal announcements retrieved successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve principal announcements',
+                'message' => 'Failed to retrieve principal biography',
                 'error' => $e->getMessage()
             ], 500);
         }

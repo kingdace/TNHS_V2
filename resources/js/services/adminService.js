@@ -1493,6 +1493,345 @@ export const adminService = {
     },
 
     /**
+     * Resources (Download Files) Management
+     */
+    resources: {
+        async getAll(filters = {}) {
+            try {
+                const query = new URLSearchParams(filters).toString();
+                const response = await makeRequest(
+                    `/api/admin/download-files?${query}`,
+                    {
+                        method: "GET",
+                        headers: getHeaders(),
+                    }
+                );
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error fetching resources:", error);
+                throw error;
+            }
+        },
+        async create(payload) {
+            try {
+                // Add timeout for large file uploads
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+
+                const response = await makeRequest(
+                    "/api/admin/download-files",
+                    {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
+                        },
+                        body: payload, // FormData
+                        signal: controller.signal,
+                    }
+                );
+
+                clearTimeout(timeoutId);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Return validation errors for the UI to handle
+                    return data;
+                }
+
+                return data;
+            } catch (error) {
+                if (error.name === "AbortError") {
+                    throw new Error("Upload timeout - file may be too large");
+                }
+                console.error("Error creating resource:", error);
+                throw error;
+            }
+        },
+        async update(id, payload) {
+            try {
+                // Add _method for Laravel
+                if (payload instanceof FormData) {
+                    payload.append("_method", "PUT");
+                }
+                const response = await makeRequest(
+                    `/api/admin/download-files/${id}`,
+                    {
+                        method: "POST", // Use POST with _method=PUT for FormData
+                        headers: {
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
+                        },
+                        body: payload,
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Return validation errors for the UI to handle
+                    return data;
+                }
+
+                return data;
+            } catch (error) {
+                console.error("Error updating resource:", error);
+                throw error;
+            }
+        },
+        async delete(id) {
+            try {
+                const response = await makeRequest(
+                    `/api/admin/download-files/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: getHeaders(),
+                    }
+                );
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error deleting resource:", error);
+                throw error;
+            }
+        },
+        async toggleActive(id) {
+            try {
+                const response = await makeRequest(
+                    `/api/admin/download-files/${id}/toggle-active`,
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                    }
+                );
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error toggling resource status:", error);
+                throw error;
+            }
+        },
+    },
+
+    /**
+     * Gallery Management
+     */
+    gallery: {
+        async getAll(filters = {}) {
+            try {
+                const query = new URLSearchParams(filters).toString();
+                const response = await makeRequest(
+                    `/api/admin/gallery?${query}`,
+                    {
+                        method: "GET",
+                        headers: getHeaders(),
+                    }
+                );
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error fetching gallery images:", error);
+                throw error;
+            }
+        },
+        async create(payload) {
+            try {
+                const response = await makeRequest("/api/admin/gallery", {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
+                    },
+                    body: payload, // FormData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    return data;
+                }
+
+                return data;
+            } catch (error) {
+                console.error("Error creating gallery image:", error);
+                throw error;
+            }
+        },
+        async update(id, payload) {
+            try {
+                if (payload instanceof FormData) {
+                    payload.append("_method", "PUT");
+                }
+                const response = await makeRequest(`/api/admin/gallery/${id}`, {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
+                    },
+                    body: payload,
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    return data;
+                }
+
+                return data;
+            } catch (error) {
+                console.error("Error updating gallery image:", error);
+                throw error;
+            }
+        },
+        async delete(id) {
+            try {
+                const response = await makeRequest(`/api/admin/gallery/${id}`, {
+                    method: "DELETE",
+                    headers: getHeaders(),
+                });
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error deleting gallery image:", error);
+                throw error;
+            }
+        },
+        async toggleActive(id) {
+            try {
+                const response = await makeRequest(
+                    `/api/admin/gallery/${id}/toggle-active`,
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                    }
+                );
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error toggling gallery image status:", error);
+                throw error;
+            }
+        },
+        async toggleFeatured(id) {
+            try {
+                const response = await makeRequest(
+                    `/api/admin/gallery/${id}/toggle-featured`,
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                    }
+                );
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error(
+                    "Error toggling gallery image featured status:",
+                    error
+                );
+                throw error;
+            }
+        },
+        async bulkUpload(payload) {
+            try {
+                const response = await makeRequest(
+                    "/api/admin/gallery/bulk-upload",
+                    {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
+                        },
+                        body: payload, // FormData
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    return data;
+                }
+
+                return data;
+            } catch (error) {
+                console.error("Error bulk uploading gallery images:", error);
+                throw error;
+            }
+        },
+        async getTrashed() {
+            try {
+                const response = await makeRequest(
+                    "/api/admin/gallery-trashed",
+                    {
+                        method: "GET",
+                        headers: getHeaders(),
+                    }
+                );
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error fetching trashed gallery images:", error);
+                throw error;
+            }
+        },
+        async restore(id) {
+            try {
+                const response = await makeRequest(
+                    `/api/admin/gallery/${id}/restore`,
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                    }
+                );
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error restoring gallery image:", error);
+                throw error;
+            }
+        },
+        async forceDelete(id) {
+            try {
+                const response = await makeRequest(
+                    `/api/admin/gallery/${id}/force`,
+                    {
+                        method: "DELETE",
+                        headers: getHeaders(),
+                    }
+                );
+                if (!response.ok)
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error(
+                    "Error permanently deleting gallery image:",
+                    error
+                );
+                throw error;
+            }
+        },
+    },
+
+    /**
      * School Seal Management
      */
     schoolSealInfo: {
@@ -2303,6 +2642,86 @@ export const adminService = {
                 throw error;
             }
         },
+
+        // Get trashed content
+        async getTrashed() {
+            try {
+                const response = await fetch(
+                    "/api/admin/principal-corner-trashed",
+                    {
+                        method: "GET",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error fetching trashed content:", error);
+                throw error;
+            }
+        },
+
+        // Restore trashed content
+        async restore(id) {
+            try {
+                const response = await fetch(
+                    `/api/admin/principal-corner/${id}/restore`,
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message ||
+                            `HTTP error! status: ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error restoring content:", error);
+                throw error;
+            }
+        },
+
+        // Permanently delete content
+        async forceDelete(id) {
+            try {
+                const response = await fetch(
+                    `/api/admin/principal-corner/${id}/force`,
+                    {
+                        method: "DELETE",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message ||
+                            `HTTP error! status: ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error permanently deleting content:", error);
+                throw error;
+            }
+        },
     },
 
     /**
@@ -2337,12 +2756,14 @@ export const adminService = {
         // Create new staff profile
         async create(staffData) {
             try {
-                const response = await fetch("/api/admin/staff-profiles", {
-                    method: "POST",
-                    headers: getHeaders(),
-                    credentials: "include",
-                    body: JSON.stringify(staffData),
-                });
+                const response = await makeRequest(
+                    "/api/admin/staff-profiles",
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                        body: JSON.stringify(staffData),
+                    }
+                );
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -2363,12 +2784,11 @@ export const adminService = {
         // Update staff profile
         async update(id, staffData) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/staff-profiles/${id}`,
                     {
                         method: "PUT",
                         headers: getHeaders(),
-                        credentials: "include",
                         body: JSON.stringify(staffData),
                     }
                 );
@@ -2392,12 +2812,11 @@ export const adminService = {
         // Delete staff profile
         async delete(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/staff-profiles/${id}`,
                     {
                         method: "DELETE",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -2420,12 +2839,11 @@ export const adminService = {
         // Toggle active status
         async toggleActive(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/staff-profiles/${id}/toggle-active`,
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -2441,6 +2859,259 @@ export const adminService = {
                 return data;
             } catch (error) {
                 console.error("Error toggling staff profile status:", error);
+                throw error;
+            }
+        },
+    },
+
+    principalProfiles: {
+        // Get all principal profiles
+        async getAll() {
+            try {
+                const response = await fetch(`/api/admin/principal-profiles`, {
+                    method: "GET",
+                    headers: getHeaders(),
+                    credentials: "include",
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error fetching principal profiles:", error);
+                throw error;
+            }
+        },
+
+        // Create principal profile
+        async create(data) {
+            try {
+                const response = await fetch(`/api/admin/principal-profiles`, {
+                    method: "POST",
+                    headers: getHeaders(),
+                    credentials: "include",
+                    body: JSON.stringify(data),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message || "Failed to create profile"
+                    );
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error creating principal profile:", error);
+                throw error;
+            }
+        },
+
+        // Update principal profile
+        async update(id, data) {
+            try {
+                const response = await fetch(
+                    `/api/admin/principal-profiles/${id}`,
+                    {
+                        method: "PUT",
+                        headers: getHeaders(),
+                        credentials: "include",
+                        body: JSON.stringify(data),
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message || "Failed to update profile"
+                    );
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error updating principal profile:", error);
+                throw error;
+            }
+        },
+
+        // Delete principal profile
+        async delete(id) {
+            try {
+                const response = await fetch(
+                    `/api/admin/principal-profiles/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message || "Failed to delete profile"
+                    );
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error deleting principal profile:", error);
+                throw error;
+            }
+        },
+
+        // Toggle active status
+        async toggleActive(id) {
+            try {
+                const response = await fetch(
+                    `/api/admin/principal-profiles/${id}/toggle-active`,
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message || "Failed to toggle status"
+                    );
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error toggling principal profile:", error);
+                throw error;
+            }
+        },
+    },
+
+    principalAwards: {
+        // Get all principal awards
+        async getAll(principalProfileId) {
+            try {
+                const url = principalProfileId
+                    ? `/api/admin/principal-awards?principal_profile_id=${principalProfileId}`
+                    : `/api/admin/principal-awards`;
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: getHeaders(),
+                    credentials: "include",
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error fetching principal awards:", error);
+                throw error;
+            }
+        },
+
+        // Create principal award
+        async create(data) {
+            try {
+                const response = await fetch(`/api/admin/principal-awards`, {
+                    method: "POST",
+                    headers: getHeaders(),
+                    credentials: "include",
+                    body: JSON.stringify(data),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message || "Failed to create award"
+                    );
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error creating principal award:", error);
+                throw error;
+            }
+        },
+
+        // Update principal award
+        async update(id, data) {
+            try {
+                const response = await fetch(
+                    `/api/admin/principal-awards/${id}`,
+                    {
+                        method: "PUT",
+                        headers: getHeaders(),
+                        credentials: "include",
+                        body: JSON.stringify(data),
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message || "Failed to update award"
+                    );
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error updating principal award:", error);
+                throw error;
+            }
+        },
+
+        // Delete principal award
+        async delete(id) {
+            try {
+                const response = await fetch(
+                    `/api/admin/principal-awards/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message || "Failed to delete award"
+                    );
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error deleting principal award:", error);
+                throw error;
+            }
+        },
+
+        // Toggle active status
+        async toggleActive(id) {
+            try {
+                const response = await fetch(
+                    `/api/admin/principal-awards/${id}/toggle-active`,
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message || "Failed to toggle status"
+                    );
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Error toggling principal award:", error);
                 throw error;
             }
         },

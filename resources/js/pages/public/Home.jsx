@@ -262,72 +262,6 @@ const Home = () => {
                     )}
                 </div>
 
-                {/* Content Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center text-white px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-                        {/* School Logo */}
-                        <div className="mb-6 flex justify-center">
-                            <div className="h-28 w-28 bg-white rounded-full flex items-center justify-center shadow-2xl border-4 border-white/30 backdrop-blur-sm">
-                                <img
-                                    src="/images/Logo.jpg"
-                                    alt="TNHS Logo"
-                                    className="h-full w-full object-cover rounded-full"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Welcome Text */}
-                        <div className="mb-6">
-                            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-wide drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
-                                Welcome to
-                            </h1>
-                            <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-wider mt-1 drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
-                                TAFT NATIONAL HIGH SCHOOL
-                            </h2>
-                        </div>
-
-                        {/* School Identity */}
-                        <div className="mb-8">
-                            <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed max-w-3xl mx-auto font-semibold text-blue-100 drop-shadow">
-                                "Moving forward with strength, growth, and
-                                resilience"
-                            </p>
-                        </div>
-
-                        {false && (
-                            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                                {/* Enrollment Requirements Button */}
-                                <Button
-                                    asChild
-                                    size="lg"
-                                    className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold px-8 h-12 text-lg rounded-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0 relative overflow-hidden group"
-                                >
-                                    <Link to="/admissions">
-                                        <span className="relative z-10">
-                                            Enrollment Requirements
-                                        </span>
-                                        {/* Shine effect */}
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                                    </Link>
-                                </Button>
-
-                                {/* Learn More Button */}
-                                <Button
-                                    asChild
-                                    size="lg"
-                                    className="bg-white hover:bg-gray-100 text-gray-900 font-bold px-8 h-12 text-lg rounded-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 transform border-0 relative overflow-hidden group"
-                                >
-                                    <Link to="/about">
-                                        <span className="relative z-10">
-                                            Learn More
-                                        </span>
-                                    </Link>
-                                </Button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
                 {/* Navigation Arrows */}
                 <button
                     onClick={() =>
@@ -640,62 +574,6 @@ const Home = () => {
                                             >
                                                 <Link to="/announcements?category=Student%20Government&type=student">
                                                     Get Involved
-                                                </Link>
-                                            </Button>
-                                        </div>
-                                    </div>
-
-                                    {/* Academic Events */}
-                                    <div className="bg-white rounded-lg p-3">
-                                        <div className="mb-3 overflow-hidden rounded-md border border-gray-200 shadow-sm">
-                                            <img
-                                                src="/images/academic.jpg"
-                                                alt="Academic Events"
-                                                className="w-full h-30 object-cover"
-                                            />
-                                        </div>
-                                        <div className="text-center">
-                                            <h5 className="font-bold text-gray-800 mb-1 text-sm">
-                                                Academic Events
-                                            </h5>
-                                            <p className="text-gray-600 text-xs mb-2">
-                                                Exams, conferences, academic
-                                                competitions
-                                            </p>
-                                            <Button
-                                                asChild
-                                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 text-xs rounded-lg transition-all duration-300"
-                                            >
-                                                <Link to="/events?type=academic">
-                                                    View Events
-                                                </Link>
-                                            </Button>
-                                        </div>
-                                    </div>
-
-                                    {/* Cultural Events */}
-                                    <div className="bg-white rounded-lg p-3">
-                                        <div className="mb-3 overflow-hidden rounded-md border border-gray-200 shadow-sm">
-                                            <img
-                                                src="/images/cultural.jpg"
-                                                alt="Cultural Events"
-                                                className="w-full h-30 object-cover"
-                                            />
-                                        </div>
-                                        <div className="text-center">
-                                            <h5 className="font-bold text-gray-800 mb-1 text-sm">
-                                                Cultural Events
-                                            </h5>
-                                            <p className="text-gray-600 text-xs mb-2">
-                                                Festivals, performances,
-                                                cultural celebrations
-                                            </p>
-                                            <Button
-                                                asChild
-                                                className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold px-3 py-1.5 text-xs rounded-lg transition-all duration-300"
-                                            >
-                                                <Link to="/events?type=cultural">
-                                                    View Events
                                                 </Link>
                                             </Button>
                                         </div>

@@ -16,7 +16,7 @@ class SchoolInfoSeeder extends Seeder
             [
                 'info_type' => 'history',
                 'title' => 'Our History',
-                'content' => 'Taft National High School was established in 1965 and has been serving the community of Taft, Eastern Samar for over 50 years. We have grown from a small school to a comprehensive educational institution. Throughout our history, we have maintained our commitment to academic excellence and character development, preparing thousands of students for successful futures.',
+                'content' => 'Taft National High School was established in 1965 and has been serving the community of Taft, Surigao City for over 50 years. We have grown from a small school to a comprehensive educational institution. Throughout our history, we have maintained our commitment to academic excellence and character development, preparing thousands of students for successful futures.',
                 'image_path' => null,
                 'display_order' => 1,
                 'is_active' => true,

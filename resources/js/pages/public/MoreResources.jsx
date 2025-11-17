@@ -21,215 +21,67 @@ import {
     Clock,
     Star,
     Eye,
+    Archive,
+    Music,
 } from "lucide-react";
+import { resourcesService } from "../../services/resourcesService";
 
 const MoreResources = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [filteredResources, setFilteredResources] = useState([]);
+    const [allResources, setAllResources] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         window.scrollTo(0, 0);
+        fetchResources();
     }, []);
 
-    // All resources consolidated into one array for better search functionality
-    const allResources = [
-        // Academic Resources
-        {
-            id: 1,
-            name: "TNHS Academic Calendar 2024-2025",
-            category: "academic",
-            type: "PDF",
-            size: "1.8 MB",
-            date: "2024-01-10",
-            downloads: 189,
-            description:
-                "Official academic calendar with important dates and events",
-            icon: Calendar,
-            color: "from-blue-500 to-blue-600",
-            priority: "high",
-        },
-        {
-            id: 2,
-            name: "K-12 Curriculum Guide",
-            category: "academic",
-            type: "PDF",
-            size: "2.3 MB",
-            date: "2024-01-15",
-            downloads: 245,
-            description: "Complete K-12 curriculum guide for all grade levels",
-            icon: BookOpen,
-            color: "from-blue-500 to-blue-600",
-            priority: "high",
-        },
-        {
-            id: 3,
-            name: "Subject Syllabi & Learning Modules",
-            category: "academic",
-            type: "ZIP",
-            size: "15.2 MB",
-            date: "2024-01-12",
-            downloads: 156,
-            description: "Comprehensive learning modules for all subjects",
-            icon: GraduationCap,
-            color: "from-blue-500 to-blue-600",
-            priority: "medium",
-        },
+    const fetchResources = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await resourcesService.getAll();
 
-        // Forms & Documents
-        {
-            id: 4,
-            name: "Enrollment Requirements 2024-2025",
-            category: "forms",
-            type: "PDF",
-            size: "245 KB",
-            date: "2024-01-15",
-            downloads: 245,
-            description: "Complete list of requirements for enrollment",
-            icon: FileText,
-            color: "from-green-500 to-green-600",
-            priority: "high",
-        },
-        {
-            id: 5,
-            name: "Student Handbook",
-            category: "forms",
-            type: "PDF",
-            size: "4.7 MB",
-            date: "2024-01-05",
-            downloads: 156,
-            description: "Comprehensive guide for students and parents",
-            icon: Shield,
-            color: "from-green-500 to-green-600",
-            priority: "high",
-        },
-        {
-            id: 6,
-            name: "Good Moral Certificate Request Form",
-            category: "forms",
-            type: "PDF",
-            size: "156 KB",
-            date: "2024-01-08",
-            downloads: 89,
-            description: "Form for requesting good moral certificate",
-            icon: Award,
-            color: "from-green-500 to-green-600",
-            priority: "medium",
-        },
-        {
-            id: 7,
-            name: "Transfer Credential Form",
-            category: "forms",
-            type: "PDF",
-            size: "189 KB",
-            date: "2024-01-06",
-            downloads: 67,
-            description: "Official form for student transfer",
-            icon: FileText,
-            color: "from-green-500 to-green-600",
-            priority: "medium",
-        },
+            if (response.success) {
+                const transformedResources = response.data.map((resource) =>
+                    resourcesService.transformResource(resource)
+                );
+                setAllResources(transformedResources);
+            } else {
+                setError("Failed to load resources");
+            }
+        } catch (err) {
+            console.error("Error fetching resources:", err);
+            setError("Failed to load resources");
+            // Fallback to empty array
+            setAllResources([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        // Multimedia Resources
-        {
-            id: 8,
-            name: "TNHS Virtual Tour",
-            category: "multimedia",
-            type: "MP4",
-            size: "78.5 MB",
-            date: "2024-01-10",
-            downloads: 134,
-            description: "Virtual tour of Taft National High School facilities",
-            icon: Video,
-            color: "from-purple-500 to-purple-600",
-            priority: "high",
-        },
-        {
-            id: 9,
-            name: "School Orientation Video",
-            category: "multimedia",
-            type: "MP4",
-            size: "45.2 MB",
-            date: "2024-01-12",
-            downloads: 98,
-            description: "Orientation video for new students and parents",
-            icon: Video,
-            color: "from-purple-500 to-purple-600",
-            priority: "medium",
-        },
-        {
-            id: 10,
-            name: "Academic Presentations",
-            category: "multimedia",
-            type: "PPTX",
-            size: "12.3 MB",
-            date: "2024-01-14",
-            downloads: 76,
-            description: "PowerPoint presentations for various subjects",
-            icon: Image,
-            color: "from-purple-500 to-purple-600",
-            priority: "low",
-        },
-
-        // External Links
-        {
-            id: 11,
-            name: "DepEd Official Website",
-            category: "links",
-            type: "Link",
-            size: "External",
-            date: "2024-01-01",
-            downloads: 0,
-            description:
-                "Official website of the Department of Education Philippines",
-            icon: Globe,
-            color: "from-orange-500 to-orange-600",
-            url: "https://www.deped.gov.ph",
-            priority: "high",
-        },
-        {
-            id: 12,
-            name: "DepEd Learning Resources Portal",
-            category: "links",
-            type: "Link",
-            size: "External",
-            date: "2024-01-01",
-            downloads: 0,
-            description: "Access to learning materials and resources",
-            icon: BookOpen,
-            color: "from-orange-500 to-orange-600",
-            url: "https://lrmds.deped.gov.ph",
-            priority: "high",
-        },
-        {
-            id: 13,
-            name: "Surigao City Division Office",
-            category: "links",
-            type: "Link",
-            size: "External",
-            date: "2024-01-01",
-            downloads: 0,
-            description: "Official website of DepEd Surigao City Division",
-            icon: MapPin,
-            color: "from-orange-500 to-orange-600",
-            url: "https://www.deped-surigao.com",
-            priority: "high",
-        },
-        {
-            id: 14,
-            name: "TNHS Contact Information",
-            category: "links",
-            type: "Link",
-            size: "Internal",
-            date: "2024-01-01",
-            downloads: 0,
-            description: "School contact details and location information",
-            icon: Phone,
-            color: "from-orange-500 to-orange-600",
-            url: "/contact",
-            priority: "high",
-        },
-    ];
+    // Get icon component from icon name
+    const getIconComponent = (iconName) => {
+        const icons = {
+            FileText,
+            BookOpen,
+            GraduationCap,
+            Shield,
+            Award,
+            Calendar,
+            Video,
+            Image,
+            Globe,
+            Phone,
+            MapPin,
+            Archive,
+            Music,
+        };
+        return icons[iconName] || FileText;
+    };
 
     const categories = [
         { value: "all", label: "All Resources", count: allResources.length },
@@ -248,6 +100,17 @@ const MoreResources = () => {
             label: "Multimedia",
             count: allResources.filter((r) => r.category === "multimedia")
                 .length,
+        },
+        {
+            value: "handbooks",
+            label: "Handbooks",
+            count: allResources.filter((r) => r.category === "handbooks")
+                .length,
+        },
+        {
+            value: "policies",
+            label: "Policies",
+            count: allResources.filter((r) => r.category === "policies").length,
         },
         {
             value: "links",
@@ -281,7 +144,7 @@ const MoreResources = () => {
         }
 
         setFilteredResources(filtered);
-    }, [searchTerm, selectedCategory]);
+    }, [searchTerm, selectedCategory, allResources]);
 
     const getPriorityColor = (priority) => {
         switch (priority) {
@@ -306,6 +169,31 @@ const MoreResources = () => {
                 return "Low Priority";
             default:
                 return "Standard";
+        }
+    };
+
+    const handleDownload = async (resource) => {
+        try {
+            // Optimistically update the download count immediately
+            const updatedResources = allResources.map((r) =>
+                r.id === resource.id ? { ...r, downloads: r.downloads + 1 } : r
+            );
+            setAllResources(updatedResources);
+
+            const success = await resourcesService.downloadFile(resource);
+            if (success) {
+                // Refresh the resources to get the actual count from server
+                setTimeout(() => {
+                    fetchResources();
+                }, 1000); // Small delay to ensure backend is updated
+            } else {
+                // Revert the optimistic update if download failed
+                setAllResources(allResources);
+            }
+        } catch (error) {
+            console.error("Download failed:", error);
+            // Revert the optimistic update
+            setAllResources(allResources);
         }
     };
 
@@ -428,79 +316,127 @@ const MoreResources = () => {
                     </p>
                 </div>
 
-                {/* Simple Resources Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                    {filteredResources.map((resource) => {
-                        const IconComponent = resource.icon;
-                        return (
-                            <div
-                                key={resource.id}
-                                className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 p-4"
-                            >
-                                {/* Header with Icon and Priority */}
-                                <div className="flex items-start justify-between mb-3">
+                {/* Loading State */}
+                {loading ? (
+                    <div className="text-center py-12">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-royal-blue mx-auto mb-4"></div>
+                        <p className="text-gray-600">Loading resources...</p>
+                    </div>
+                ) : error ? (
+                    <div className="text-center py-12">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <FileText className="w-8 h-8 text-red-400" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                            Error Loading Resources
+                        </h3>
+                        <p className="text-gray-500 mb-4">{error}</p>
+                        <button
+                            onClick={fetchResources}
+                            className="px-4 py-2 bg-royal-blue text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                            Try Again
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        {/* Simple Resources Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                            {filteredResources.map((resource) => {
+                                const IconComponent = getIconComponent(
+                                    resource.icon
+                                );
+                                return (
                                     <div
-                                        className={`p-2 rounded-lg bg-gradient-to-r ${resource.color} text-white`}
+                                        key={resource.id}
+                                        className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 p-4"
                                     >
-                                        <IconComponent className="w-5 h-5" />
+                                        {/* Header with Icon and Priority */}
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div
+                                                className={`p-2 rounded-lg bg-gradient-to-r ${resource.color} text-white`}
+                                            >
+                                                <IconComponent className="w-5 h-5" />
+                                            </div>
+                                            <span
+                                                className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(
+                                                    resource.priority
+                                                )}`}
+                                            >
+                                                {getPriorityLabel(
+                                                    resource.priority
+                                                )}
+                                            </span>
+                                        </div>
+
+                                        {/* Title */}
+                                        <h3 className="font-semibold text-gray-900 mb-2 text-sm">
+                                            {resource.name}
+                                        </h3>
+
+                                        {/* Description */}
+                                        <p className="text-gray-600 text-xs mb-3 line-clamp-2">
+                                            {resource.description}
+                                        </p>
+
+                                        {/* Meta Info */}
+                                        <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                                            <span className="flex items-center gap-1">
+                                                <FileText className="w-3 h-3" />
+                                                {resource.type}
+                                            </span>
+                                            <span>{resource.size}</span>
+                                        </div>
+
+                                        {/* Downloads Count */}
+                                        <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                                            <span className="flex items-center gap-1">
+                                                <Download className="w-3 h-3" />
+                                                {resource.downloads} downloads
+                                            </span>
+                                            <span>{resource.date}</span>
+                                        </div>
+
+                                        {/* Action Button */}
+                                        {resource.type === "Link" ? (
+                                            <a
+                                                href={resource.url}
+                                                target={
+                                                    resource.url?.startsWith(
+                                                        "http"
+                                                    )
+                                                        ? "_blank"
+                                                        : "_self"
+                                                }
+                                                rel={
+                                                    resource.url?.startsWith(
+                                                        "http"
+                                                    )
+                                                        ? "noopener noreferrer"
+                                                        : ""
+                                                }
+                                                className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-500 text-white text-xs font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                                            >
+                                                <ExternalLink className="w-3 h-3" />
+                                                Visit
+                                            </a>
+                                        ) : (
+                                            <button
+                                                onClick={() =>
+                                                    handleDownload(resource)
+                                                }
+                                                className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-green-500 text-white text-xs font-medium rounded-lg hover:bg-green-600 transition-colors"
+                                            >
+                                                <Download className="w-3 h-3" />
+                                                Download
+                                            </button>
+                                        )}
                                     </div>
-                                    <span
-                                        className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(
-                                            resource.priority
-                                        )}`}
-                                    >
-                                        {getPriorityLabel(resource.priority)}
-                                    </span>
-                                </div>
-
-                                {/* Title */}
-                                <h3 className="font-semibold text-gray-900 mb-2 text-sm">
-                                    {resource.name}
-                                </h3>
-
-                                {/* Description */}
-                                <p className="text-gray-600 text-xs mb-3 line-clamp-2">
-                                    {resource.description}
-                                </p>
-
-                                {/* Meta Info */}
-                                <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                                    <span className="flex items-center gap-1">
-                                        <FileText className="w-3 h-3" />
-                                        {resource.type}
-                                    </span>
-                                    <span>{resource.size}</span>
-                                </div>
-
-                                {/* Action Button */}
-                                {resource.type === "Link" ? (
-                                    <a
-                                        href={resource.url}
-                                        target={
-                                            resource.url.startsWith("http")
-                                                ? "_blank"
-                                                : "_self"
-                                        }
-                                        rel={
-                                            resource.url.startsWith("http")
-                                                ? "noopener noreferrer"
-                                                : ""
-                                        }
-                                        className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-500 text-white text-xs font-medium rounded-lg hover:bg-blue-600 transition-colors"
-                                    >
-                                        <ExternalLink className="w-3 h-3" />
-                                        Visit
-                                    </a>
-                                ) : (
-                                    <button className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-green-500 text-white text-xs font-medium rounded-lg hover:bg-green-600 transition-colors">
-                                        <Download className="w-3 h-3" />
-                                        Download
-                                    </button>
-                                )}
-                            </div>
-                        );
-                    })}
-                </div>
+                                );
+                            })}
+                        </div>
+                    </>
+                )}
 
                 {/* No Results */}
                 {filteredResources.length === 0 && (

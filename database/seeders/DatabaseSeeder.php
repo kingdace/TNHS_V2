@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             SchoolSealInfoSeeder::class,
             SchoolSealSymbolicElementSeeder::class,
             SchoolSealCoreValueSeeder::class,
+            ComprehensiveStaffSeeder::class,
         ]);
     }
 }

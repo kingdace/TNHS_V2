@@ -64,7 +64,7 @@ class ContactInfoSeeder extends Seeder
             [
                 'contact_type' => 'address',
                 'title' => 'School Address',
-                'value' => 'Taft, Eastern Samar, Philippines',
+                'value' => 'Taft, Surigao City, Philippines',
                 'icon' => 'map-pin',
                 'display_order' => 7,
                 'is_active' => true,

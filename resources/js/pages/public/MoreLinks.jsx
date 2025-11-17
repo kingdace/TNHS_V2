@@ -73,9 +73,9 @@ const MoreLinks = () => {
         },
         {
             id: 5,
-            title: "Eastern Samar Division Office",
-            url: "https://www.deped.gov.ph/region8",
-            description: "Regional office of DepEd in Eastern Samar",
+            title: "Surigao City Division Office",
+            url: "https://www.deped.gov.ph/region13",
+            description: "Regional office of DepEd in Surigao City",
             category: "government",
             icon: Users,
             color: "from-red-500 to-red-600",

@@ -43,7 +43,7 @@ const ContactGeneral = () => {
             icon: MapPin,
             title: "Address",
             details:
-                "Taft National High School\nTaft, Eastern Samar\nPhilippines 6816",
+                "Taft National High School\nTaft, Surigao City\nPhilippines 8400",
             color: "from-blue-500 to-blue-600",
         },
         {

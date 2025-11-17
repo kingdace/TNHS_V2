@@ -43,12 +43,13 @@ import ContactSupport from "../pages/public/ContactSupport";
 
 // Faculty Pages
 import Faculties from "../pages/public/Faculties";
+import EnhancedFaculties from "../pages/public/EnhancedFaculties";
 import Principal from "../pages/public/faculty/Principal";
 import AssistantPrincipal from "../pages/public/faculty/AssistantPrincipal";
 import TeachingStaff from "../pages/public/faculty/TeachingStaff";
+import EnhancedStaff from "../pages/public/faculty/EnhancedStaff";
 import AdministrativeStaff from "../pages/public/faculty/AdministrativeStaff";
 import SupportStaff from "../pages/public/faculty/SupportStaff";
-import Staff from "../pages/public/faculty/Staff";
 
 // More Pages
 import MoreResources from "../pages/public/MoreResources";
@@ -74,7 +75,12 @@ import AdminEvents from "../pages/admin/Events.jsx";
 import AboutManagement from "../pages/admin/About";
 import NewsEventsManagement from "../pages/admin/NewsEvents";
 import PrincipalCorner from "../pages/admin/PrincipalCorner";
+import PrincipalProfile from "../pages/admin/PrincipalProfile";
+import PrincipalAwards from "../pages/admin/PrincipalAwards";
+import PrincipalManagement from "../pages/admin/PrincipalManagement";
 import StaffProfiles from "../pages/admin/StaffProfiles";
+import Resources from "../pages/admin/Resources";
+import AdminGallery from "../pages/admin/Gallery";
 import HistoryManagement from "../pages/admin/about/HistoryManagement";
 import MissionVisionManagement from "../pages/admin/about/MissionVisionManagement";
 import SchoolSealManagement from "../pages/admin/about/SchoolSealManagement";
@@ -199,7 +205,10 @@ function App() {
                                 path="contact/support"
                                 element={<ContactSupport />}
                             />
-                            <Route path="faculty" element={<Faculties />} />
+                            <Route
+                                path="faculty"
+                                element={<EnhancedFaculties />}
+                            />
                             <Route
                                 path="faculty/principal"
                                 element={<Principal />}
@@ -210,11 +219,11 @@ function App() {
                             />
                             <Route
                                 path="faculty/teaching-staff"
-                                element={<TeachingStaff />}
+                                element={<EnhancedStaff />}
                             />
                             <Route
                                 path="faculty/administrative-staff"
-                                element={<Staff />}
+                                element={<AdministrativeStaff />}
                             />
                             <Route
                                 path="faculty/support-staff"
@@ -344,8 +353,28 @@ function App() {
                                     element={<PrincipalCorner />}
                                 />
                                 <Route
+                                    path="principal-profile"
+                                    element={<PrincipalProfile />}
+                                />
+                                <Route
+                                    path="principal-awards"
+                                    element={<PrincipalAwards />}
+                                />
+                                <Route
+                                    path="principal"
+                                    element={<PrincipalManagement />}
+                                />
+                                <Route
                                     path="staff-profiles"
                                     element={<StaffProfiles />}
+                                />
+                                <Route
+                                    path="resources"
+                                    element={<Resources />}
+                                />
+                                <Route
+                                    path="gallery"
+                                    element={<AdminGallery />}
                                 />
                             </Route>
                         </Route>

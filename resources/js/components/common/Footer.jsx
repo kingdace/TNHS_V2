@@ -36,7 +36,7 @@ const Footer = () => {
                         </div>
                         <p className="text-blue-100 text-sm mb-4 leading-relaxed">
                             Empowering students with quality education and
-                            fostering academic excellence in Eastern Samar.
+                            fostering academic excellence in Surigao City.
                         </p>
                         <div className="flex space-x-3">
                             <a

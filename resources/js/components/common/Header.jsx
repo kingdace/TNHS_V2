@@ -45,12 +45,6 @@ const Header = () => {
         {
             name: "Faculty and Staff",
             href: "/faculty",
-            hasDropdown: true,
-            submenu: [
-                { name: "Assistant", href: "/faculty/assistant-principal" },
-                { name: "Faculties", href: "/faculty" },
-                { name: "Staff", href: "/faculty/administrative-staff" },
-            ],
         },
         { name: "Principal Corner", href: "/faculty/principal" },
         {
@@ -85,7 +79,7 @@ const Header = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center h-20">
                     {/* Logo and School Name */}
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-1">
                         <div className="relative">
                             <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center shadow-lg overflow-hidden">
                                 <img
@@ -106,7 +100,7 @@ const Header = () => {
                     </div>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden lg:flex items-center space-x-1 ml-auto">
+                    <nav className="hidden lg:flex items-center space-x-1 ml-2">
                         {navigation.map((item) => (
                             <div key={item.name} className="relative group">
                                 {item.hasDropdown ? (

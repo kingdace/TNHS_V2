@@ -22,14 +22,15 @@ const FacultyIndex = () => {
         },
         {
             name: "Teaching Staff",
-            description: "Our dedicated educators and mentors",
+            description: "Our dedicated educators organized by grade levels",
             icon: GraduationCap,
             color: "purple",
             href: "/faculty/teaching-staff",
             features: [
                 "Grade 7-12 Teachers",
-                "ALS Teacher",
-                "Quick Navigation",
+                "Subject Specializations",
+                "Department Heads",
+                "ALS Program",
             ],
         },
         {
@@ -75,16 +76,27 @@ const FacultyIndex = () => {
     return (
         <div className="min-h-screen bg-gray-50 pt-24 pb-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header */}
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                        Our Faculty & Staff
-                    </h1>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Meet the dedicated professionals who make TNHS a center
-                        of educational excellence. Each team member plays a
-                        vital role in our mission to provide quality education.
-                    </p>
+                {/* Compact Header */}
+                <div className="mb-8 text-center relative">
+                    {/* Subtle glow effect */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-purple-200/40 to-blue-200/30 blur-3xl rounded-full"></div>
+
+                    <div className="relative">
+                        <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-purple-600 via-blue-600 to-purple-700 bg-clip-text text-transparent mb-3 tracking-tight">
+                            Faculty & Staff Directory
+                        </h1>
+                        <div className="flex items-center justify-center space-x-3 mb-2">
+                            <div className="h-1 w-16 bg-gradient-to-r from-transparent via-purple-400 to-purple-500 rounded-full"></div>
+                            <User className="w-6 h-6 text-purple-500" />
+                            <div className="h-1 w-16 bg-gradient-to-r from-purple-500 via-purple-400 to-transparent rounded-full"></div>
+                        </div>
+                        <p className="text-base font-semibold text-gray-700">
+                            Taft National High School
+                        </p>
+                        <p className="text-sm text-purple-600 font-medium italic">
+                            Meet our dedicated professionals
+                        </p>
+                    </div>
                 </div>
 
                 {/* Faculty Categories Grid */}

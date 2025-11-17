@@ -76,6 +76,16 @@ const AdminLayout = () => {
             icon: School,
         },
         {
+            name: "Resources",
+            href: "/admin/resources",
+            icon: Download,
+        },
+        {
+            name: "Gallery",
+            href: "/admin/gallery",
+            icon: Image,
+        },
+        {
             name: "About Management",
             href: "/admin/about",
             icon: FileText,
@@ -150,6 +160,8 @@ const AdminLayout = () => {
         if (path.includes("/admin/about")) return "About Management";
         if (path.includes("/admin/page-content")) return "Page Content";
         if (path.includes("/admin/users")) return "User Management";
+        if (path.includes("/admin/resources")) return "Resources Management";
+        if (path.includes("/admin/gallery")) return "Gallery Management";
         if (path.includes("/admin/download-files")) return "Download Files";
         if (path.includes("/admin/external-links")) return "External Links";
 

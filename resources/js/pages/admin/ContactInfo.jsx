@@ -52,7 +52,7 @@ const ContactInfo = () => {
             value: "address",
             label: "Address",
             icon: MapPin,
-            placeholder: "Taft, Eastern Samar, Philippines",
+            placeholder: "Taft, Surigao City, Philippines",
         },
         {
             value: "hours",
