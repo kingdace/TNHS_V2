@@ -56,6 +56,8 @@ const Gallery = () => {
     });
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [deleting, setDeleting] = useState(false);
 
     const categories = [
         { value: "all", label: "All Categories" },
@@ -90,8 +92,22 @@ const Gallery = () => {
         setErrors({});
 
         try {
-            // Validate file size
-            if (formData.image && !editingImage) {
+            // Validate required fields
+            if (!formData.title.trim()) {
+                setErrors({ title: ["Title is required"] });
+                setSubmitting(false);
+                return;
+            }
+
+            // Validate file for new images
+            if (!editingImage && !formData.image) {
+                setErrors({ image: ["Image is required for new entries"] });
+                setSubmitting(false);
+                return;
+            }
+
+            // Validate file size if image is provided
+            if (formData.image) {
                 const maxSize = 10 * 1024 * 1024; // 10MB
                 if (formData.image.size > maxSize) {
                     setErrors({
@@ -106,14 +122,38 @@ const Gallery = () => {
                     setSubmitting(false);
                     return;
                 }
+
+                // Validate file type
+                const allowedTypes = [
+                    "image/jpeg",
+                    "image/jpg",
+                    "image/png",
+                    "image/gif",
+                    "image/webp",
+                ];
+                if (!allowedTypes.includes(formData.image.type)) {
+                    setErrors({
+                        image: [
+                            "Please select a valid image file (JPEG, PNG, GIF, or WebP)",
+                        ],
+                    });
+                    setSubmitting(false);
+                    return;
+                }
             }
 
             const form = new FormData();
+
+            // Add all form fields
             Object.entries(formData).forEach(([key, value]) => {
-                if (value !== null && value !== undefined && value !== "") {
+                if (value !== null && value !== undefined) {
+                    if (key === "image" && !value) {
+                        // Skip empty image field for updates
+                        return;
+                    }
                     if (typeof value === "boolean") {
                         form.append(key, value ? "1" : "0");
-                    } else {
+                    } else if (value !== "") {
                         form.append(key, value);
                     }
                 }
@@ -121,30 +161,52 @@ const Gallery = () => {
 
             let response;
             if (editingImage) {
+                console.log("Attempting to update image:", editingImage.id);
+                console.log(
+                    "Form data being sent:",
+                    Array.from(form.entries())
+                );
                 response = await adminService.gallery.update(
                     editingImage.id,
                     form
                 );
             } else {
+                console.log("Attempting to create new image");
+                console.log(
+                    "Form data being sent:",
+                    Array.from(form.entries())
+                );
                 response = await adminService.gallery.create(form);
             }
 
+            console.log("Submit response:", response);
+
             if (response && response.success) {
+                console.log("Operation successful, refreshing images...");
                 await fetchImages();
                 resetForm();
                 setShowForm(false);
             } else {
+                console.error("Operation failed:", response);
                 if (response && response.errors) {
                     setErrors(response.errors);
                 } else {
                     setErrors({
-                        general: response?.message || "Failed to save image",
+                        general:
+                            response?.message ||
+                            `Failed to ${
+                                editingImage ? "update" : "create"
+                            } image`,
                     });
                 }
             }
         } catch (error) {
             console.error("Error saving image:", error);
-            setErrors({ general: "Failed to save image: " + error.message });
+            setErrors({
+                general:
+                    `Failed to ${editingImage ? "update" : "create"} image: ` +
+                    error.message,
+            });
         } finally {
             setSubmitting(false);
         }
@@ -152,6 +214,22 @@ const Gallery = () => {
 
     const handleEdit = (image) => {
         setEditingImage(image);
+
+        // Format date for HTML date input (yyyy-MM-dd)
+        let formattedDate = "";
+        if (image.event_date) {
+            try {
+                // Handle both ISO format and simple date format
+                const date = new Date(image.event_date);
+                if (!isNaN(date.getTime())) {
+                    formattedDate = date.toISOString().split("T")[0];
+                }
+            } catch (error) {
+                console.warn("Error formatting date:", error);
+                formattedDate = "";
+            }
+        }
+
         setFormData({
             title: image.title,
             description: image.description || "",
@@ -159,7 +237,7 @@ const Gallery = () => {
             image: null,
             alt_text: image.alt_text || "",
             tags: image.tags ? image.tags.join(", ") : "",
-            event_date: image.event_date || "",
+            event_date: formattedDate,
             photographer: image.photographer || "",
             is_featured: image.is_featured,
             is_active: image.is_active,
@@ -168,14 +246,34 @@ const Gallery = () => {
         setShowForm(true);
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm("Are you sure you want to delete this image?")) {
-            try {
-                await adminService.gallery.delete(id);
+    const handleDelete = (image) => {
+        setDeleteConfirm(image);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteConfirm) return;
+
+        setDeleting(true);
+        try {
+            console.log("Attempting to delete image:", deleteConfirm.id);
+            const response = await adminService.gallery.delete(
+                deleteConfirm.id
+            );
+            console.log("Delete response:", response);
+
+            if (response && response.success) {
+                console.log("Delete successful, refreshing images...");
                 await fetchImages();
-            } catch (error) {
-                console.error("Error deleting image:", error);
+                setDeleteConfirm(null);
+            } else {
+                console.error("Delete failed:", response?.message);
+                alert(`Delete failed: ${response?.message || "Unknown error"}`);
             }
+        } catch (error) {
+            console.error("Error deleting image:", error);
+            alert(`Error deleting image: ${error.message}`);
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -473,7 +571,7 @@ const Gallery = () => {
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => handleDelete(image.id)}
+                                        onClick={() => handleDelete(image)}
                                         className="flex-1 text-red-600 hover:text-red-700"
                                     >
                                         <Trash2 className="w-3 h-3" />
@@ -569,7 +667,7 @@ const Gallery = () => {
                                                     variant="outline"
                                                     size="sm"
                                                     onClick={() =>
-                                                        handleDelete(image.id)
+                                                        handleDelete(image)
                                                     }
                                                     className="text-red-600 hover:text-red-700"
                                                 >
@@ -939,6 +1037,78 @@ const Gallery = () => {
                 </div>
             )}
 
+            {/* Delete Confirmation Modal */}
+            {deleteConfirm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg max-w-md w-full">
+                        <div className="p-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                    <AlertCircle className="w-5 h-5 text-red-600" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900">
+                                        Delete Image
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        This action cannot be undone
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="mb-4">
+                                <div className="flex gap-3">
+                                    <img
+                                        src={
+                                            deleteConfirm.thumbnail_url ||
+                                            deleteConfirm.image_url
+                                        }
+                                        alt={deleteConfirm.title}
+                                        className="w-16 h-16 object-cover rounded-lg"
+                                    />
+                                    <div>
+                                        <p className="font-medium text-gray-900">
+                                            {deleteConfirm.title}
+                                        </p>
+                                        <p className="text-sm text-gray-600">
+                                            {deleteConfirm.category_label}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p className="text-gray-600 mb-6">
+                                Are you sure you want to delete this image? It
+                                will be moved to trash and can be restored
+                                later.
+                            </p>
+
+                            <div className="flex justify-end gap-3">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setDeleteConfirm(null)}
+                                    disabled={deleting}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={confirmDelete}
+                                    disabled={deleting}
+                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                >
+                                    {deleting ? (
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                    ) : (
+                                        <Trash2 className="w-4 h-4 mr-2" />
+                                    )}
+                                    Delete Image
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Image Preview Modal */}
             {selectedImage && (
                 <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
@@ -1024,6 +1194,516 @@ const Gallery = () => {
                     </div>
                 </div>
             )}
+
+            {/* Bulk Upload Modal */}
+            {showBulkUpload && (
+                <BulkUploadModal
+                    onClose={() => setShowBulkUpload(false)}
+                    onSuccess={() => {
+                        setShowBulkUpload(false);
+                        fetchImages();
+                    }}
+                    categories={categories.filter((cat) => cat.value !== "all")}
+                />
+            )}
+        </div>
+    );
+};
+
+// Bulk Upload Modal Component
+const BulkUploadModal = ({ onClose, onSuccess, categories }) => {
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState({});
+    const [formData, setFormData] = useState({
+        title: "", // Will be used as prefix for auto-generated titles
+        description: "",
+        category: "events",
+        alt_text: "", // Will be used as prefix for auto-generated alt text
+        tags: "",
+        event_date: "",
+        photographer: "",
+        is_featured: false,
+        is_active: true,
+        display_order: 0,
+    });
+    const [errors, setErrors] = useState({});
+
+    const handleFileSelect = (e) => {
+        const files = Array.from(e.target.files);
+        const validFiles = [];
+        const newErrors = {};
+
+        files.forEach((file, index) => {
+            // Validate file type
+            if (!file.type.startsWith("image/")) {
+                newErrors[`file_${index}`] = "Only image files are allowed";
+                return;
+            }
+
+            // Validate file size (10MB max)
+            const maxSize = 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                newErrors[
+                    `file_${index}`
+                ] = `File size must be less than 10MB. Current: ${(
+                    file.size /
+                    1024 /
+                    1024
+                ).toFixed(2)}MB`;
+                return;
+            }
+
+            validFiles.push({
+                file,
+                id: Date.now() + index,
+                name: file.name,
+                size: file.size,
+                preview: URL.createObjectURL(file),
+                status: "pending",
+            });
+        });
+
+        setSelectedFiles((prev) => [...prev, ...validFiles]);
+        setErrors(newErrors);
+    };
+
+    const removeFile = (fileId) => {
+        setSelectedFiles((prev) => {
+            const updated = prev.filter((f) => f.id !== fileId);
+            // Clean up object URL
+            const fileToRemove = prev.find((f) => f.id === fileId);
+            if (fileToRemove) {
+                URL.revokeObjectURL(fileToRemove.preview);
+            }
+            return updated;
+        });
+    };
+
+    const handleBulkUpload = async () => {
+        if (selectedFiles.length === 0) {
+            setErrors({ general: "Please select at least one image" });
+            return;
+        }
+
+        setUploading(true);
+        setErrors({});
+
+        try {
+            const form = new FormData();
+
+            // Add files
+            selectedFiles.forEach((fileObj) => {
+                form.append("images[]", fileObj.file);
+            });
+
+            // Add metadata
+            form.append("category", formData.category);
+            if (formData.title) form.append("title", formData.title);
+            if (formData.description)
+                form.append("description", formData.description);
+            if (formData.alt_text) form.append("alt_text", formData.alt_text);
+            if (formData.tags) form.append("tags", formData.tags);
+            if (formData.event_date)
+                form.append("event_date", formData.event_date);
+            if (formData.photographer)
+                form.append("photographer", formData.photographer);
+            form.append("is_featured", formData.is_featured ? "1" : "0");
+            form.append("is_active", formData.is_active ? "1" : "0");
+            form.append("display_order", formData.display_order.toString());
+
+            const response = await adminService.gallery.bulkUpload(form);
+
+            console.log("Bulk upload response:", response);
+
+            if (response && response.success) {
+                // Clean up object URLs
+                selectedFiles.forEach((fileObj) => {
+                    URL.revokeObjectURL(fileObj.preview);
+                });
+
+                // Show success message if there were any uploads
+                if (response.data && response.data.length > 0) {
+                    console.log(
+                        `Successfully uploaded ${response.data.length} images`
+                    );
+                }
+
+                // Show any errors for individual files
+                if (response.errors && response.errors.length > 0) {
+                    console.warn("Some files had errors:", response.errors);
+                    setErrors({
+                        general: `${response.data.length} images uploaded successfully. ${response.errors.length} files had errors.`,
+                        details: response.errors,
+                    });
+                    // Still call onSuccess since some images were uploaded
+                    setTimeout(() => onSuccess(), 2000);
+                } else {
+                    onSuccess();
+                }
+            } else {
+                console.error("Bulk upload failed:", response);
+                setErrors(
+                    response?.errors || {
+                        general: response?.message || "Upload failed",
+                    }
+                );
+            }
+        } catch (error) {
+            console.error("Bulk upload error:", error);
+            setErrors({ general: "Upload failed: " + error.message });
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const formatFileSize = (bytes) => {
+        if (bytes === 0) return "0 Bytes";
+        const k = 1024;
+        const sizes = ["Bytes", "KB", "MB", "GB"];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="p-6">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold">
+                            Bulk Upload Images
+                        </h2>
+                        <Button variant="ghost" size="sm" onClick={onClose}>
+                            <X className="w-4 h-4" />
+                        </Button>
+                    </div>
+
+                    {/* File Selection */}
+                    <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Select Images
+                        </label>
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-royal-blue transition-colors">
+                            <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={handleFileSelect}
+                                className="hidden"
+                                id="bulk-file-input"
+                            />
+                            <label
+                                htmlFor="bulk-file-input"
+                                className="cursor-pointer"
+                            >
+                                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                                <p className="text-gray-600">
+                                    Click to select images or drag and drop
+                                </p>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Maximum 20 images, 10MB each
+                                </p>
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* Selected Files */}
+                    {selectedFiles.length > 0 && (
+                        <div className="mb-6">
+                            <h3 className="text-sm font-medium text-gray-700 mb-3">
+                                Selected Images ({selectedFiles.length})
+                            </h3>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-60 overflow-y-auto">
+                                {selectedFiles.map((fileObj) => (
+                                    <div
+                                        key={fileObj.id}
+                                        className="relative group"
+                                    >
+                                        <img
+                                            src={fileObj.preview}
+                                            alt={fileObj.name}
+                                            className="w-full h-24 object-cover rounded-lg"
+                                        />
+                                        <button
+                                            onClick={() =>
+                                                removeFile(fileObj.id)
+                                            }
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-lg">
+                                            <p className="truncate">
+                                                {fileObj.name}
+                                            </p>
+                                            <p>
+                                                {formatFileSize(fileObj.size)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Metadata Form */}
+                    <div className="space-y-4 mb-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Title Prefix
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.title}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            title: e.target.value,
+                                        })
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-blue focus:border-transparent"
+                                    placeholder="Optional prefix for all image titles (e.g., 'Graduation 2024')"
+                                />
+                                <p className="text-sm text-gray-500 mt-1">
+                                    If provided, will be used as: "Title Prefix
+                                    - filename"
+                                </p>
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Description
+                                </label>
+                                <textarea
+                                    value={formData.description}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            description: e.target.value,
+                                        })
+                                    }
+                                    rows={3}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-blue focus:border-transparent"
+                                    placeholder="Description for all images (optional)"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Category *
+                                </label>
+                                <select
+                                    value={formData.category}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            category: e.target.value,
+                                        })
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-blue focus:border-transparent"
+                                >
+                                    {categories.map((category) => (
+                                        <option
+                                            key={category.value}
+                                            value={category.value}
+                                        >
+                                            {category.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Event Date
+                                </label>
+                                <input
+                                    type="date"
+                                    value={formData.event_date}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            event_date: e.target.value,
+                                        })
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-blue focus:border-transparent"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Alt Text Prefix
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.alt_text}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            alt_text: e.target.value,
+                                        })
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-blue focus:border-transparent"
+                                    placeholder="Alt text prefix for accessibility"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Photographer
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.photographer}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            photographer: e.target.value,
+                                        })
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-blue focus:border-transparent"
+                                    placeholder="Photographer name"
+                                />
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Tags (comma-separated)
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.tags}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            tags: e.target.value,
+                                        })
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-blue focus:border-transparent"
+                                    placeholder="graduation, ceremony, students, achievement"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Display Order Start
+                                </label>
+                                <input
+                                    type="number"
+                                    value={formData.display_order}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            display_order:
+                                                parseInt(e.target.value) || 0,
+                                        })
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-royal-blue focus:border-transparent"
+                                    min="0"
+                                />
+                            </div>
+
+                            <div className="flex items-center space-x-4">
+                                <div className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        id="bulk_is_featured"
+                                        checked={formData.is_featured}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                is_featured: e.target.checked,
+                                            })
+                                        }
+                                        className="h-4 w-4 text-royal-blue focus:ring-royal-blue border-gray-300 rounded"
+                                    />
+                                    <label
+                                        htmlFor="bulk_is_featured"
+                                        className="ml-2 block text-sm text-gray-900"
+                                    >
+                                        Featured
+                                    </label>
+                                </div>
+
+                                <div className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        id="bulk_is_active"
+                                        checked={formData.is_active}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                is_active: e.target.checked,
+                                            })
+                                        }
+                                        className="h-4 w-4 text-royal-blue focus:ring-royal-blue border-gray-300 rounded"
+                                    />
+                                    <label
+                                        htmlFor="bulk_is_active"
+                                        className="ml-2 block text-sm text-gray-900"
+                                    >
+                                        Active
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Errors */}
+                    {Object.keys(errors).length > 0 && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            {Object.entries(errors).map(([key, error]) => (
+                                <div key={key}>
+                                    <p className="text-red-600 text-sm flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4" />
+                                        {Array.isArray(error)
+                                            ? error[0]
+                                            : error}
+                                    </p>
+                                    {key === "general" && errors.details && (
+                                        <div className="mt-2 ml-6">
+                                            {errors.details.map(
+                                                (detail, index) => (
+                                                    <p
+                                                        key={index}
+                                                        className="text-red-500 text-xs"
+                                                    >
+                                                        • {detail}
+                                                    </p>
+                                                )
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex justify-end gap-3">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={onClose}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleBulkUpload}
+                            disabled={uploading || selectedFiles.length === 0}
+                            className="bg-royal-blue hover:bg-blue-700"
+                        >
+                            {uploading ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            ) : (
+                                <Upload className="w-4 h-4 mr-2" />
+                            )}
+                            Upload {selectedFiles.length} Images
+                        </Button>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

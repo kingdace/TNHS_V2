@@ -7,7 +7,7 @@ use App\Models\GalleryImage;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Log;
 
 class GalleryController extends Controller
 {
@@ -135,9 +135,11 @@ class GalleryController extends Controller
     /**
      * Display the specified gallery image
      */
-    public function show(GalleryImage $galleryImage): JsonResponse
+    public function show($id): JsonResponse
     {
         try {
+            // Find the gallery image
+            $galleryImage = GalleryImage::findOrFail($id);
             $galleryImage->image_url = $galleryImage->image_url;
             $galleryImage->thumbnail_url = $galleryImage->thumbnail_url;
             $galleryImage->category_label = $galleryImage->category_label;
@@ -159,9 +161,18 @@ class GalleryController extends Controller
     /**
      * Update the specified gallery image
      */
-    public function update(Request $request, GalleryImage $galleryImage): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
         try {
+            // Find the gallery image
+            $galleryImage = GalleryImage::findOrFail($id);
+
+            Log::info('Gallery update request', [
+                'id' => $id,
+                'request_data' => $request->all(),
+                'has_file' => $request->hasFile('image')
+            ]);
+
             $validated = $request->validate([
                 'title' => 'sometimes|string|max:255',
                 'description' => 'nullable|string',
@@ -234,9 +245,17 @@ class GalleryController extends Controller
     /**
      * Remove the specified gallery image (soft delete)
      */
-    public function destroy(GalleryImage $galleryImage): JsonResponse
+    public function destroy($id): JsonResponse
     {
         try {
+            // Find the gallery image
+            $galleryImage = GalleryImage::findOrFail($id);
+
+            Log::info('Gallery delete request', [
+                'id' => $id,
+                'image_title' => $galleryImage->title
+            ]);
+
             $galleryImage->delete();
 
             return response()->json([
@@ -255,9 +274,11 @@ class GalleryController extends Controller
     /**
      * Toggle active status
      */
-    public function toggleActive(GalleryImage $galleryImage): JsonResponse
+    public function toggleActive($id): JsonResponse
     {
         try {
+            // Find the gallery image
+            $galleryImage = GalleryImage::findOrFail($id);
             $galleryImage->update(['is_active' => !$galleryImage->is_active]);
 
             return response()->json([
@@ -277,9 +298,11 @@ class GalleryController extends Controller
     /**
      * Toggle featured status
      */
-    public function toggleFeatured(GalleryImage $galleryImage): JsonResponse
+    public function toggleFeatured($id): JsonResponse
     {
         try {
+            // Find the gallery image
+            $galleryImage = GalleryImage::findOrFail($id);
             $galleryImage->update(['is_featured' => !$galleryImage->is_featured]);
 
             return response()->json([
@@ -302,40 +325,128 @@ class GalleryController extends Controller
     public function bulkUpload(Request $request): JsonResponse
     {
         try {
+            Log::info('Bulk upload started', [
+                'files_count' => $request->hasFile('images') ? count($request->file('images')) : 0,
+                'form_data' => $request->except(['images'])
+            ]);
+            // Handle both 'images' and 'images[]' field names
+            $images = $request->file('images') ?? $request->file('images');
+            if (!$images) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No images provided',
+                    'errors' => ['images' => ['At least one image is required']]
+                ], 422);
+            }
+
             $validated = $request->validate([
-                'images' => 'required|array|min:1|max:20',
-                'images.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:10240',
                 'category' => 'required|string|in:events,academic,sports,arts,facilities,community',
+                'title' => 'nullable|string|max:255',
+                'description' => 'nullable|string',
+                'alt_text' => 'nullable|string|max:255',
+                'tags' => 'nullable|string',
                 'event_date' => 'nullable|date',
                 'photographer' => 'nullable|string|max:255',
+                'is_featured' => 'boolean',
                 'is_active' => 'boolean',
+                'display_order' => 'nullable|integer|min:0',
             ]);
+
+            // Validate images manually
+            if (!is_array($images)) {
+                $images = [$images];
+            }
+
+            if (count($images) > 20) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Too many images',
+                    'errors' => ['images' => ['Maximum 20 images allowed']]
+                ], 422);
+            }
+
+            foreach ($images as $index => $image) {
+                if (!$image->isValid()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid image file',
+                        'errors' => ['images' => ["Image {$index} is invalid"]]
+                    ], 422);
+                }
+
+                // Check file size (10MB max)
+                if ($image->getSize() > 10240 * 1024) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'File too large',
+                        'errors' => ['images' => ["Image {$index} exceeds 10MB limit"]]
+                    ], 422);
+                }
+
+                // Check file type
+                $allowedMimes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                if (!in_array(strtolower($image->getClientOriginalExtension()), $allowedMimes)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid file type',
+                        'errors' => ['images' => ["Image {$index} must be jpg, jpeg, png, gif, or webp"]]
+                    ], 422);
+                }
+            }
 
             $uploadedImages = [];
             $errors = [];
 
-            foreach ($request->file('images') as $index => $image) {
+            foreach ($images as $index => $image) {
                 try {
                     $imagePath = $this->storeImage($image);
                     $thumbnailPath = $this->createThumbnail($image, $imagePath);
 
+                    $filename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+
+                    // Generate title: use prefix + filename if prefix provided, otherwise just filename
+                    $title = !empty($validated['title']) ? $validated['title'] . ' - ' . $filename : $filename;
+
+                    // Generate alt text: use prefix + filename if prefix provided, otherwise just filename
+                    $altText = !empty($validated['alt_text']) ? $validated['alt_text'] . ' - ' . $filename : $filename;
+
+                    // Process tags
+                    $tags = null;
+                    if (!empty($validated['tags'])) {
+                        $tags = array_map('trim', explode(',', $validated['tags']));
+                        $tags = array_filter($tags); // Remove empty values
+                    }
+
                     $galleryImage = GalleryImage::create([
-                        'title' => pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME),
+                        'title' => $title,
+                        'description' => $validated['description'] ?? null,
                         'category' => $validated['category'],
                         'image_path' => $imagePath,
                         'thumbnail_path' => $thumbnailPath,
-                        'alt_text' => pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME),
-                        'event_date' => $validated['event_date'],
-                        'photographer' => $validated['photographer'],
+                        'alt_text' => $altText,
+                        'tags' => $tags,
+                        'event_date' => $validated['event_date'] ?? null,
+                        'photographer' => $validated['photographer'] ?? null,
+                        'is_featured' => $request->boolean('is_featured', false),
                         'is_active' => $request->boolean('is_active', true),
-                        'display_order' => $index,
+                        'display_order' => ($validated['display_order'] ?? 0) + $index,
                     ]);
+
+                    // Add URLs to response (consistent with single upload)
+                    $galleryImage->image_url = $galleryImage->image_url;
+                    $galleryImage->thumbnail_url = $galleryImage->thumbnail_url;
+                    $galleryImage->category_label = $galleryImage->category_label;
 
                     $uploadedImages[] = $galleryImage;
                 } catch (\Exception $e) {
                     $errors[] = "Failed to upload image {$index}: " . $e->getMessage();
                 }
             }
+
+            Log::info('Bulk upload completed', [
+                'uploaded_count' => count($uploadedImages),
+                'errors_count' => count($errors)
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -350,6 +461,11 @@ class GalleryController extends Controller
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
+            Log::error('Bulk upload failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to upload images',
@@ -452,7 +568,7 @@ class GalleryController extends Controller
     /**
      * Create thumbnail
      */
-    private function createThumbnail($image, $originalPath): string
+    private function createThumbnail($image, $originalPath): ?string
     {
         try {
             $thumbnailPath = 'gallery/thumbnails/' . basename($originalPath);
@@ -464,18 +580,9 @@ class GalleryController extends Controller
                 mkdir($thumbnailDir, 0755, true);
             }
 
-            // Create thumbnail using Intervention Image (if available) or basic resize
-            if (class_exists('Intervention\Image\Facades\Image')) {
-                $img = Image::make($image->getRealPath());
-                $img->resize(400, 300, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                });
-                $img->save($fullThumbnailPath, 80);
-            } else {
-                // Fallback: copy original image as thumbnail
-                copy(storage_path('app/public/' . $originalPath), $fullThumbnailPath);
-            }
+            // For now, copy original image as thumbnail
+            // TODO: Implement proper thumbnail generation when GD extension is available
+            copy(storage_path('app/public/' . $originalPath), $fullThumbnailPath);
 
             return $thumbnailPath;
         } catch (\Exception $e) {
@@ -483,4 +590,6 @@ class GalleryController extends Controller
             return null;
         }
     }
+
+
 }
