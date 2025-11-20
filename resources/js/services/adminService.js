@@ -88,11 +88,13 @@ export const adminService = {
         async getAll(filters = {}) {
             try {
                 const query = new URLSearchParams(filters).toString();
-                const response = await fetch(`/api/admin/events?${query}`, {
-                    method: "GET",
-                    headers: getHeaders(),
-                    credentials: "include",
-                });
+                const response = await makeRequest(
+                    `/api/admin/events?${query}`,
+                    {
+                        method: "GET",
+                        headers: getHeaders(),
+                    }
+                );
                 if (!response.ok)
                     throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
@@ -113,23 +115,21 @@ export const adminService = {
                             form.append(k, v ? "1" : "0");
                         else form.append(k, v);
                     });
-                    const response = await fetch(`/api/admin/events`, {
+                    const response = await makeRequest(`/api/admin/events`, {
                         method: "POST",
                         headers: {
                             Accept: "application/json",
                             "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
                         },
-                        credentials: "include",
                         body: form,
                     });
                     if (!response.ok)
                         throw new Error(`HTTP ${response.status}`);
                     return await response.json();
                 } else {
-                    const response = await fetch(`/api/admin/events`, {
+                    const response = await makeRequest(`/api/admin/events`, {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                         body: JSON.stringify(payload),
                     });
                     if (!response.ok)
@@ -152,25 +152,29 @@ export const adminService = {
                             form.append(k, v ? "1" : "0");
                         else form.append(k, v);
                     });
-                    const response = await fetch(`/api/admin/events/${id}`, {
-                        method: "POST",
-                        headers: {
-                            Accept: "application/json",
-                            "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
-                        },
-                        credentials: "include",
-                        body: form,
-                    });
+                    const response = await makeRequest(
+                        `/api/admin/events/${id}`,
+                        {
+                            method: "POST",
+                            headers: {
+                                Accept: "application/json",
+                                "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
+                            },
+                            body: form,
+                        }
+                    );
                     if (!response.ok)
                         throw new Error(`HTTP ${response.status}`);
                     return await response.json();
                 } else {
-                    const response = await fetch(`/api/admin/events/${id}`, {
-                        method: "PUT",
-                        headers: getHeaders(),
-                        credentials: "include",
-                        body: JSON.stringify(payload),
-                    });
+                    const response = await makeRequest(
+                        `/api/admin/events/${id}`,
+                        {
+                            method: "PUT",
+                            headers: getHeaders(),
+                            body: JSON.stringify(payload),
+                        }
+                    );
                     if (!response.ok)
                         throw new Error(`HTTP ${response.status}`);
                     return await response.json();
@@ -182,10 +186,9 @@ export const adminService = {
         },
         async delete(id) {
             try {
-                const response = await fetch(`/api/admin/events/${id}`, {
+                const response = await makeRequest(`/api/admin/events/${id}`, {
                     method: "DELETE",
                     headers: getHeaders(),
-                    credentials: "include",
                 });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 return await response.json();
@@ -202,10 +205,9 @@ export const adminService = {
         // Get all hero carousel slides
         async getAll() {
             try {
-                const response = await fetch(`/api/admin/hero-carousel`, {
+                const response = await makeRequest(`/api/admin/hero-carousel`, {
                     method: "GET",
                     headers: getHeaders(),
-                    credentials: "include",
                 });
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -221,11 +223,13 @@ export const adminService = {
         // Get a specific slide
         async getById(id) {
             try {
-                const response = await fetch(`/api/admin/hero-carousel/${id}`, {
-                    method: "GET",
-                    headers: getHeaders(),
-                    credentials: "include",
-                });
+                const response = await makeRequest(
+                    `/api/admin/hero-carousel/${id}`,
+                    {
+                        method: "GET",
+                        headers: getHeaders(),
+                    }
+                );
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -251,14 +255,13 @@ export const adminService = {
                     }
                 });
 
-                const response = await fetch(`/api/admin/hero-carousel`, {
+                const response = await makeRequest(`/api/admin/hero-carousel`, {
                     method: "POST",
                     // Do not set Content-Type for FormData; browser will set boundary
                     headers: {
                         Accept: "application/json",
                         "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
                     },
-                    credentials: "include",
                     body: form,
                 });
 
@@ -292,15 +295,17 @@ export const adminService = {
                     }
                 });
 
-                const response = await fetch(`/api/admin/hero-carousel/${id}`, {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json",
-                        "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
-                    },
-                    credentials: "include",
-                    body: form,
-                });
+                const response = await makeRequest(
+                    `/api/admin/hero-carousel/${id}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": getHeaders()["X-CSRF-TOKEN"],
+                        },
+                        body: form,
+                    }
+                );
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -321,11 +326,13 @@ export const adminService = {
         // Delete a slide (soft delete)
         async delete(id) {
             try {
-                const response = await fetch(`/api/admin/hero-carousel/${id}`, {
-                    method: "DELETE",
-                    headers: getHeaders(),
-                    credentials: "include",
-                });
+                const response = await makeRequest(
+                    `/api/admin/hero-carousel/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: getHeaders(),
+                    }
+                );
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -346,12 +353,11 @@ export const adminService = {
         // Get trashed slides
         async getTrashed() {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/hero-carousel-trashed`,
                     {
                         method: "GET",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -373,12 +379,11 @@ export const adminService = {
         // Restore a slide from trash
         async restore(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/hero-carousel/${id}/restore`,
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -401,12 +406,11 @@ export const adminService = {
         // Permanently delete a slide
         async forceDelete(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/hero-carousel/${id}/force`,
                     {
                         method: "DELETE",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -438,12 +442,11 @@ export const adminService = {
         async getAll(filters = {}) {
             try {
                 const queryParams = new URLSearchParams(filters);
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/academic-programs?${queryParams}`,
                     {
                         method: "GET",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -462,12 +465,14 @@ export const adminService = {
         // Create a new academic program
         async create(programData) {
             try {
-                const response = await fetch("/api/admin/academic-programs", {
-                    method: "POST",
-                    headers: getHeaders(),
-                    credentials: "include",
-                    body: JSON.stringify(programData),
-                });
+                const response = await makeRequest(
+                    "/api/admin/academic-programs",
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                        body: JSON.stringify(programData),
+                    }
+                );
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -488,12 +493,11 @@ export const adminService = {
         // Update an academic program
         async update(id, programData) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/academic-programs/${id}`,
                     {
                         method: "PUT",
                         headers: getHeaders(),
-                        credentials: "include",
                         body: JSON.stringify(programData),
                     }
                 );
@@ -517,12 +521,11 @@ export const adminService = {
         // Delete an academic program
         async delete(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/academic-programs/${id}`,
                     {
                         method: "DELETE",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -545,12 +548,11 @@ export const adminService = {
         // Toggle active status
         async toggleActive(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/admin/academic-programs/${id}/toggle-active`,
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -573,12 +575,11 @@ export const adminService = {
         // Reorder programs
         async reorder(programs) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     "/api/admin/academic-programs/reorder",
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                         body: JSON.stringify({ programs }),
                     }
                 );
@@ -608,12 +609,11 @@ export const adminService = {
         async getAll(filters = {}) {
             try {
                 const queryParams = new URLSearchParams(filters);
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/school-info?${queryParams}`,
                     {
                         method: "GET",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -632,10 +632,9 @@ export const adminService = {
         // Create new school information
         async create(infoData) {
             try {
-                const response = await fetch("/api/admin/school-info", {
+                const response = await makeRequest("/api/admin/school-info", {
                     method: "POST",
                     headers: getHeaders(),
-                    credentials: "include",
                     body: JSON.stringify(infoData),
                 });
 
@@ -658,12 +657,14 @@ export const adminService = {
         // Update school information
         async update(id, infoData) {
             try {
-                const response = await fetch(`/api/admin/school-info/${id}`, {
-                    method: "PUT",
-                    headers: getHeaders(),
-                    credentials: "include",
-                    body: JSON.stringify(infoData),
-                });
+                const response = await makeRequest(
+                    `/api/admin/school-info/${id}`,
+                    {
+                        method: "PUT",
+                        headers: getHeaders(),
+                        body: JSON.stringify(infoData),
+                    }
+                );
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -684,11 +685,13 @@ export const adminService = {
         // Delete school information
         async delete(id) {
             try {
-                const response = await fetch(`/api/admin/school-info/${id}`, {
-                    method: "DELETE",
-                    headers: getHeaders(),
-                    credentials: "include",
-                });
+                const response = await makeRequest(
+                    `/api/admin/school-info/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: getHeaders(),
+                    }
+                );
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -709,12 +712,11 @@ export const adminService = {
         // Toggle active status
         async toggleActive(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/admin/school-info/${id}/toggle-active`,
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -740,12 +742,14 @@ export const adminService = {
         // Reorder school information
         async reorder(info) {
             try {
-                const response = await fetch("/api/admin/school-info/reorder", {
-                    method: "POST",
-                    headers: getHeaders(),
-                    credentials: "include",
-                    body: JSON.stringify({ info }),
-                });
+                const response = await makeRequest(
+                    "/api/admin/school-info/reorder",
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                        body: JSON.stringify({ info }),
+                    }
+                );
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -772,12 +776,11 @@ export const adminService = {
         async getAll(filters = {}) {
             try {
                 const queryParams = new URLSearchParams(filters);
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/contact-info?${queryParams}`,
                     {
                         method: "GET",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -796,10 +799,9 @@ export const adminService = {
         // Create new contact information
         async create(infoData) {
             try {
-                const response = await fetch("/api/admin/contact-info", {
+                const response = await makeRequest("/api/admin/contact-info", {
                     method: "POST",
                     headers: getHeaders(),
-                    credentials: "include",
                     body: JSON.stringify(infoData),
                 });
 
@@ -822,12 +824,14 @@ export const adminService = {
         // Update contact information
         async update(id, infoData) {
             try {
-                const response = await fetch(`/api/admin/contact-info/${id}`, {
-                    method: "PUT",
-                    headers: getHeaders(),
-                    credentials: "include",
-                    body: JSON.stringify(infoData),
-                });
+                const response = await makeRequest(
+                    `/api/admin/contact-info/${id}`,
+                    {
+                        method: "PUT",
+                        headers: getHeaders(),
+                        body: JSON.stringify(infoData),
+                    }
+                );
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -848,11 +852,13 @@ export const adminService = {
         // Delete contact information
         async delete(id) {
             try {
-                const response = await fetch(`/api/admin/contact-info/${id}`, {
-                    method: "DELETE",
-                    headers: getHeaders(),
-                    credentials: "include",
-                });
+                const response = await makeRequest(
+                    `/api/admin/contact-info/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: getHeaders(),
+                    }
+                );
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -873,12 +879,11 @@ export const adminService = {
         // Toggle active status
         async toggleActive(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/admin/contact-info/${id}/toggle-active`,
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -904,12 +909,11 @@ export const adminService = {
         // Reorder contact information
         async reorder(info) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     "/api/admin/contact-info/reorder",
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                         body: JSON.stringify({ info }),
                     }
                 );
@@ -2732,12 +2736,11 @@ export const adminService = {
         async getAll(filters = {}) {
             try {
                 const queryParams = new URLSearchParams(filters);
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/staff-profiles?${queryParams}`,
                     {
                         method: "GET",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -2868,11 +2871,13 @@ export const adminService = {
         // Get all principal profiles
         async getAll() {
             try {
-                const response = await fetch(`/api/admin/principal-profiles`, {
-                    method: "GET",
-                    headers: getHeaders(),
-                    credentials: "include",
-                });
+                const response = await makeRequest(
+                    `/api/admin/principal-profiles`,
+                    {
+                        method: "GET",
+                        headers: getHeaders(),
+                    }
+                );
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -2888,12 +2893,14 @@ export const adminService = {
         // Create principal profile
         async create(data) {
             try {
-                const response = await fetch(`/api/admin/principal-profiles`, {
-                    method: "POST",
-                    headers: getHeaders(),
-                    credentials: "include",
-                    body: JSON.stringify(data),
-                });
+                const response = await makeRequest(
+                    `/api/admin/principal-profiles`,
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                        body: JSON.stringify(data),
+                    }
+                );
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -2912,12 +2919,11 @@ export const adminService = {
         // Update principal profile
         async update(id, data) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/principal-profiles/${id}`,
                     {
                         method: "PUT",
                         headers: getHeaders(),
-                        credentials: "include",
                         body: JSON.stringify(data),
                     }
                 );
@@ -2939,12 +2945,11 @@ export const adminService = {
         // Delete principal profile
         async delete(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/principal-profiles/${id}`,
                     {
                         method: "DELETE",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -2965,12 +2970,11 @@ export const adminService = {
         // Toggle active status
         async toggleActive(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/principal-profiles/${id}/toggle-active`,
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -3016,12 +3020,14 @@ export const adminService = {
         // Create principal award
         async create(data) {
             try {
-                const response = await fetch(`/api/admin/principal-awards`, {
-                    method: "POST",
-                    headers: getHeaders(),
-                    credentials: "include",
-                    body: JSON.stringify(data),
-                });
+                const response = await makeRequest(
+                    `/api/admin/principal-awards`,
+                    {
+                        method: "POST",
+                        headers: getHeaders(),
+                        body: JSON.stringify(data),
+                    }
+                );
 
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -3040,12 +3046,11 @@ export const adminService = {
         // Update principal award
         async update(id, data) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/principal-awards/${id}`,
                     {
                         method: "PUT",
                         headers: getHeaders(),
-                        credentials: "include",
                         body: JSON.stringify(data),
                     }
                 );
@@ -3067,12 +3072,11 @@ export const adminService = {
         // Delete principal award
         async delete(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/principal-awards/${id}`,
                     {
                         method: "DELETE",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -3093,12 +3097,11 @@ export const adminService = {
         // Toggle active status
         async toggleActive(id) {
             try {
-                const response = await fetch(
+                const response = await makeRequest(
                     `/api/admin/principal-awards/${id}/toggle-active`,
                     {
                         method: "POST",
                         headers: getHeaders(),
-                        credentials: "include",
                     }
                 );
 
@@ -3122,10 +3125,9 @@ export const adminService = {
      */
     async getStaffProfiles() {
         try {
-            const response = await fetch("/api/staff-profiles", {
+            const response = await makeRequest("/api/staff-profiles", {
                 method: "GET",
                 headers: getHeaders(),
-                credentials: "include",
             });
 
             if (!response.ok) {

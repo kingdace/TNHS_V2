@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }) => {
                 credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
+                    Accept: "application/json",
                     "X-CSRF-TOKEN":
                         document
                             .querySelector('meta[name="csrf-token"]')
@@ -35,15 +36,43 @@ export const AuthProvider = ({ children }) => {
             });
 
             if (response.ok) {
-                const userData = await response.json();
-                setUser(userData);
-                setIsAuthenticated(!!userData);
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    const userData = await response.json();
+                    console.log(
+                        "🔐 Auth check - received user data:",
+                        userData
+                    );
+
+                    // Check if userData is a valid user object
+                    // userData should be null for unauthenticated users, or have an id for authenticated users
+                    const isValidUser =
+                        userData &&
+                        userData !== null &&
+                        typeof userData === "object" &&
+                        userData.id &&
+                        typeof userData.id !== "undefined";
+
+                    console.log("🔐 Auth check - is valid user:", isValidUser);
+
+                    setUser(isValidUser ? userData : null);
+                    setIsAuthenticated(isValidUser);
+                } else {
+                    // Response is not JSON (likely HTML error page)
+                    console.log("🔐 Auth check - non-JSON response");
+                    setUser(null);
+                    setIsAuthenticated(false);
+                }
             } else {
                 setUser(null);
                 setIsAuthenticated(false);
             }
         } catch (error) {
-            console.error("Auth check failed:", error);
+            // Silently handle auth check errors to avoid console spam
+            // Only log if it's not a JSON parsing error
+            if (!error.message.includes("Unexpected token")) {
+                console.warn("Auth check failed:", error.message);
+            }
             setUser(null);
             setIsAuthenticated(false);
         } finally {

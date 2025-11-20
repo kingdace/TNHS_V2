@@ -27,13 +27,13 @@ import { announcementService } from "../../services/announcementService";
 import { publicService } from "../../services/publicService";
 import { useDynamicContent } from "../../hooks/useDynamicContent";
 import EventCalendar from "../../components/calendar/EventCalendar";
+import EnhancedSearch from "../../components/EnhancedSearch";
 
 const Home = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [announcements, setAnnouncements] = useState([]);
     const [heroSlides, setHeroSlides] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
 
     // Dynamic content hooks
     const { content: featuresContent } = useDynamicContent("home", "features");
@@ -70,28 +70,8 @@ const Home = () => {
         fetchData();
     }, []);
 
-    // Filter announcements based on search term
-    const filteredAnnouncements = announcements.filter((announcement) => {
-        if (!searchTerm.trim()) return true;
-
-        const searchLower = searchTerm.toLowerCase();
-        const titleMatch = announcement.title
-            .toLowerCase()
-            .includes(searchLower);
-        const categoryMatch =
-            announcement.category &&
-            announcement.category.toLowerCase().includes(searchLower);
-        const contentMatch =
-            announcement.excerpt &&
-            announcement.excerpt.toLowerCase().includes(searchLower);
-
-        // Special case: if user searches for "sports", show sports announcements
-        if (searchLower === "sports" || searchLower === "sport") {
-            return categoryMatch || titleMatch || contentMatch;
-        }
-
-        return titleMatch || categoryMatch || contentMatch;
-    });
+    // Display all announcements (search is now handled by EnhancedSearch component)
+    const displayAnnouncements = announcements;
 
     // Auto-advance slides every 10 seconds
     useEffect(() => {
@@ -352,7 +332,10 @@ const Home = () => {
                         </div>
 
                         {/* Explore Section */}
-                        <div className="relative">
+                        <div
+                            className="relative"
+                            style={{ zIndex: 999999, position: "relative" }}
+                        >
                             {/* Half border around search area */}
                             <div className="absolute -top-2 left-1/4 w-1/2 h-1 bg-gradient-to-r from-transparent via-royal-blue to-transparent"></div>
                             <div className="absolute -bottom-2 left-1/4 w-1/2 h-1 bg-gradient-to-r from-transparent via-blue-600 to-transparent"></div>
@@ -360,33 +343,14 @@ const Home = () => {
                             <h2 className="text-lg font-semibold text-royal-blue mb-4 tracking-wide">
                                 EXPLORE
                             </h2>
-                            <div className="max-w-2xl mx-auto">
-                                <div className="relative">
-                                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                                        <svg
-                                            className="w-5 h-5 text-royal-blue"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                            />
-                                        </svg>
-                                    </div>
-                                    <input
-                                        type="text"
-                                        placeholder="Search..."
-                                        value={searchTerm}
-                                        onChange={(e) =>
-                                            setSearchTerm(e.target.value)
-                                        }
-                                        className="w-full pl-12 pr-4 py-3 border-2 border-royal-blue rounded-2xl focus:border-blue-700 focus:outline-none text-gray-700"
-                                    />
-                                </div>
+                            <div
+                                className="max-w-2xl mx-auto"
+                                style={{ position: "relative", zIndex: 999999 }}
+                            >
+                                <EnhancedSearch
+                                    placeholder="Search announcements, events, staff, programs..."
+                                    className="w-full"
+                                />
                             </div>
                         </div>
                     </div>
@@ -394,7 +358,10 @@ const Home = () => {
             </section>
 
             {/* Combined Search & News Section */}
-            <section className="py-16 bg-[#F7F7F7]">
+            <section
+                className="py-16 bg-[#F7F7F7]"
+                style={{ position: "relative", zIndex: 1 }}
+            >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Two-Column Layout */}
                     <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
@@ -422,9 +389,9 @@ const Home = () => {
                                             </div>
                                         ))}
                                     </div>
-                                ) : filteredAnnouncements.length > 0 ? (
+                                ) : displayAnnouncements.length > 0 ? (
                                     <div className="space-y-5">
-                                        {filteredAnnouncements
+                                        {displayAnnouncements
                                             .slice(0, 5)
                                             .map((a) => (
                                                 <div
@@ -504,9 +471,8 @@ const Home = () => {
                                             <Newspaper className="w-8 h-8 text-gray-400" />
                                         </div>
                                         <p className="text-gray-600">
-                                            {searchTerm.trim()
-                                                ? `No announcements found for "${searchTerm}".`
-                                                : "No announcements available at the moment."}
+                                            No announcements available at the
+                                            moment.
                                         </p>
                                     </div>
                                 )}

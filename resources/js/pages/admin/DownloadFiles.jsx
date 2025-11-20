@@ -22,6 +22,64 @@ import {
     X,
 } from "lucide-react";
 
+// Helper function to refresh CSRF token
+const refreshCSRFToken = async () => {
+    try {
+        const response = await fetch("/api/csrf-token", {
+            method: "GET",
+            credentials: "include",
+        });
+        if (response.ok) {
+            const data = await response.json();
+            // Update the meta tag with the new token
+            const metaTag = document.querySelector('meta[name="csrf-token"]');
+            if (metaTag && data.csrf_token) {
+                metaTag.setAttribute("content", data.csrf_token);
+            }
+            return data.csrf_token;
+        }
+    } catch (error) {
+        console.warn("Failed to refresh CSRF token:", error);
+    }
+    return null;
+};
+
+// Helper function to handle API requests with CSRF retry
+const makeRequest = async (url, options = {}) => {
+    try {
+        const response = await fetch(url, {
+            credentials: "include",
+            ...options,
+        });
+
+        // If we get a 419 CSRF error, try refreshing the token and retry once
+        if (response.status === 419) {
+            console.log("CSRF token expired, refreshing...");
+            const newToken = await refreshCSRFToken();
+            if (newToken) {
+                // Update headers with new token
+                const updatedHeaders = {
+                    ...options.headers,
+                    "X-CSRF-TOKEN": newToken,
+                };
+
+                // Retry the request with the new token
+                const retryResponse = await fetch(url, {
+                    ...options,
+                    headers: updatedHeaders,
+                    credentials: "include",
+                });
+                return retryResponse;
+            }
+        }
+
+        return response;
+    } catch (error) {
+        console.error("Request failed:", error);
+        throw error;
+    }
+};
+
 const AdminDownloadFiles = () => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -57,12 +115,11 @@ const AdminDownloadFiles = () => {
     const fetchItems = async () => {
         try {
             setLoading(true);
-            const response = await fetch("/api/admin/download-files", {
+            const response = await makeRequest("/api/admin/download-files", {
                 headers: {
                     Accept: "application/json",
                     "X-Requested-With": "XMLHttpRequest",
                 },
-                credentials: "same-origin",
             });
 
             if (!response.ok) {
@@ -110,12 +167,17 @@ const AdminDownloadFiles = () => {
                 formData.append("_method", "PUT");
             }
 
-            const response = await fetch(url, {
+            // Get CSRF token
+            const csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content");
+
+            const response = await makeRequest(url, {
                 method,
                 headers: {
+                    "X-CSRF-TOKEN": csrfToken,
                     "X-Requested-With": "XMLHttpRequest",
                 },
-                credentials: "same-origin",
                 body: formData,
             });
 
@@ -145,14 +207,22 @@ const AdminDownloadFiles = () => {
         }
 
         try {
-            const response = await fetch(`/api/admin/download-files/${id}`, {
-                method: "DELETE",
-                headers: {
-                    Accept: "application/json",
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-                credentials: "same-origin",
-            });
+            // Get CSRF token
+            const csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content");
+
+            const response = await makeRequest(
+                `/api/admin/download-files/${id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                }
+            );
 
             const data = await response.json();
 
@@ -169,15 +239,20 @@ const AdminDownloadFiles = () => {
 
     const handleToggleActive = async (item) => {
         try {
-            const response = await fetch(
+            // Get CSRF token
+            const csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content");
+
+            const response = await makeRequest(
                 `/api/admin/download-files/${item.id}/toggle-active`,
                 {
                     method: "POST",
                     headers: {
                         Accept: "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
                         "X-Requested-With": "XMLHttpRequest",
                     },
-                    credentials: "same-origin",
                 }
             );
 

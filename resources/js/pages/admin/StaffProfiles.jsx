@@ -27,6 +27,64 @@ import {
     Image as ImageIcon,
 } from "lucide-react";
 
+// Helper function to refresh CSRF token
+const refreshCSRFToken = async () => {
+    try {
+        const response = await fetch("/api/csrf-token", {
+            method: "GET",
+            credentials: "include",
+        });
+        if (response.ok) {
+            const data = await response.json();
+            // Update the meta tag with the new token
+            const metaTag = document.querySelector('meta[name="csrf-token"]');
+            if (metaTag && data.csrf_token) {
+                metaTag.setAttribute("content", data.csrf_token);
+            }
+            return data.csrf_token;
+        }
+    } catch (error) {
+        console.warn("Failed to refresh CSRF token:", error);
+    }
+    return null;
+};
+
+// Helper function to handle API requests with CSRF retry
+const makeRequest = async (url, options = {}) => {
+    try {
+        const response = await fetch(url, {
+            credentials: "include",
+            ...options,
+        });
+
+        // If we get a 419 CSRF error, try refreshing the token and retry once
+        if (response.status === 419) {
+            console.log("CSRF token expired, refreshing...");
+            const newToken = await refreshCSRFToken();
+            if (newToken) {
+                // Update headers with new token
+                const updatedHeaders = {
+                    ...options.headers,
+                    "X-CSRF-TOKEN": newToken,
+                };
+
+                // Retry the request with the new token
+                const retryResponse = await fetch(url, {
+                    ...options,
+                    headers: updatedHeaders,
+                    credentials: "include",
+                });
+                return retryResponse;
+            }
+        }
+
+        return response;
+    } catch (error) {
+        console.error("Request failed:", error);
+        throw error;
+    }
+};
+
 const StaffProfiles = () => {
     const [staff, setStaff] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -176,13 +234,12 @@ const StaffProfiles = () => {
                 .querySelector('meta[name="csrf-token"]')
                 ?.getAttribute("content");
 
-            const response = await fetch("/api/admin/staff-profiles", {
+            const response = await makeRequest("/api/admin/staff-profiles", {
                 method: "POST",
                 headers: {
                     "X-CSRF-TOKEN": csrfToken,
                     Accept: "application/json",
                 },
-                credentials: "include",
                 body: formDataToSend,
             });
 
@@ -258,7 +315,7 @@ const StaffProfiles = () => {
                 .querySelector('meta[name="csrf-token"]')
                 ?.getAttribute("content");
 
-            const response = await fetch(
+            const response = await makeRequest(
                 `/api/admin/staff-profiles/${editingStaff.id}`,
                 {
                     method: "POST", // Always POST for FormData with _method
@@ -266,7 +323,6 @@ const StaffProfiles = () => {
                         "X-CSRF-TOKEN": csrfToken,
                         Accept: "application/json",
                     },
-                    credentials: "include",
                     body: formDataToSend,
                 }
             );
@@ -399,10 +455,9 @@ const StaffProfiles = () => {
                 headers["X-CSRF-TOKEN"] = csrfToken;
             }
 
-            const response = await fetch("/api/admin/upload-image", {
+            const response = await makeRequest("/api/admin/upload-image", {
                 method: "POST",
                 headers: headers,
-                credentials: "include",
                 body: formData,
             });
 

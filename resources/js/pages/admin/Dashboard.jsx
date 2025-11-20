@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import {
@@ -31,6 +31,19 @@ import { galleryService } from "../../services/galleryService";
 import { resourcesService } from "../../services/resourcesService";
 import { adminService } from "../../services/adminService";
 
+// Simple cache for dashboard data (5 minutes TTL)
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+let dashboardCache = {
+    data: null,
+    timestamp: null,
+    isValid: () => {
+        return (
+            dashboardCache.timestamp &&
+            Date.now() - dashboardCache.timestamp < CACHE_TTL
+        );
+    },
+};
+
 const AdminDashboard = () => {
     // Main container for all dashboard content - ULTRA COMPACT
     const DashboardContainer = ({ children }) => (
@@ -45,7 +58,6 @@ const AdminDashboard = () => {
         gallery: [],
         resources: [],
         staffProfiles: [],
-
         stats: {
             totalAnnouncements: 0,
             publishedAnnouncements: 0,
@@ -62,174 +74,239 @@ const AdminDashboard = () => {
     });
 
     const [loading, setLoading] = useState(true);
+    const [secondaryLoading, setSecondaryLoading] = useState(true);
     const [error, setError] = useState("");
 
+    // Progressive loading: Load critical data first, then secondary data
     useEffect(() => {
-        loadDashboardData();
+        loadCriticalData();
     }, []);
 
-    const loadDashboardData = async () => {
+    // Load secondary data after critical data is loaded
+    useEffect(() => {
+        if (!loading) {
+            loadSecondaryData();
+        }
+    }, [loading]);
+
+    // Load critical data first (announcements for stats and recent items)
+    const loadCriticalData = useCallback(async () => {
         try {
             setLoading(true);
             setError("");
 
-            // Load all data in parallel with proper data extraction
+            // Check cache first
+            if (dashboardCache.isValid()) {
+                setDashboardData(dashboardCache.data);
+                setLoading(false);
+                return;
+            }
+
+            // Load only announcements first (most important for dashboard)
+            const announcementsResponse = await announcementService
+                .list()
+                .catch(() => []);
+
+            // Extract announcements data
+            const announcements = Array.isArray(announcementsResponse)
+                ? announcementsResponse
+                : [];
+
+            // Calculate critical stats from announcements only
+            const criticalStats = {
+                totalAnnouncements: announcements.length,
+                publishedAnnouncements: announcements.filter(
+                    (a) => a?.status === "published"
+                ).length,
+                draftAnnouncements: announcements.filter(
+                    (a) => a?.status === "draft"
+                ).length,
+                scheduledAnnouncements: announcements.filter(
+                    (a) => a?.scheduled_publish_at
+                ).length,
+                featuredAnnouncements: announcements.filter(
+                    (a) => a?.is_featured
+                ).length,
+                expiringAnnouncements: announcements.filter((a) => {
+                    if (!a?.scheduled_unpublish_at) return false;
+                    const expiryDate = new Date(a.scheduled_unpublish_at);
+                    const now = new Date();
+                    const daysUntilExpiry = Math.ceil(
+                        (expiryDate - now) / (1000 * 60 * 60 * 24)
+                    );
+                    return daysUntilExpiry <= 7 && daysUntilExpiry > 0;
+                }).length,
+                // Placeholder values for secondary data
+                totalEvents: 0,
+                publishedEvents: 0,
+                totalGalleryImages: 0,
+                totalResources: 0,
+                totalStaffProfiles: 0,
+            };
+
+            // Update state with critical data
+            setDashboardData((prev) => ({
+                ...prev,
+                announcements: announcements.slice(0, 5), // Only keep first 5 for display
+                stats: criticalStats,
+            }));
+        } catch (err) {
+            console.error("Error loading critical dashboard data:", err);
+            setError("Failed to load dashboard data");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Load secondary data (events, gallery, resources, staff) in background
+    const loadSecondaryData = useCallback(async () => {
+        try {
+            setSecondaryLoading(true);
+
+            // Load secondary data in parallel
             const [
-                announcementsResponse,
                 eventsResponse,
                 galleryResponse,
                 resourcesResponse,
                 staffProfiles,
             ] = await Promise.all([
-                announcementService.list().catch(() => []),
                 adminService.events
                     .getAll()
                     .catch(() => ({ success: true, data: [] })),
+                // Get minimal data for counts only
                 galleryService
                     .list()
-                    .catch(() => ({ success: true, data: [] })),
+                    .then((data) => ({
+                        count: Array.isArray(data)
+                            ? data.length
+                            : data?.success && Array.isArray(data.data)
+                            ? data.data.length
+                            : 0,
+                    }))
+                    .catch(() => ({ count: 0 })),
                 resourcesService
                     .list()
-                    .catch(() => ({ success: true, data: [] })),
+                    .then((data) => ({
+                        count: Array.isArray(data)
+                            ? data.length
+                            : data?.success && Array.isArray(data.data)
+                            ? data.data.length
+                            : 0,
+                    }))
+                    .catch(() => ({ count: 0 })),
                 adminService.getStaffProfiles().catch(() => []),
             ]);
 
-            // Extract data arrays safely
-            const announcements = Array.isArray(announcementsResponse)
-                ? announcementsResponse
-                : [];
+            // Extract secondary data
             const events = Array.isArray(eventsResponse)
                 ? eventsResponse
                 : eventsResponse?.success && Array.isArray(eventsResponse.data)
                 ? eventsResponse.data
                 : [];
-            const gallery = Array.isArray(galleryResponse)
-                ? galleryResponse
-                : galleryResponse?.success &&
-                  Array.isArray(galleryResponse.data)
-                ? galleryResponse.data
-                : [];
-            const resources = Array.isArray(resourcesResponse)
-                ? resourcesResponse
-                : resourcesResponse?.success &&
-                  Array.isArray(resourcesResponse.data)
-                ? resourcesResponse.data
-                : [];
 
-            // Calculate statistics with safe array handling
-            const stats = {
-                totalAnnouncements: Array.isArray(announcements)
-                    ? announcements.length
-                    : 0,
-                publishedAnnouncements: Array.isArray(announcements)
-                    ? announcements.filter((a) => a?.status === "published")
-                          .length
-                    : 0,
-                draftAnnouncements: Array.isArray(announcements)
-                    ? announcements.filter((a) => a?.status === "draft").length
-                    : 0,
-                scheduledAnnouncements: Array.isArray(announcements)
-                    ? announcements.filter((a) => a?.scheduled_publish_at)
-                          .length
-                    : 0,
-                featuredAnnouncements: Array.isArray(announcements)
-                    ? announcements.filter((a) => a?.is_featured).length
-                    : 0,
-                expiringAnnouncements: Array.isArray(announcements)
-                    ? announcements.filter((a) => {
-                          if (!a?.scheduled_unpublish_at) return false;
-                          const expiryDate = new Date(a.scheduled_unpublish_at);
-                          const now = new Date();
-                          const daysUntilExpiry = Math.ceil(
-                              (expiryDate - now) / (1000 * 60 * 60 * 24)
-                          );
-                          return daysUntilExpiry <= 7 && daysUntilExpiry > 0;
-                      }).length
-                    : 0,
-                totalEvents: Array.isArray(events) ? events.length : 0,
-                publishedEvents: Array.isArray(events)
-                    ? events.filter((e) => e?.status === "published").length
-                    : 0,
-                totalGalleryImages: Array.isArray(gallery) ? gallery.length : 0,
-                totalResources: Array.isArray(resources) ? resources.length : 0,
-                totalStaffProfiles: Array.isArray(staffProfiles)
-                    ? staffProfiles.length
-                    : 0,
-            };
+            // Update state with secondary data
+            setDashboardData((prev) => {
+                const updatedStats = {
+                    ...prev.stats,
+                    totalEvents: events.length,
+                    publishedEvents: events.filter(
+                        (e) => e?.status === "published"
+                    ).length,
+                    totalGalleryImages: galleryResponse.count || 0,
+                    totalResources: resourcesResponse.count || 0,
+                    totalStaffProfiles: Array.isArray(staffProfiles)
+                        ? staffProfiles.length
+                        : 0,
+                };
 
-            setDashboardData({
-                announcements,
-                events,
-                gallery,
-                resources,
-                staffProfiles,
-                stats,
+                const updatedData = {
+                    ...prev,
+                    events: events.slice(0, 5), // Only keep first 5 for display
+                    stats: updatedStats,
+                };
+
+                // Cache the complete data
+                dashboardCache.data = updatedData;
+                dashboardCache.timestamp = Date.now();
+
+                return updatedData;
             });
         } catch (err) {
-            console.error("Error loading dashboard data:", err);
-            setError("Failed to load dashboard data");
+            console.error("Error loading secondary dashboard data:", err);
+            // Don't show error for secondary data, just log it
         } finally {
-            setLoading(false);
+            setSecondaryLoading(false);
         }
-    };
+    }, []);
 
-    const statsCards = [
-        {
-            title: "Total Announcements",
-            value: dashboardData.stats.totalAnnouncements,
-            change: `${dashboardData.stats.publishedAnnouncements} published`,
-            changeType: "info",
-            icon: Megaphone,
-            color: "from-blue-500 to-blue-600",
-            bgColor: "bg-blue-50",
-            textColor: "text-blue-600",
-            description: "All announcements",
-        },
-        {
-            title: "Published Content",
-            value: dashboardData.stats.publishedAnnouncements,
-            change: `${dashboardData.stats.draftAnnouncements} drafts`,
-            changeType: "positive",
-            icon: CheckCircle,
-            color: "from-green-500 to-green-600",
-            bgColor: "bg-green-50",
-            textColor: "text-green-600",
-            description: "Live announcements",
-        },
-        {
-            title: "Featured Content",
-            value: dashboardData.stats.featuredAnnouncements,
-            change: "On homepage",
-            changeType: "info",
-            icon: Star,
-            color: "from-yellow-500 to-yellow-600",
-            bgColor: "bg-yellow-50",
-            textColor: "text-yellow-600",
-            description: "Featured items",
-        },
-        {
-            title: "Scheduled Posts",
-            value: dashboardData.stats.scheduledAnnouncements,
-            change: "Upcoming",
-            changeType: "info",
-            icon: Clock,
-            color: "from-cyan-500 to-cyan-600",
-            bgColor: "bg-cyan-50",
-            textColor: "text-cyan-600",
-            description: "Auto-publish queue",
-        },
-        {
-            title: "Expiring Soon",
-            value: dashboardData.stats.expiringAnnouncements,
-            change: "Within 7 days",
-            changeType: "warning",
-            icon: AlertTriangle,
-            color: "from-orange-500 to-orange-600",
-            bgColor: "bg-orange-50",
-            textColor: "text-orange-600",
-            description: "Needs attention",
-        },
-    ];
+    // Manual refresh function (clears cache)
+    const refreshDashboard = useCallback(() => {
+        dashboardCache.data = null;
+        dashboardCache.timestamp = null;
+        loadCriticalData();
+    }, [loadCriticalData]);
+
+    // Memoize stats cards to prevent unnecessary recalculations
+    const statsCards = useMemo(
+        () => [
+            {
+                title: "Total Announcements",
+                value: dashboardData.stats.totalAnnouncements,
+                change: `${dashboardData.stats.publishedAnnouncements} published`,
+                changeType: "info",
+                icon: Megaphone,
+                color: "from-blue-500 to-blue-600",
+                bgColor: "bg-blue-50",
+                textColor: "text-blue-600",
+                description: "All announcements",
+            },
+            {
+                title: "Published Content",
+                value: dashboardData.stats.publishedAnnouncements,
+                change: `${dashboardData.stats.draftAnnouncements} drafts`,
+                changeType: "positive",
+                icon: CheckCircle,
+                color: "from-green-500 to-green-600",
+                bgColor: "bg-green-50",
+                textColor: "text-green-600",
+                description: "Live announcements",
+            },
+            {
+                title: "Featured Content",
+                value: dashboardData.stats.featuredAnnouncements,
+                change: "On homepage",
+                changeType: "info",
+                icon: Star,
+                color: "from-yellow-500 to-yellow-600",
+                bgColor: "bg-yellow-50",
+                textColor: "text-yellow-600",
+                description: "Featured items",
+            },
+            {
+                title: "Scheduled Posts",
+                value: dashboardData.stats.scheduledAnnouncements,
+                change: "Upcoming",
+                changeType: "info",
+                icon: Clock,
+                color: "from-cyan-500 to-cyan-600",
+                bgColor: "bg-cyan-50",
+                textColor: "text-cyan-600",
+                description: "Auto-publish queue",
+            },
+            {
+                title: "Expiring Soon",
+                value: dashboardData.stats.expiringAnnouncements,
+                change: "Within 7 days",
+                changeType: "warning",
+                icon: AlertTriangle,
+                color: "from-orange-500 to-orange-600",
+                bgColor: "bg-orange-50",
+                textColor: "text-orange-600",
+                description: "Needs attention",
+            },
+        ],
+        [dashboardData.stats]
+    );
 
     const quickActions = [
         {
@@ -269,17 +346,117 @@ const AdminDashboard = () => {
         },
     ];
 
-    if (loading) {
-        return (
-            <DashboardContainer className="mt-0">
-                <div className="flex items-center justify-center h-64">
-                    <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                        <p className="mt-4 text-slate-600">
-                            Loading dashboard...
-                        </p>
+    // Skeleton component for loading states
+    const SkeletonCard = () => (
+        <Card className="relative overflow-hidden border-0 shadow-md h-full bg-white">
+            <CardContent className="p-3 relative flex flex-col items-center justify-center text-center h-full min-h-[120px]">
+                <div className="animate-pulse">
+                    <div className="p-2.5 rounded-xl bg-gray-200 mb-2 w-12 h-12"></div>
+                    <div className="h-6 bg-gray-200 rounded mb-1.5 w-16"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-1.5 w-20"></div>
+                    <div className="h-5 bg-gray-200 rounded w-24"></div>
+                </div>
+            </CardContent>
+        </Card>
+    );
+
+    const SkeletonContent = () => (
+        <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+                <div
+                    key={i}
+                    className="animate-pulse p-3 border border-slate-200 rounded-xl bg-white"
+                >
+                    <div className="flex items-center space-x-3">
+                        <div className="h-4 bg-gray-200 rounded flex-1"></div>
+                        <div className="h-6 bg-gray-200 rounded w-16"></div>
+                    </div>
+                    <div className="flex items-center space-x-3 mt-2">
+                        <div className="h-3 bg-gray-200 rounded w-20"></div>
+                        <div className="h-3 bg-gray-200 rounded w-24"></div>
+                        <div className="h-3 bg-gray-200 rounded w-16"></div>
                     </div>
                 </div>
+            ))}
+        </div>
+    );
+
+    if (loading) {
+        return (
+            <DashboardContainer>
+                {/* Header - Show immediately */}
+                <div className="relative bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 rounded-lg px-4 py-3 text-white shadow-lg overflow-hidden">
+                    <div className="absolute inset-0 opacity-10">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -mr-16 -mt-16"></div>
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full -ml-12 -mb-12"></div>
+                    </div>
+                    <div className="relative flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                            <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                                <Database className="h-5 w-5 text-white" />
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-bold flex items-center">
+                                    TNHS Admin Dashboard
+                                    <div className="ml-2 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                </h1>
+                                <p className="text-blue-100 text-sm flex items-center">
+                                    <Activity className="h-3 w-3 mr-1" />
+                                    Loading system data...
+                                </p>
+                            </div>
+                        </div>
+                        <div className="hidden md:block text-right">
+                            <div className="text-sm font-medium flex items-center justify-end">
+                                <Clock className="h-3 w-3 mr-1" />
+                                {new Date().toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                })}
+                            </div>
+                            <div className="text-blue-200 text-xs">
+                                {new Date().toLocaleTimeString("en-US", {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: true,
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Skeleton Stats Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 gap-4">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                        <SkeletonCard key={i} />
+                    ))}
+                </div>
+
+                {/* Skeleton Quick Actions */}
+                <Card className="relative overflow-hidden border-0 shadow-md bg-white">
+                    <CardHeader className="relative bg-gradient-to-r from-slate-50 to-gray-50 p-4 border-b border-slate-100">
+                        <CardTitle className="flex items-center text-slate-800 text-base font-semibold">
+                            <div className="p-2 bg-slate-100 rounded-lg mr-3">
+                                <Target className="h-5 w-5 text-slate-600" />
+                            </div>
+                            Quick Actions
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="relative p-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <div
+                                    key={i}
+                                    className="animate-pulse text-center p-4 rounded-xl border border-slate-200 bg-white"
+                                >
+                                    <div className="inline-flex p-3 rounded-lg bg-gray-200 mb-3 w-12 h-12"></div>
+                                    <div className="h-4 bg-gray-200 rounded mb-1 w-20 mx-auto"></div>
+                                    <div className="h-3 bg-gray-200 rounded w-24 mx-auto"></div>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
             </DashboardContainer>
         );
     }
@@ -294,7 +471,7 @@ const AdminDashboard = () => {
                             <span>{error}</span>
                         </div>
                         <Button
-                            onClick={loadDashboardData}
+                            onClick={refreshDashboard}
                             className="mt-4 bg-red-600 hover:bg-red-700"
                         >
                             Retry
@@ -487,30 +664,32 @@ const AdminDashboard = () => {
             </Card>
 
             {/* Welcome Message for New Users */}
-            {dashboardData.stats.totalAnnouncements === 0 && (
-                <Card className="border-0 shadow-md bg-gradient-to-r from-blue-50 to-indigo-50">
-                    <CardContent className="p-6 text-center">
-                        <div className="p-4 bg-blue-100 rounded-full w-fit mx-auto mb-4">
-                            <Megaphone className="h-8 w-8 text-blue-600" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-slate-800 mb-2">
-                            Welcome to TNHS Admin Dashboard!
-                        </h3>
-                        <p className="text-slate-600 mb-4">
-                            Get started by creating your first announcement or
-                            exploring the quick actions below.
-                        </p>
-                        <Button
-                            asChild
-                            className="bg-blue-600 hover:bg-blue-700"
-                        >
-                            <Link to="/admin/news-events">
-                                Create First Announcement
-                            </Link>
-                        </Button>
-                    </CardContent>
-                </Card>
-            )}
+            {!loading &&
+                !secondaryLoading &&
+                dashboardData.stats.totalAnnouncements === 0 && (
+                    <Card className="border-0 shadow-md bg-gradient-to-r from-blue-50 to-indigo-50">
+                        <CardContent className="p-6 text-center">
+                            <div className="p-4 bg-blue-100 rounded-full w-fit mx-auto mb-4">
+                                <Megaphone className="h-8 w-8 text-blue-600" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-slate-800 mb-2">
+                                Welcome to TNHS Admin Dashboard!
+                            </h3>
+                            <p className="text-slate-600 mb-4">
+                                Get started by creating your first announcement
+                                or exploring the quick actions below.
+                            </p>
+                            <Button
+                                asChild
+                                className="bg-blue-600 hover:bg-blue-700"
+                            >
+                                <Link to="/admin/news-events">
+                                    Create First Announcement
+                                </Link>
+                            </Button>
+                        </CardContent>
+                    </Card>
+                )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Recent School Highlights - ENHANCED */}
@@ -540,8 +719,10 @@ const AdminDashboard = () => {
                             </div>
                         </CardHeader>
                         <CardContent className="relative p-4">
-                            {!Array.isArray(dashboardData.announcements) ||
-                            dashboardData.announcements.length === 0 ? (
+                            {secondaryLoading ? (
+                                <SkeletonContent />
+                            ) : !Array.isArray(dashboardData.announcements) ||
+                              dashboardData.announcements.length === 0 ? (
                                 <div className="text-center py-8 text-slate-500">
                                     <div className="p-4 bg-slate-100 rounded-full w-fit mx-auto mb-4">
                                         <Megaphone className="h-12 w-12 text-slate-400" />
@@ -667,8 +848,10 @@ const AdminDashboard = () => {
                             </div>
                         </CardHeader>
                         <CardContent className="relative p-4">
-                            {!Array.isArray(dashboardData.events) ||
-                            dashboardData.events.length === 0 ? (
+                            {secondaryLoading ? (
+                                <SkeletonContent />
+                            ) : !Array.isArray(dashboardData.events) ||
+                              dashboardData.events.length === 0 ? (
                                 <div className="text-center py-8 text-slate-500">
                                     <div className="p-4 bg-slate-100 rounded-full w-fit mx-auto mb-4">
                                         <CalendarIcon className="h-12 w-12 text-slate-400" />

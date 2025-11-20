@@ -25,8 +25,9 @@ Route::prefix('api')->group(function () {
         return response()->json(['csrf_token' => csrf_token()]);
     });
 
-    // Public announcements endpoint
+    // Public announcements endpoints
     Route::get('/announcements/public', [AnnouncementController::class, 'public']);
+    Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show']);
 
     // Admin announcements endpoints (protected)
     Route::middleware(['auth', 'admin.auth'])->group(function () {
@@ -154,19 +155,20 @@ Route::prefix('api')->group(function () {
         Route::post('/quality-policies/{qualityPolicy}/toggle-active', [\App\Http\Controllers\Admin\QualityPolicyController::class, 'toggleActive']);
         Route::post('/privacy-policies/{privacyPolicy}/toggle-active', [\App\Http\Controllers\Admin\PrivacyPolicyController::class, 'toggleActive']);
     });
+
+    // Search Routes
+    Route::get('/search', [\App\Http\Controllers\Api\SearchController::class, 'globalSearch']);
+    Route::get('/search/suggestions', [\App\Http\Controllers\Api\SearchController::class, 'getSearchSuggestions']);
 });
 
-// Authentication routes
-Route::get('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])->name('login');
-Route::post('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
-Route::post('/logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
 
 // API Routes for authentication
 Route::post('/api/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
 Route::post('/api/logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy']);
 Route::get('/api/user', function () {
-    return response()->json(Auth::user() ?? null);
-})->middleware('auth');
+    return response()->json(Auth::user());
+})->middleware('web');
 
 // Protected Routes
 Route::middleware('auth')->group(function () {
@@ -289,6 +291,11 @@ Route::get('/api/gallery-featured', [\App\Http\Controllers\Api\GalleryController
 Route::get('/api/gallery-categories', [\App\Http\Controllers\Api\GalleryController::class, 'getCategories']);
 Route::get('/api/gallery-statistics', [\App\Http\Controllers\Api\GalleryController::class, 'getStatistics']);
 Route::post('/api/gallery/{id}/like', [\App\Http\Controllers\Api\GalleryController::class, 'incrementLike']);
+
+// Authentication routes - MUST come before catch-all route
+Route::get('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])->name('login');
+Route::post('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
+Route::post('/logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 // React SPA route - all routes will be handled by React Router
 Route::get('/{any}', function () {

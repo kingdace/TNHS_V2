@@ -12,6 +12,64 @@ const getHeaders = () => ({
             ?.getAttribute("content") || "",
 });
 
+// Helper function to refresh CSRF token
+const refreshCSRFToken = async () => {
+    try {
+        const response = await fetch("/api/csrf-token", {
+            method: "GET",
+            credentials: "include",
+        });
+        if (response.ok) {
+            const data = await response.json();
+            // Update the meta tag with the new token
+            const metaTag = document.querySelector('meta[name="csrf-token"]');
+            if (metaTag && data.csrf_token) {
+                metaTag.setAttribute("content", data.csrf_token);
+            }
+            return data.csrf_token;
+        }
+    } catch (error) {
+        console.warn("Failed to refresh CSRF token:", error);
+    }
+    return null;
+};
+
+// Helper function to handle API requests with CSRF retry
+const makeRequest = async (url, options = {}) => {
+    try {
+        const response = await fetch(url, {
+            credentials: "include",
+            ...options,
+        });
+
+        // If we get a 419 CSRF error, try refreshing the token and retry once
+        if (response.status === 419) {
+            console.log("CSRF token expired, refreshing...");
+            const newToken = await refreshCSRFToken();
+            if (newToken) {
+                // Update headers with new token
+                const updatedHeaders = {
+                    ...options.headers,
+                    "X-CSRF-TOKEN": newToken,
+                };
+
+                // Retry the request with the new token
+                const retryResponse = await fetch(url, {
+                    ...options,
+                    headers: updatedHeaders,
+                    credentials: "include",
+                });
+                return retryResponse;
+            }
+        }
+
+        return response;
+    } catch (error) {
+        console.error("Request failed:", error);
+        throw error;
+    }
+};
+
 export const announcementService = {
     /**
      * Fetch all published announcements for public view
@@ -313,12 +371,14 @@ export const announcementService = {
                 body instanceof FormData ? "FormData" : typeof body
             );
 
-            const response = await fetch(`${API_BASE_URL}/announcements`, {
-                method: "POST",
-                headers,
-                credentials: "include",
-                body,
-            });
+            const response = await makeRequest(
+                `${API_BASE_URL}/announcements`,
+                {
+                    method: "POST",
+                    headers,
+                    body,
+                }
+            );
 
             console.log("Response status:", response.status);
             const responseData = await response.json();
@@ -439,12 +499,11 @@ export const announcementService = {
                 delete headers["Content-Type"];
             }
 
-            const response = await fetch(
+            const response = await makeRequest(
                 `${API_BASE_URL}/announcements/${id}`,
                 {
                     method: "POST", // Use POST with _method=PUT for Laravel
                     headers,
-                    credentials: "include",
                     body,
                 }
             );
@@ -479,12 +538,11 @@ export const announcementService = {
      */
     async remove(id) {
         try {
-            const response = await fetch(
+            const response = await makeRequest(
                 `${API_BASE_URL}/announcements/${id}`,
                 {
                     method: "DELETE",
                     headers: { ...getHeaders(), Accept: "application/json" },
-                    credentials: "include",
                 }
             );
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -520,12 +578,11 @@ export const announcementService = {
      */
     async restore(id) {
         try {
-            const response = await fetch(
+            const response = await makeRequest(
                 `${API_BASE_URL}/announcements/${id}/restore`,
                 {
                     method: "POST",
                     headers: { ...getHeaders(), Accept: "application/json" },
-                    credentials: "include",
                 }
             );
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -542,12 +599,11 @@ export const announcementService = {
      */
     async forceDelete(id) {
         try {
-            const response = await fetch(
+            const response = await makeRequest(
                 `${API_BASE_URL}/announcements/${id}/force`,
                 {
                     method: "DELETE",
                     headers: { ...getHeaders(), Accept: "application/json" },
-                    credentials: "include",
                 }
             );
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
