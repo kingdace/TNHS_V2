@@ -404,11 +404,11 @@ class GalleryController extends Controller
 
                     $filename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
 
-                    // Generate title: use prefix + filename if prefix provided, otherwise just filename
-                    $title = !empty($validated['title']) ? $validated['title'] . ' - ' . $filename : $filename;
+                    // Generate title: use custom title if provided, otherwise use filename
+                    $title = !empty($validated['title']) ? $validated['title'] : $filename;
 
-                    // Generate alt text: use prefix + filename if prefix provided, otherwise just filename
-                    $altText = !empty($validated['alt_text']) ? $validated['alt_text'] . ' - ' . $filename : $filename;
+                    // Generate alt text: use custom alt text if provided, otherwise use filename
+                    $altText = !empty($validated['alt_text']) ? $validated['alt_text'] : $filename;
 
                     // Process tags
                     $tags = null;

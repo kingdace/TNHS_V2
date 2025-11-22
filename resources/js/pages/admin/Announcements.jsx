@@ -323,173 +323,172 @@ const AdminAnnouncements = () => {
 
     return (
         <div className="space-y-8">
-            {/* Header
-            <div className="bg-gradient-to-r from-blue-900 to-blue-700 rounded-xl px-6 py-4 text-white shadow-lg">
-                <div className="flex items-center justify-between">
-        <div>
-                        <h1 className="text-2xl font-bold">School Highlights</h1>
-                        <p className="text-blue-100 text-sm">
-                    Manage school announcements and updates
-                </p>
-            </div>
-                </div>
-            </div> */}
-
-            <Card className="border-blue-100">
-                <CardHeader className="bg-gray-75">
+            <Card className={showTrash ? "border-red-200" : "border-blue-100"}>
+                <CardHeader
+                    className={
+                        showTrash
+                            ? "bg-gradient-to-r from-red-50 to-rose-50"
+                            : "bg-gray-75"
+                    }
+                >
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <CardTitle className="text-royal-blue">
-                                    All Highlights
+                                <CardTitle
+                                    className={
+                                        showTrash
+                                            ? "text-red-700"
+                                            : "text-royal-blue"
+                                    }
+                                >
+                                    {showTrash ? "Trash" : "All Highlights"}
                                 </CardTitle>
-                                <CardDescription className="text-blue-700">
-                                    Create and manage campus highlights and
-                                    updates
+                                <CardDescription
+                                    className={
+                                        showTrash
+                                            ? "text-red-600"
+                                            : "text-blue-700"
+                                    }
+                                >
+                                    {showTrash
+                                        ? "Soft-deleted announcements. Restore or delete permanently."
+                                        : "Create and manage campus highlights and updates"}
                                 </CardDescription>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Button
                                     variant="outline"
                                     className="text-gray-700"
-                                    onClick={() => setShowTrash((v) => !v)}
+                                    onClick={() => {
+                                        setShowTrash((v) => !v);
+                                        if (!showTrash) {
+                                            loadTrashed();
+                                        }
+                                    }}
                                 >
                                     <Trash2 className="h-4 w-4 mr-2" />
-                                    {showTrash ? "Hide Trash" : "View Trash"}
+                                    {showTrash
+                                        ? "Back to Highlights"
+                                        : "View Trash"}
                                 </Button>
-                                <Button
-                                    className="bg-royal-blue hover:bg-blue-700 text-white"
-                                    onClick={openCreate}
-                                >
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Create Announcement
-                                </Button>
+                                {showTrash && (
+                                    <Button
+                                        variant="outline"
+                                        className="text-gray-700"
+                                        onClick={loadTrashed}
+                                    >
+                                        <RotateCcw className="h-4 w-4 mr-2" />
+                                        Refresh
+                                    </Button>
+                                )}
+                                {!showTrash && (
+                                    <Button
+                                        className="bg-royal-blue hover:bg-blue-700 text-white"
+                                        onClick={openCreate}
+                                    >
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Create Announcement
+                                    </Button>
+                                )}
                             </div>
                         </div>
-                        {/* Toolbar */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sticky top-0">
-                            {/* Search */}
-                            <div className="lg:col-span-5">
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                    <input
-                                        value={query}
-                                        onChange={(e) =>
-                                            setQuery(e.target.value)
-                                        }
-                                        placeholder="Search title, content, author..."
-                                        className="w-full pl-9 pr-3 py-2 rounded-lg border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white"
-                                    />
+
+                        {/* Toolbar - Only show for main highlights view */}
+                        {!showTrash && (
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sticky top-0">
+                                {/* Search */}
+                                <div className="lg:col-span-5">
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                        <input
+                                            value={query}
+                                            onChange={(e) =>
+                                                setQuery(e.target.value)
+                                            }
+                                            placeholder="Search title, content, author..."
+                                            className="w-full pl-9 pr-3 py-2 rounded-lg border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white"
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                            {/* Sort
-                            <div className="lg:col-span-4">
-                                <div className="flex items-center gap-2 justify-end">
-                                    <span className="text-sm text-gray-600">
-                                        Sort by:
-                                    </span>
-                                    <select
-                                        value={sortKey}
-                                        onChange={(e) =>
-                                            setSortKey(e.target.value)
-                                        }
-                                        className="w-40 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                    >
-                                        <option value="newest">Newest</option>
-                                        <option value="oldest">Oldest</option>
-                                        <option value="title">Title A–Z</option>
-                                        <option value="status">Status</option>
-                                    </select>
-                                    {(query ||
-                                        statusFilter !== "all" ||
-                                        categoryFilter !== "all" ||
-                                        featuredOnly ||
-                                        sortKey !== "newest") && (
-                                        <Button
-                                            variant="outline"
-                                            className="text-gray-700"
-                                            onClick={() => {
-                                                setQuery("");
-                                                setStatusFilter("all");
-                                                setCategoryFilter("all");
-                                                setFeaturedOnly(false);
-                                                setSortKey("newest");
-                                                setPage(1);
-                                            }}
+                                {/* Filters */}
+                                <div className="lg:col-span-7 flex items-center gap-2">
+                                    <div className="flex items-center gap-2 w-full">
+                                        <Filter className="h-4 w-4 text-gray-400" />
+                                        <select
+                                            value={statusFilter}
+                                            onChange={(e) =>
+                                                setStatusFilter(e.target.value)
+                                            }
+                                            className="w-32 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
                                         >
-                                            Clear filters
-                                        </Button>
-                                    )}
+                                            <option value="all">
+                                                All statuses
+                                            </option>
+                                            <option value="draft">Draft</option>
+                                            <option value="published">
+                                                Published
+                                            </option>
+                                            <option value="archived">
+                                                Archived
+                                            </option>
+                                        </select>
+                                        <select
+                                            value={categoryFilter}
+                                            onChange={(e) =>
+                                                setCategoryFilter(
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="w-32 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
+                                        >
+                                            <option value="all">
+                                                All categories
+                                            </option>
+                                            <option value="General">
+                                                General
+                                            </option>
+                                            <option value="Academic">
+                                                Academic
+                                            </option>
+                                            <option value="Events">
+                                                Events
+                                            </option>
+                                            <option value="Sports">
+                                                Sports
+                                            </option>
+                                            <option value="Arts">Arts</option>
+                                            <option value="Announcements">
+                                                Announcements
+                                            </option>
+                                            <option value="News">News</option>
+                                            <option value="Important">
+                                                Important
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <label className="flex items-center gap-2 text-sm text-gray-700 whitespace-nowrap">
+                                        <input
+                                            type="checkbox"
+                                            checked={featuredOnly}
+                                            onChange={(e) =>
+                                                setFeaturedOnly(
+                                                    e.target.checked
+                                                )
+                                            }
+                                            className="h-4 w-4 text-royal-blue border-gray-300 rounded"
+                                        />
+                                        <Star
+                                            className={`h-4 w-4 ${
+                                                featuredOnly
+                                                    ? "text-royal-blue"
+                                                    : "text-gray-400"
+                                            }`}
+                                        />
+                                        Featured only
+                                    </label>
                                 </div>
-                            </div> */}
-                            {/* Filters */}
-                            <div className="lg:col-span-7 flex items-center gap-2">
-                                <div className="flex items-center gap-2 w-full">
-                                    <Filter className="h-4 w-4 text-gray-400" />
-                                    <select
-                                        value={statusFilter}
-                                        onChange={(e) =>
-                                            setStatusFilter(e.target.value)
-                                        }
-                                        className="w-32 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
-                                    >
-                                        <option value="all">
-                                            All statuses
-                                        </option>
-                                        <option value="draft">Draft</option>
-                                        <option value="published">
-                                            Published
-                                        </option>
-                                        <option value="archived">
-                                            Archived
-                                        </option>
-                                    </select>
-                                    <select
-                                        value={categoryFilter}
-                                        onChange={(e) =>
-                                            setCategoryFilter(e.target.value)
-                                        }
-                                        className="w-32 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
-                                    >
-                                        <option value="all">
-                                            All categories
-                                        </option>
-                                        <option value="General">General</option>
-                                        <option value="Academic">
-                                            Academic
-                                        </option>
-                                        <option value="Events">Events</option>
-                                        <option value="Sports">Sports</option>
-                                        <option value="Arts">Arts</option>
-                                        <option value="Announcements">
-                                            Announcements
-                                        </option>
-                                        <option value="News">News</option>
-                                        <option value="Important">
-                                            Important
-                                        </option>
-                                    </select>
-                                </div>
-                                <label className="flex items-center gap-2 text-sm text-gray-700 whitespace-nowrap">
-                                    <input
-                                        type="checkbox"
-                                        checked={featuredOnly}
-                                        onChange={(e) =>
-                                            setFeaturedOnly(e.target.checked)
-                                        }
-                                        className="h-4 w-4 text-royal-blue border-gray-300 rounded"
-                                    />
-                                    <Star
-                                        className={`h-4 w-4 ${
-                                            featuredOnly
-                                                ? "text-royal-blue"
-                                                : "text-gray-400"
-                                        }`}
-                                    />
-                                    Featured only
-                                </label>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </CardHeader>
                 <CardContent>
@@ -503,399 +502,476 @@ const AdminAnnouncements = () => {
                             {error}
                         </div>
                     )}
-                    {loading ? (
-                        <div className="space-y-3">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="flex items-start gap-4 py-2"
-                                >
-                                    <div className="w-12 h-12 rounded-lg bg-gray-100 animate-pulse" />
-                                    <div className="flex-1 space-y-2">
-                                        <div className="h-3 w-24 bg-gray-100 rounded animate-pulse" />
-                                        <div className="h-4 w-1/2 bg-gray-100 rounded animate-pulse" />
-                                        <div className="h-4 w-2/3 bg-gray-100 rounded animate-pulse" />
-                                    </div>
-                                    <div className="w-64 flex items-center gap-2">
-                                        <div className="h-8 w-24 bg-gray-100 rounded animate-pulse" />
-                                        <div className="h-8 w-24 bg-gray-100 rounded animate-pulse" />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : displayedItems.length === 0 ? (
-                        <div className="text-center py-12 text-blue-700">
-                            <Megaphone className="h-12 w-12 mx-auto mb-4 text-royal-blue/40" />
-                            <p>No announcements match your filters.</p>
-                        </div>
-                    ) : (
-                        <div className="divide-y divide-blue-100">
-                            {displayedItems.map((item) => (
-                                <div key={item.id} className="py-4">
-                                    <div className="group flex items-start gap-4 p-3 rounded-lg transition-colors hover:bg-blue-50/50 hover:shadow-sm">
-                                        {/* Thumbnail */}
-                                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center border border-blue-100">
-                                            {item.image_path ? (
-                                                <img
-                                                    src={(() => {
-                                                        const p =
-                                                            item.image_path ||
-                                                            "";
-                                                        if (!p) return "";
-                                                        if (
-                                                            p.startsWith("http")
-                                                        )
-                                                            return p;
-                                                        if (
-                                                            p.startsWith(
-                                                                "/storage/"
+
+                    {/* Main Content - Toggle between Highlights and Trash */}
+                    {showTrash ? (
+                        // Trash View
+                        trashed.length === 0 ? (
+                            <div className="text-center py-12 text-red-700">
+                                <Trash2 className="h-12 w-12 mx-auto mb-4 text-red-400" />
+                                <p className="text-lg font-medium mb-2">
+                                    No items in Trash
+                                </p>
+                                <p className="text-sm text-red-600">
+                                    Deleted announcements will appear here
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-red-100">
+                                {trashed.map((item) => (
+                                    <div key={item.id} className="py-4">
+                                        <div className="group flex items-start gap-4 p-3 rounded-lg transition-colors hover:bg-red-50/50 hover:shadow-sm">
+                                            {/* Thumbnail */}
+                                            <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center border border-red-200">
+                                                {item.image_path ? (
+                                                    <img
+                                                        src={(() => {
+                                                            const p =
+                                                                item.image_path ||
+                                                                "";
+                                                            if (!p) return "";
+                                                            if (
+                                                                p.startsWith(
+                                                                    "http"
+                                                                )
                                                             )
-                                                        )
-                                                            return p;
-                                                        // ensure single /storage prefix
-                                                        const cleaned =
-                                                            p.replace(
-                                                                /^\/?storage\//,
-                                                                ""
-                                                            );
-                                                        return `/storage/${cleaned}`;
-                                                    })()}
-                                                    alt={item.title}
-                                                    className="w-full h-full object-cover"
-                                                    onError={(e) =>
-                                                        (e.currentTarget.style.display =
-                                                            "none")
-                                                    }
-                                                />
-                                            ) : (
-                                                <ImageIcon className="h-5 w-5 text-gray-400" />
-                                            )}
-                                        </div>
-                                        {/* Main content */}
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2">
-                                                {item.is_featured && (
-                                                    <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-royal-blue/10 text-royal-blue border border-royal-blue/20">
-                                                        <Star className="h-3 w-3 mr-1" />{" "}
-                                                        Featured
-                                                    </span>
+                                                                return p;
+                                                            if (
+                                                                p.startsWith(
+                                                                    "/storage/"
+                                                                )
+                                                            )
+                                                                return p;
+                                                            const cleaned =
+                                                                p.replace(
+                                                                    /^\/?storage\//,
+                                                                    ""
+                                                                );
+                                                            return `/storage/${cleaned}`;
+                                                        })()}
+                                                        alt={item.title}
+                                                        className="w-full h-full object-cover"
+                                                        onError={(e) =>
+                                                            (e.currentTarget.style.display =
+                                                                "none")
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <ImageIcon className="h-5 w-5 text-gray-400" />
                                                 )}
-                                                {item.external_link && (
-                                                    <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                                                        <svg
-                                                            className="h-3 w-3 mr-1"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth={2}
-                                                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                                                            />
-                                                        </svg>
-                                                        Link
+                                            </div>
+
+                                            {/* Main content */}
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                                    {item.title}
+                                                </h3>
+                                                <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+                                                    {item.content}
+                                                </p>
+                                                <div className="flex items-center gap-4 text-xs text-gray-500">
+                                                    <span>
+                                                        By {item.author}
                                                     </span>
-                                                )}
-                                                <span
-                                                    className={`text-[11px] px-2 py-0.5 rounded-full border ${
-                                                        item.status ===
-                                                        "published"
-                                                            ? "bg-green-50 text-green-700 border-green-200"
-                                                            : item.status ===
-                                                              "archived"
-                                                            ? "bg-gray-100 text-gray-700 border-gray-200"
-                                                            : "bg-yellow-50 text-yellow-700 border-yellow-200"
-                                                    }`}
-                                                >
-                                                    {item.status}
-                                                </span>
-                                                <span className="text-xs text-gray-500">
-                                                    {item.published_at
-                                                        ? `Published: ${new Date(
-                                                              item.published_at
-                                                          ).toLocaleString()}`
-                                                        : item.scheduled_publish_at
-                                                        ? `Scheduled: ${new Date(
-                                                              item.scheduled_publish_at
-                                                          ).toLocaleString()}`
-                                                        : "—"}
-                                                </span>
-                                                {item.scheduled_unpublish_at && (
-                                                    <span className="text-xs text-orange-500">
-                                                        • Unpublish:{" "}
+                                                    <span>•</span>
+                                                    <span>
+                                                        Deleted{" "}
                                                         {new Date(
-                                                            item.scheduled_unpublish_at
+                                                            item.deleted_at
                                                         ).toLocaleString()}
                                                     </span>
-                                                )}
-                                                <span className="text-xs text-gray-400 truncate">
-                                                    • By {item.author}
-                                                </span>
+                                                    {item.category && (
+                                                        <>
+                                                            <span>•</span>
+                                                            <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full">
+                                                                {item.category}
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <h3 className="text-base font-semibold text-gray-900 mt-1 truncate">
-                                                {item.title}
-                                            </h3>
-                                            <p className="text-gray-600 text-sm line-clamp-2 mt-1">
-                                                {item.content}
-                                            </p>
-                                        </div>
-                                        {/* Actions */}
-                                        <div className="flex items-center gap-2 shrink-0">
-                                            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={
-                                                        item.status ===
-                                                        "published"
-                                                    }
-                                                    onChange={() =>
-                                                        toggleStatus(item)
-                                                    }
-                                                    disabled={
-                                                        publishingId === item.id
-                                                    }
-                                                    className="h-4 w-4 text-royal-blue border-gray-300 rounded"
-                                                />
-                                                {publishingId === item.id ? (
-                                                    <span className="text-gray-400">
-                                                        Updating...
-                                                    </span>
-                                                ) : (
-                                                    <span>
-                                                        {item.status ===
-                                                        "published"
-                                                            ? "Published"
-                                                            : "Draft"}
-                                                    </span>
-                                                )}
-                                            </label>
-                                            <Button
-                                                variant="outline"
-                                                className={`text-gray-700 ${
-                                                    item.is_featured
-                                                        ? "border-royal-blue text-royal-blue"
-                                                        : ""
-                                                }`}
-                                                onClick={async () => {
-                                                    try {
-                                                        setFeaturingId(item.id);
-                                                        await announcementService.update(
-                                                            item.id,
-                                                            {
-                                                                is_featured:
-                                                                    !item.is_featured,
-                                                            }
+
+                                            {/* Actions */}
+                                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                    onClick={async () => {
+                                                        await announcementService.restore(
+                                                            item.id
                                                         );
                                                         await load();
-                                                        setToast(
-                                                            !item.is_featured
-                                                                ? "Marked as featured"
-                                                                : "Removed from featured"
-                                                        );
-                                                        setTimeout(
-                                                            () => setToast(""),
-                                                            2500
-                                                        );
-                                                    } catch (e) {
-                                                        setError(
-                                                            "Feature toggle failed."
-                                                        );
-                                                    } finally {
-                                                        setFeaturingId(null);
-                                                    }
-                                                }}
-                                            >
-                                                {featuringId === item.id
-                                                    ? "Updating..."
-                                                    : item.is_featured
-                                                    ? "Unfeature"
-                                                    : "Feature"}
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                className="text-gray-700"
-                                                onClick={() => openEdit(item)}
-                                            >
-                                                <Edit className="h-4 w-4 mr-2" />{" "}
-                                                Edit
-                                            </Button>
-                                            <Button
-                                                className="bg-red-600 hover:bg-red-700"
-                                                onClick={() => remove(item.id)}
-                                            >
-                                                <Trash2 className="h-4 w-4 mr-2" />{" "}
-                                                Delete
-                                            </Button>
+                                                        await loadTrashed();
+                                                    }}
+                                                >
+                                                    <RotateCcw className="h-4 w-4 mr-1" />
+                                                    Restore
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                                    onClick={async () => {
+                                                        if (
+                                                            confirm(
+                                                                "Permanently delete this announcement? This action cannot be undone."
+                                                            )
+                                                        ) {
+                                                            await announcementService.forceDelete(
+                                                                item.id
+                                                            );
+                                                            await loadTrashed();
+                                                        }
+                                                    }}
+                                                >
+                                                    <Trash2 className="h-4 w-4 mr-1" />
+                                                    Delete Forever
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
+                                ))}
+                            </div>
+                        )
+                    ) : (
+                        // Highlights View (existing content)
+                        <>
+                            {loading ? (
+                                <div className="space-y-3">
+                                    {Array.from({ length: 5 }).map((_, i) => (
+                                        <div
+                                            key={i}
+                                            className="flex items-start gap-4 py-2"
+                                        >
+                                            <div className="w-12 h-12 rounded-lg bg-gray-100 animate-pulse" />
+                                            <div className="flex-1 space-y-2">
+                                                <div className="h-3 w-24 bg-gray-100 rounded animate-pulse" />
+                                                <div className="h-4 w-1/2 bg-gray-100 rounded animate-pulse" />
+                                                <div className="h-4 w-2/3 bg-gray-100 rounded animate-pulse" />
+                                            </div>
+                                            <div className="w-64 flex items-center gap-2">
+                                                <div className="h-8 w-24 bg-gray-100 rounded animate-pulse" />
+                                                <div className="h-8 w-24 bg-gray-100 rounded animate-pulse" />
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                    {/* Pagination footer (moved to bottom) */}
-                    <div className="flex items-center justify-between mt-6">
-                        <div className="text-sm text-gray-600">
-                            Showing {displayedItems.length} of {totalItems}{" "}
-                            items
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-600">Rows:</span>
-                            <select
-                                value={pageSize}
-                                onChange={(e) => {
-                                    setPageSize(parseInt(e.target.value, 10));
-                                    setPage(1);
-                                }}
-                                className="rounded-lg border border-blue-100 py-1.5 px-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
-                            >
-                                <option value={5}>5</option>
-                                <option value={10}>10</option>
-                                <option value={20}>20</option>
-                                <option value={50}>50</option>
-                            </select>
-                            <div className="flex items-center gap-1">
-                                <Button
-                                    variant="outline"
-                                    className="text-gray-700 px-3 py-1"
-                                    onClick={() =>
-                                        setPage((p) => Math.max(1, p - 1))
-                                    }
-                                    disabled={page <= 1}
-                                    title="Previous page"
-                                >
-                                    Prev
-                                </Button>
-                                <span className="text-sm text-gray-600 px-2">
-                                    {page} /{" "}
-                                    {Math.max(
-                                        1,
-                                        Math.ceil(totalItems / pageSize)
-                                    )}
-                                </span>
-                                <Button
-                                    variant="outline"
-                                    className="text-gray-700 px-3 py-1"
-                                    onClick={() =>
-                                        setPage((p) =>
-                                            Math.min(
+                            ) : displayedItems.length === 0 ? (
+                                <div className="text-center py-12 text-blue-700">
+                                    <Megaphone className="h-12 w-12 mx-auto mb-4 text-royal-blue/40" />
+                                    <p>No announcements match your filters.</p>
+                                </div>
+                            ) : (
+                                <div className="divide-y divide-blue-100">
+                                    {displayedItems.map((item) => (
+                                        <div key={item.id} className="py-4">
+                                            <div className="group flex items-start gap-4 p-3 rounded-lg transition-colors hover:bg-blue-50/50 hover:shadow-sm">
+                                                {/* Thumbnail */}
+                                                <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center border border-blue-100">
+                                                    {item.image_path ? (
+                                                        <img
+                                                            src={(() => {
+                                                                const p =
+                                                                    item.image_path ||
+                                                                    "";
+                                                                if (!p)
+                                                                    return "";
+                                                                if (
+                                                                    p.startsWith(
+                                                                        "http"
+                                                                    )
+                                                                )
+                                                                    return p;
+                                                                if (
+                                                                    p.startsWith(
+                                                                        "/storage/"
+                                                                    )
+                                                                )
+                                                                    return p;
+                                                                // ensure single /storage prefix
+                                                                const cleaned =
+                                                                    p.replace(
+                                                                        /^\/?storage\//,
+                                                                        ""
+                                                                    );
+                                                                return `/storage/${cleaned}`;
+                                                            })()}
+                                                            alt={item.title}
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) =>
+                                                                (e.currentTarget.style.display =
+                                                                    "none")
+                                                            }
+                                                        />
+                                                    ) : (
+                                                        <ImageIcon className="h-5 w-5 text-gray-400" />
+                                                    )}
+                                                </div>
+                                                {/* Main content */}
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2">
+                                                        {item.is_featured && (
+                                                            <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-royal-blue/10 text-royal-blue border border-royal-blue/20">
+                                                                <Star className="h-3 w-3 mr-1" />{" "}
+                                                                Featured
+                                                            </span>
+                                                        )}
+                                                        {item.external_link && (
+                                                            <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                                                                <svg
+                                                                    className="h-3 w-3 mr-1"
+                                                                    fill="none"
+                                                                    stroke="currentColor"
+                                                                    viewBox="0 0 24 24"
+                                                                >
+                                                                    <path
+                                                                        strokeLinecap="round"
+                                                                        strokeLinejoin="round"
+                                                                        strokeWidth={
+                                                                            2
+                                                                        }
+                                                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                                                    />
+                                                                </svg>
+                                                                Link
+                                                            </span>
+                                                        )}
+                                                        <span
+                                                            className={`text-[11px] px-2 py-0.5 rounded-full border ${
+                                                                item.status ===
+                                                                "published"
+                                                                    ? "bg-green-50 text-green-700 border-green-200"
+                                                                    : item.status ===
+                                                                      "archived"
+                                                                    ? "bg-gray-100 text-gray-700 border-gray-200"
+                                                                    : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                                            }`}
+                                                        >
+                                                            {item.status}
+                                                        </span>
+                                                        <span className="text-xs text-gray-500">
+                                                            {item.published_at
+                                                                ? `Published: ${new Date(
+                                                                      item.published_at
+                                                                  ).toLocaleString()}`
+                                                                : item.scheduled_publish_at
+                                                                ? `Scheduled: ${new Date(
+                                                                      item.scheduled_publish_at
+                                                                  ).toLocaleString()}`
+                                                                : `Created: ${new Date(
+                                                                      item.created_at
+                                                                  ).toLocaleString()}`}
+                                                        </span>
+                                                    </div>
+
+                                                    <h3 className="text-lg font-semibold text-gray-900 mt-2 mb-1">
+                                                        {item.title}
+                                                    </h3>
+
+                                                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                                                        {item.content}
+                                                    </p>
+
+                                                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                                                        <span>
+                                                            By {item.author}
+                                                        </span>
+                                                        <span>•</span>
+                                                        <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full">
+                                                            {item.category}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Actions */}
+                                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <label className="flex items-center gap-2 text-sm">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={
+                                                                item.status ===
+                                                                "published"
+                                                            }
+                                                            onChange={() =>
+                                                                toggleStatus(
+                                                                    item
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                publishingId ===
+                                                                item.id
+                                                            }
+                                                            className="h-4 w-4 text-royal-blue border-gray-300 rounded"
+                                                        />
+                                                        {publishingId ===
+                                                        item.id ? (
+                                                            <span className="text-gray-500">
+                                                                Updating...
+                                                            </span>
+                                                        ) : (
+                                                            <span>
+                                                                {item.status ===
+                                                                "published"
+                                                                    ? "Published"
+                                                                    : "Draft"}
+                                                            </span>
+                                                        )}
+                                                    </label>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className={`text-gray-700 ${
+                                                            item.is_featured
+                                                                ? "border-royal-blue text-royal-blue"
+                                                                : ""
+                                                        }`}
+                                                        onClick={async () => {
+                                                            try {
+                                                                setFeaturingId(
+                                                                    item.id
+                                                                );
+                                                                await announcementService.update(
+                                                                    item.id,
+                                                                    {
+                                                                        is_featured:
+                                                                            !item.is_featured,
+                                                                    }
+                                                                );
+                                                                await load();
+                                                            } catch (e) {
+                                                                setError(
+                                                                    "Feature update failed."
+                                                                );
+                                                            } finally {
+                                                                setFeaturingId(
+                                                                    null
+                                                                );
+                                                            }
+                                                        }}
+                                                        disabled={
+                                                            featuringId ===
+                                                            item.id
+                                                        }
+                                                    >
+                                                        <Star className="h-4 w-4 mr-1" />
+                                                        {featuringId === item.id
+                                                            ? "..."
+                                                            : item.is_featured
+                                                            ? "Featured"
+                                                            : "Feature"}
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="text-gray-700"
+                                                        onClick={() =>
+                                                            openEdit(item)
+                                                        }
+                                                    >
+                                                        <Edit className="h-4 w-4 mr-1" />
+                                                        Edit
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="text-red-600 hover:text-red-700"
+                                                        onClick={() =>
+                                                            remove(item.id)
+                                                        }
+                                                    >
+                                                        <Trash2 className="h-4 w-4 mr-1" />
+                                                        Delete
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Pagination footer - Only show for highlights view */}
+                            <div className="flex items-center justify-between mt-6">
+                                <div className="text-sm text-gray-600">
+                                    Showing {displayedItems.length} of{" "}
+                                    {totalItems} items
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-gray-600">
+                                        Rows:
+                                    </span>
+                                    <select
+                                        value={pageSize}
+                                        onChange={(e) => {
+                                            setPageSize(
+                                                parseInt(e.target.value, 10)
+                                            );
+                                            setPage(1);
+                                        }}
+                                        className="rounded-lg border border-blue-100 py-1.5 px-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
+                                    >
+                                        <option value={5}>5</option>
+                                        <option value={10}>10</option>
+                                        <option value={20}>20</option>
+                                        <option value={50}>50</option>
+                                    </select>
+                                    <div className="flex items-center gap-1">
+                                        <Button
+                                            variant="outline"
+                                            className="text-gray-700 px-3 py-1"
+                                            onClick={() =>
+                                                setPage((p) =>
+                                                    Math.max(1, p - 1)
+                                                )
+                                            }
+                                            disabled={page <= 1}
+                                            title="Previous page"
+                                        >
+                                            Prev
+                                        </Button>
+                                        <span className="text-sm text-gray-600 px-2">
+                                            {page} /{" "}
+                                            {Math.max(
+                                                1,
+                                                Math.ceil(totalItems / pageSize)
+                                            )}
+                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            className="text-gray-700 px-3 py-1"
+                                            onClick={() =>
+                                                setPage((p) =>
+                                                    Math.min(
+                                                        Math.max(
+                                                            1,
+                                                            Math.ceil(
+                                                                totalItems /
+                                                                    pageSize
+                                                            )
+                                                        ),
+                                                        p + 1
+                                                    )
+                                                )
+                                            }
+                                            disabled={
+                                                page >=
                                                 Math.max(
                                                     1,
                                                     Math.ceil(
                                                         totalItems / pageSize
                                                     )
-                                                ),
-                                                p + 1
-                                            )
-                                        )
-                                    }
-                                    disabled={
-                                        page >=
-                                        Math.max(
-                                            1,
-                                            Math.ceil(totalItems / pageSize)
-                                        )
-                                    }
-                                    title="Next page"
-                                >
-                                    Next
-                                </Button>
+                                                )
+                                            }
+                                            title="Next page"
+                                        >
+                                            Next
+                                        </Button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        </>
+                    )}
                 </CardContent>
             </Card>
-
-            {showTrash && (
-                <Card className="border-red-200">
-                    <CardHeader className="bg-gradient-to-r from-red-50 to-rose-50">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <CardTitle className="text-red-700">
-                                    Trash
-                                </CardTitle>
-                                <CardDescription className="text-red-600">
-                                    Soft-deleted announcements. Restore or
-                                    delete permanently.
-                                </CardDescription>
-                            </div>
-                            <Button
-                                variant="outline"
-                                className="text-gray-700"
-                                onClick={loadTrashed}
-                            >
-                                Refresh
-                            </Button>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        {trashed.length === 0 ? (
-                            <div className="text-center py-8 text-red-700">
-                                No items in Trash.
-                            </div>
-                        ) : (
-                            <div className="divide-y divide-red-100">
-                                {trashed.map((item) => (
-                                    <div
-                                        key={item.id}
-                                        className="py-4 flex items-start justify-between gap-4"
-                                    >
-                                        <div>
-                                            <h3 className="text-lg font-semibold text-gray-900">
-                                                {item.title}
-                                            </h3>
-                                            <p className="text-sm text-gray-600 line-clamp-2">
-                                                {item.content}
-                                            </p>
-                                            <p className="text-xs text-gray-500 mt-1">
-                                                Deleted at{" "}
-                                                {new Date(
-                                                    item.deleted_at
-                                                ).toLocaleString()}
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Button
-                                                variant="outline"
-                                                className="text-gray-700"
-                                                onClick={async () => {
-                                                    await announcementService.restore(
-                                                        item.id
-                                                    );
-                                                    await load();
-                                                    await loadTrashed();
-                                                }}
-                                            >
-                                                <RotateCcw className="h-4 w-4 mr-2" />{" "}
-                                                Restore
-                                            </Button>
-                                            <Button
-                                                className="bg-red-600 hover:bg-red-700"
-                                                onClick={async () => {
-                                                    if (
-                                                        confirm(
-                                                            "Permanently delete this announcement?"
-                                                        )
-                                                    ) {
-                                                        await announcementService.forceDelete(
-                                                            item.id
-                                                        );
-                                                        await loadTrashed();
-                                                    }
-                                                }}
-                                            >
-                                                <Trash2 className="h-4 w-4 mr-2" />{" "}
-                                                Delete Permanently
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-            )}
 
             {showForm && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -1006,183 +1082,79 @@ const AdminAnnouncements = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-3">
-                                        Featured Image (optional)
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Author
                                     </label>
-                                    <div className="mb-3">
-                                        <label className="block text-xs text-gray-600 mb-1">
-                                            Upload main image (max 1 image, 2MB)
-                                        </label>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => {
-                                                const file =
-                                                    e.target.files?.[0] || null;
+                                    <input
+                                        value={form.author}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                author: e.target.value,
+                                            })
+                                        }
+                                        required
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Image
+                                    </label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
                                                 setForm({
                                                     ...form,
                                                     image: file,
                                                 });
-                                                if (imagePreviewUrl) {
-                                                    URL.revokeObjectURL(
-                                                        imagePreviewUrl
-                                                    );
-                                                }
-                                                if (file) {
+                                                const reader = new FileReader();
+                                                reader.onload = (e) =>
                                                     setImagePreviewUrl(
-                                                        URL.createObjectURL(
-                                                            file
-                                                        )
+                                                        e.target?.result
                                                     );
-                                                } else if (editing) {
-                                                    // If editing and no new file selected, keep existing preview
-                                                    setImagePreviewUrl(
-                                                        editing.image_path
-                                                            ? editing.image_path.startsWith(
-                                                                  "http"
-                                                              )
-                                                                ? editing.image_path
-                                                                : `/storage/${editing.image_path.replace(
-                                                                      /^\/?storage\//,
-                                                                      ""
-                                                                  )}`
-                                                            : ""
-                                                    );
-                                                } else {
-                                                    setImagePreviewUrl("");
-                                                }
-                                            }}
-                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                        />
-                                        {editing && !form.image && (
-                                            <p className="text-xs text-gray-500 mt-1">
-                                                Leave empty to keep current
-                                                image
-                                            </p>
-                                        )}
-                                    </div>
-
+                                                reader.readAsDataURL(file);
+                                            }
+                                        }}
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                    />
                                     {imagePreviewUrl && (
-                                        <div className="mt-3 flex items-center gap-3">
+                                        <div className="mt-2">
                                             <img
                                                 src={imagePreviewUrl}
                                                 alt="Preview"
-                                                className="w-16 h-16 rounded-lg object-cover border border-blue-100"
-                                                onError={(e) => {
-                                                    e.currentTarget.style.display =
-                                                        "none";
-                                                }}
+                                                className="w-full h-32 object-cover rounded-lg border"
                                             />
-                                            <span className="text-xs text-blue-600">
-                                                {form.image
-                                                    ? "New image preview"
-                                                    : "Current featured image"}
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-3">
-                                        Gallery Images (optional)
-                                    </label>
-                                    <div className="mb-3">
-                                        <label className="block text-xs text-gray-600 mb-1">
-                                            Upload multiple images (max 5
-                                            images, 2MB each)
-                                        </label>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            multiple
-                                            onChange={(e) => {
-                                                const files = Array.from(
-                                                    e.target.files || []
-                                                );
-                                                setForm({
-                                                    ...form,
-                                                    images: files,
-                                                });
-                                            }}
-                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                        />
-                                    </div>
-
-                                    {form.images && form.images.length > 0 && (
-                                        <div className="mt-3">
-                                            <p className="text-xs text-blue-600 mb-2">
-                                                {form.images.length} gallery
-                                                image(s) selected
-                                            </p>
-                                            <div className="flex flex-wrap gap-2">
-                                                {form.images.map(
-                                                    (file, index) => (
-                                                        <img
-                                                            key={index}
-                                                            src={URL.createObjectURL(
-                                                                file
-                                                            )}
-                                                            alt={`Gallery ${
-                                                                index + 1
-                                                            }`}
-                                                            className="w-12 h-12 rounded-lg object-cover border border-blue-100"
-                                                            onError={(e) => {
-                                                                e.currentTarget.style.display =
-                                                                    "none";
-                                                            }}
-                                                        />
-                                                    )
-                                                )}
-                                            </div>
                                         </div>
                                     )}
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        External Link (optional)
+                                        External Link (Optional)
                                     </label>
                                     <input
-                                        type="url"
                                         value={form.image_url}
-                                        onChange={(e) => {
-                                            const url = e.target.value;
+                                        onChange={(e) =>
                                             setForm({
                                                 ...form,
-                                                image_url: url,
-                                            });
-                                        }}
-                                        placeholder="https://drive.google.com/... or any external link"
+                                                image_url: e.target.value,
+                                            })
+                                        }
+                                        placeholder="https://example.com"
                                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        Link will be displayed below the image
-                                        for users to view additional content
-                                    </p>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Author
-                                        </label>
+                                <div className="flex items-center gap-4">
+                                    <label className="flex items-center gap-2">
                                         <input
-                                            value={form.author}
-                                            onChange={(e) =>
-                                                setForm({
-                                                    ...form,
-                                                    author: e.target.value,
-                                                })
-                                            }
-                                            required
-                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                        />
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            id="is_featured"
                                             type="checkbox"
-                                            checked={!!form.is_featured}
+                                            checked={form.is_featured}
                                             onChange={(e) =>
                                                 setForm({
                                                     ...form,
@@ -1192,69 +1164,32 @@ const AdminAnnouncements = () => {
                                             }
                                             className="h-4 w-4 text-royal-blue border-gray-300 rounded"
                                         />
-                                        <label
-                                            htmlFor="is_featured"
-                                            className="text-sm text-gray-700"
-                                        >
-                                            Feature on Home page
-                                        </label>
-                                    </div>
+                                        <Star className="h-4 w-4 text-royal-blue" />
+                                        Featured
+                                    </label>
                                 </div>
 
-                                {/* Date/Time Fields */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Scheduled Publish Date & Time
+                                            Scheduled Publish (Optional)
                                         </label>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="datetime-local"
-                                                value={
-                                                    form.scheduled_publish_at
-                                                }
-                                                onChange={(e) =>
-                                                    setForm({
-                                                        ...form,
-                                                        scheduled_publish_at:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    const futureDate =
-                                                        new Date();
-                                                    futureDate.setMinutes(
-                                                        futureDate.getMinutes() +
-                                                            10
-                                                    ); // 10 minutes from now
-                                                    const isoString = futureDate
-                                                        .toISOString()
-                                                        .slice(0, 16); // Format for datetime-local
-                                                    setForm({
-                                                        ...form,
-                                                        scheduled_publish_at:
-                                                            isoString,
-                                                    });
-                                                }}
-                                                className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-sm whitespace-nowrap"
-                                                title="Set to 10 minutes from now"
-                                            >
-                                                +10min
-                                            </button>
-                                        </div>
-                                        <p className="text-xs text-gray-500 mt-1">
-                                            Leave empty to publish immediately.
-                                            Use +10min button for safe future
-                                            scheduling.
-                                        </p>
+                                        <input
+                                            type="datetime-local"
+                                            value={form.scheduled_publish_at}
+                                            onChange={(e) =>
+                                                setForm({
+                                                    ...form,
+                                                    scheduled_publish_at:
+                                                        e.target.value,
+                                                })
+                                            }
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Scheduled Unpublish Date & Time
+                                            Scheduled Unpublish (Optional)
                                         </label>
                                         <input
                                             type="datetime-local"
@@ -1268,14 +1203,10 @@ const AdminAnnouncements = () => {
                                             }
                                             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
                                         />
-                                        <p className="text-xs text-gray-500 mt-1">
-                                            Optional: Automatically unpublish
-                                            the announcement
-                                        </p>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-end gap-2 pt-2">
+                                <div className="flex items-center justify-end gap-3 pt-4">
                                     <Button
                                         type="button"
                                         variant="outline"
@@ -1285,9 +1216,9 @@ const AdminAnnouncements = () => {
                                     </Button>
                                     <Button
                                         type="submit"
-                                        className="bg-royal-blue hover:bg-blue-700 text-white"
+                                        className="bg-royal-blue hover:bg-blue-700"
                                     >
-                                        {editing ? "Save Changes" : "Create"}
+                                        {editing ? "Update" : "Create"}
                                     </Button>
                                 </div>
                             </form>

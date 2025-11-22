@@ -67,7 +67,7 @@ class GalleryImage extends Model
      */
     public function scopeOrdered($query)
     {
-        return $query->orderBy('display_order')->orderBy('created_at', 'desc');
+        return $query->orderBy('created_at', 'desc')->orderBy('display_order');
     }
 
     /**

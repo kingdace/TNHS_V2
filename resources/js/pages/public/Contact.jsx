@@ -10,17 +10,13 @@ import {
     BookOpen,
     Award,
     MessageCircle,
-    Calendar,
-    Globe,
-    Star,
     Shield,
     Heart,
-    Zap,
     Target,
     CheckCircle,
     ArrowRight,
-    ExternalLink,
 } from "lucide-react";
+import CompactPageHeader from "../../components/ui/CompactPageHeader";
 
 const Contact = () => {
     useEffect(() => {
@@ -28,89 +24,73 @@ const Contact = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 pt-24 pb-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Enhanced Header */}
-                <div className="text-center mb-16">
-                    <div className="inline-flex items-center gap-2 bg-blue-100 rounded-full px-4 py-2 mb-6">
-                        <MessageCircle className="w-5 h-5 text-blue-600" />
-                        <span className="text-blue-800 font-medium">
-                            Taft National High School
-                        </span>
-                    </div>
-                    <h1 className="text-5xl font-bold text-gray-900 mb-6">
-                        Contact Us
-                    </h1>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                        We're here to help! Reach out to us for any inquiries,
-                        support, or information about our school community.
-                    </p>
-                </div>
+        <div className="min-h-screen bg-white pb-20">
+            {/* Compact Header */}
+            <CompactPageHeader
+                icon={MessageCircle}
+                title="Contact Us"
+                subtitle="We're here to help! Reach out to us for any inquiries, support, or information about our school community."
+                gradient="from-blue-600 to-purple-600"
+                bgPattern="from-blue-50 to-purple-50"
+            />
 
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
                 {/* Quick Contact Cards */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-                    <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 border-l-4 border-blue-500">
-                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <MapPin className="w-8 h-8 text-blue-600" />
+                <div className="grid md:grid-cols-4 gap-6 mb-12">
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                        <div className="flex items-center gap-3 mb-4">
+                            <MapPin className="w-6 h-6 text-blue-600" />
+                            <h3 className="text-lg font-bold text-gray-800">
+                                Location
+                            </h3>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">
-                            Location
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                            Taft, Surigao City
-                            <br />
-                            Philippines
-                        </p>
+                        <p className="text-gray-600 mb-2">Taft, Surigao City</p>
+                        <p className="text-sm text-gray-500">Philippines</p>
                     </div>
 
-                    <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 border-l-4 border-green-500">
-                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Phone className="w-8 h-8 text-green-600" />
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Phone className="w-6 h-6 text-green-600" />
+                            <h3 className="text-lg font-bold text-gray-800">
+                                Phone
+                            </h3>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">
-                            Phone
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                            (086) 826-1234
-                            <br />
+                        <p className="text-gray-600 mb-2">(086) 826-1234</p>
+                        <p className="text-sm text-gray-500">
                             +63 912 345 6789
                         </p>
                     </div>
 
-                    <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 border-l-4 border-purple-500">
-                        <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Mail className="w-8 h-8 text-purple-600" />
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Mail className="w-6 h-6 text-purple-600" />
+                            <h3 className="text-lg font-bold text-gray-800">
+                                Email
+                            </h3>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">
-                            Email
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                            info@tnhs.edu.ph
-                            <br />
+                        <p className="text-gray-600 mb-2">info@tnhs.edu.ph</p>
+                        <p className="text-sm text-gray-500">
                             admissions@tnhs.edu.ph
                         </p>
                     </div>
 
-                    <div className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-all duration-300 border-l-4 border-orange-500">
-                        <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Clock className="w-8 h-8 text-orange-600" />
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Clock className="w-6 h-6 text-orange-600" />
+                            <h3 className="text-lg font-bold text-gray-800">
+                                Hours
+                            </h3>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">
-                            Hours
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                            Mon-Fri: 7AM-5PM
-                            <br />
-                            Sat: 8AM-12PM
-                        </p>
+                        <p className="text-gray-600 mb-2">Mon-Fri: 7AM-5PM</p>
+                        <p className="text-sm text-gray-500">Sat: 8AM-12PM</p>
                     </div>
                 </div>
 
                 {/* Main Content Grid */}
                 <div className="grid lg:grid-cols-3 gap-8 mb-16">
                     {/* Contact Information */}
-                    <div className="lg:col-span-2">
-                        <div className="bg-white rounded-2xl shadow-xl p-8 border-l-4 border-blue-500">
+                    <div className="lg:col-span-2 flex">
+                        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200 flex-1 flex flex-col">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                                     <MessageCircle className="w-6 h-6 text-blue-600" />
@@ -236,71 +216,73 @@ const Contact = () => {
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="space-y-6">
-                        <div className="bg-white rounded-2xl shadow-xl p-6 border-l-4 border-green-500">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                                    <GraduationCap className="w-5 h-5 text-green-600" />
+                    <div className="flex flex-col">
+                        <div className="grid grid-rows-3 gap-4 flex-1">
+                            <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-200 flex flex-col">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                                        <GraduationCap className="w-5 h-5 text-green-600" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-gray-800">
+                                        Admissions
+                                    </h3>
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-800">
-                                    Admissions
-                                </h3>
+                                <p className="text-sm text-gray-600 mb-4 flex-1">
+                                    Questions about enrollment, requirements, or
+                                    application process?
+                                </p>
+                                <Link
+                                    to="/admissions/requirements"
+                                    className="inline-flex items-center gap-2 w-full justify-center px-4 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors duration-300"
+                                >
+                                    View Requirements
+                                    <ArrowRight className="w-4 h-4" />
+                                </Link>
                             </div>
-                            <p className="text-sm text-gray-600 mb-4">
-                                Questions about enrollment, requirements, or
-                                application process?
-                            </p>
-                            <Link
-                                to="/admissions/requirements"
-                                className="inline-flex items-center gap-2 w-full justify-center px-4 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors duration-300"
-                            >
-                                View Requirements
-                                <ArrowRight className="w-4 h-4" />
-                            </Link>
-                        </div>
 
-                        <div className="bg-white rounded-2xl shadow-xl p-6 border-l-4 border-purple-500">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                                    <BookOpen className="w-5 h-5 text-purple-600" />
+                            <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-200 flex flex-col">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                                        <BookOpen className="w-5 h-5 text-purple-600" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-gray-800">
+                                        Academics
+                                    </h3>
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-800">
-                                    Academics
-                                </h3>
+                                <p className="text-sm text-gray-600 mb-4 flex-1">
+                                    Learn about our programs, curriculum, and
+                                    academic offerings.
+                                </p>
+                                <Link
+                                    to="/academics"
+                                    className="inline-flex items-center gap-2 w-full justify-center px-4 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors duration-300"
+                                >
+                                    Explore Programs
+                                    <ArrowRight className="w-4 h-4" />
+                                </Link>
                             </div>
-                            <p className="text-sm text-gray-600 mb-4">
-                                Learn about our programs, curriculum, and
-                                academic offerings.
-                            </p>
-                            <Link
-                                to="/academics"
-                                className="inline-flex items-center gap-2 w-full justify-center px-4 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors duration-300"
-                            >
-                                Explore Programs
-                                <ArrowRight className="w-4 h-4" />
-                            </Link>
-                        </div>
 
-                        <div className="bg-white rounded-2xl shadow-xl p-6 border-l-4 border-orange-500">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-                                    <Users className="w-5 h-5 text-orange-600" />
+                            <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-200 flex flex-col">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+                                        <Users className="w-5 h-5 text-orange-600" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-gray-800">
+                                        About Us
+                                    </h3>
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-800">
-                                    About Us
-                                </h3>
+                                <p className="text-sm text-gray-600 mb-4 flex-1">
+                                    Discover our mission, vision, history, and
+                                    school community.
+                                </p>
+                                <Link
+                                    to="/about"
+                                    className="inline-flex items-center gap-2 w-full justify-center px-4 py-3 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors duration-300"
+                                >
+                                    Learn More
+                                    <ArrowRight className="w-4 h-4" />
+                                </Link>
                             </div>
-                            <p className="text-sm text-gray-600 mb-4">
-                                Discover our mission, vision, history, and
-                                school community.
-                            </p>
-                            <Link
-                                to="/about"
-                                className="inline-flex items-center gap-2 w-full justify-center px-4 py-3 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors duration-300"
-                            >
-                                Learn More
-                                <ArrowRight className="w-4 h-4" />
-                            </Link>
                         </div>
                     </div>
                 </div>

@@ -20,6 +20,7 @@ import {
     Building,
 } from "lucide-react";
 import { galleryService } from "../../services/galleryService";
+import CompactPageHeader from "../../components/ui/CompactPageHeader";
 
 const Gallery = () => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -240,19 +241,17 @@ const Gallery = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 pt-24 pb-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header */}
-                <div className="text-center mb-12">
-                    <h1 className="text-5xl font-bold text-gray-900 mb-4">
-                        TNHS Gallery
-                    </h1>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Explore moments, achievements, and memories from Taft
-                        National High School of Surigao City
-                    </p>
-                </div>
+        <div className="min-h-screen bg-white pb-20">
+            {/* Compact Header */}
+            <CompactPageHeader
+                icon={Camera}
+                title="Gallery"
+                subtitle="Explore moments, achievements, and memories from Taft National High School. Discover our vibrant school community through photos."
+                gradient="from-blue-600 to-cyan-600"
+                bgPattern="from-blue-50 to-cyan-50"
+            />
 
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
                 {/* Search and Filter Section */}
                 <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
                     <div className="flex flex-col lg:flex-row gap-4">

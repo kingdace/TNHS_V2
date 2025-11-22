@@ -20,6 +20,7 @@ import {
     Zap,
     Trophy,
 } from "lucide-react";
+import CompactPageHeader from "../../components/ui/CompactPageHeader";
 
 const Admissions = () => {
     useEffect(() => {
@@ -125,31 +126,20 @@ const Admissions = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 pt-24 pb-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Enhanced Header */}
-                <div className="text-center mb-16">
-                    <div className="inline-flex items-center gap-2 bg-blue-100 rounded-full px-4 py-2 mb-6">
-                        <School className="w-5 h-5 text-blue-600" />
-                        <span className="text-blue-800 font-medium">
-                            Taft National High School
-                        </span>
-                    </div>
-                    <h1 className="text-5xl font-bold text-gray-900 mb-6">
-                        Enrollment Guidelines & Requirements
-                    </h1>
-                    <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-                        Comprehensive enrollment information for Junior High
-                        School (Grades 7-10) and Senior High School (Grades
-                        11-12) plus special programs. Find detailed
-                        requirements, processes, and guidelines for each
-                        educational level at TNHS.
-                    </p>
-                </div>
+        <div className="min-h-screen bg-white pb-20">
+            {/* Compact Header */}
+            <CompactPageHeader
+                icon={GraduationCap}
+                title="Enrollment Guidelines"
+                subtitle="Comprehensive enrollment information for Junior High School (Grades 7-10) and Senior High School (Grades 11-12) plus special programs."
+                gradient="from-blue-600 to-green-600"
+                bgPattern="from-blue-50 to-green-50"
+            />
 
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
                 {/* School Information Cards */}
                 <div className="grid md:grid-cols-4 gap-6 mb-12">
-                    <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
                         <div className="flex items-center gap-3 mb-4">
                             <Calendar className="w-6 h-6 text-blue-600" />
                             <h3 className="text-lg font-bold text-gray-800">
@@ -164,7 +154,7 @@ const Admissions = () => {
                         </p>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
                         <div className="flex items-center gap-3 mb-4">
                             <Users className="w-6 h-6 text-green-600" />
                             <h3 className="text-lg font-bold text-gray-800">
@@ -179,7 +169,7 @@ const Admissions = () => {
                         </p>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
                         <div className="flex items-center gap-3 mb-4">
                             <Award className="w-6 h-6 text-purple-600" />
                             <h3 className="text-lg font-bold text-gray-800">
@@ -192,7 +182,7 @@ const Admissions = () => {
                         </p>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-teal-500">
+                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
                         <div className="flex items-center gap-3 mb-4">
                             <Globe className="w-6 h-6 text-teal-600" />
                             <h3 className="text-lg font-bold text-gray-800">
