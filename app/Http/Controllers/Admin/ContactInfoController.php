@@ -53,10 +53,18 @@ class ContactInfoController extends Controller
     {
         try {
             $validated = $request->validate([
-                'contact_type' => 'required|string|max:100',
-                'title' => 'nullable|string|max:255',
+                'type' => 'required|string|max:100',
+                'label' => 'required|string|max:255',
                 'value' => 'required|string|max:500',
+                'department' => 'nullable|string|max:255',
+                'position' => 'nullable|string|max:255',
+                'description' => 'nullable|string|max:1000',
                 'icon' => 'nullable|string|max:100',
+                'social_links' => 'nullable|array',
+                'additional_info' => 'nullable|array',
+                'category' => 'required|string|max:100',
+                'featured' => 'boolean',
+                'color' => 'nullable|string|max:50',
                 'display_order' => 'integer|min:0',
                 'is_active' => 'boolean',
             ]);
@@ -110,10 +118,18 @@ class ContactInfoController extends Controller
     {
         try {
             $validated = $request->validate([
-                'contact_type' => 'sometimes|string|max:100',
-                'title' => 'nullable|string|max:255',
+                'type' => 'sometimes|string|max:100',
+                'label' => 'sometimes|string|max:255',
                 'value' => 'sometimes|string|max:500',
+                'department' => 'nullable|string|max:255',
+                'position' => 'nullable|string|max:255',
+                'description' => 'nullable|string|max:1000',
                 'icon' => 'nullable|string|max:100',
+                'social_links' => 'nullable|array',
+                'additional_info' => 'nullable|array',
+                'category' => 'sometimes|string|max:100',
+                'featured' => 'boolean',
+                'color' => 'nullable|string|max:50',
                 'display_order' => 'integer|min:0',
                 'is_active' => 'boolean',
             ]);

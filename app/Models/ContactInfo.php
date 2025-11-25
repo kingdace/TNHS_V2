@@ -12,17 +12,32 @@ class ContactInfo extends Model
     protected $table = 'contact_info';
 
     protected $fillable = [
-        'contact_type',
-        'title',
+        'type',
+        'label',
         'value',
+        'department',
+        'position',
+        'description',
         'icon',
-        'display_order',
+        'social_links',
+        'additional_info',
+        'category',
+        'featured',
+        'color',
         'is_active',
+        'display_order',
+        'created_at',
+        'updated_at'
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'featured' => 'boolean',
         'display_order' => 'integer',
+        'social_links' => 'array',
+        'additional_info' => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
 
     /**
@@ -38,7 +53,7 @@ class ContactInfo extends Model
      */
     public function scopeByType($query, $type)
     {
-        return $query->where('contact_type', $type);
+        return $query->where('type', $type);
     }
 
     /**
@@ -46,6 +61,22 @@ class ContactInfo extends Model
      */
     public function scopeOrdered($query)
     {
-        return $query->orderBy('display_order')->orderBy('title');
+        return $query->orderBy('display_order')->orderBy('label');
+    }
+
+    /**
+     * Scope a query to filter by category.
+     */
+    public function scopeByCategory($query, $category)
+    {
+        return $query->where('category', $category);
+    }
+
+    /**
+     * Scope a query to only include featured contact info.
+     */
+    public function scopeFeatured($query)
+    {
+        return $query->where('featured', true);
     }
 }

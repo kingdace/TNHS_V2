@@ -7,7 +7,6 @@ import {
     Eye,
     EyeOff,
     Search,
-    Filter,
     Phone,
     AlertCircle,
     CheckCircle,
@@ -16,61 +15,137 @@ import {
     MapPin,
     Clock,
     ExternalLink,
+    Building,
+    Users,
+    GraduationCap,
+    Save,
+    X,
 } from "lucide-react";
 
 const ContactInfo = () => {
-    const [contactInfo, setContactInfo] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [filterType, setFilterType] = useState("");
-    const [showForm, setShowForm] = useState(false);
-    const [editingInfo, setEditingInfo] = useState(null);
-    const [formData, setFormData] = useState({
-        contact_type: "email",
-        title: "",
-        value: "",
-        icon: "",
-        display_order: 0,
-        is_active: true,
+    const [activeTab, setActiveTab] = useState("general");
+    const [editingSection, setEditingSection] = useState(null);
+    const [saving, setSaving] = useState(false);
+
+    // Organized contact data by category
+    const [contactSections, setContactSections] = useState({
+        general: {
+            name: "General Information",
+            icon: Building,
+            color: "blue",
+            contacts: {
+                phone: {
+                    label: "Main Phone",
+                    value: "",
+                    description: "",
+                    id: null,
+                },
+                email: {
+                    label: "Main Email",
+                    value: "",
+                    description: "",
+                    id: null,
+                },
+                address: {
+                    label: "School Address",
+                    value: "",
+                    description: "",
+                    id: null,
+                },
+                hours: {
+                    label: "Office Hours",
+                    value: "",
+                    description: "",
+                    id: null,
+                },
+            },
+        },
+        admissions: {
+            name: "Admissions Office",
+            icon: GraduationCap,
+            color: "green",
+            contacts: {
+                phone: {
+                    label: "Admissions Phone",
+                    value: "",
+                    description: "",
+                    id: null,
+                },
+                email: {
+                    label: "Admissions Email",
+                    value: "",
+                    description: "",
+                    id: null,
+                },
+                hours: {
+                    label: "Admissions Hours",
+                    value: "",
+                    description: "",
+                    id: null,
+                },
+                address: {
+                    label: "School Address",
+                    value: "",
+                    description: "",
+                    id: null,
+                    readOnly: true,
+                },
+            },
+        },
+        support: {
+            name: "Student Support",
+            icon: Users,
+            color: "purple",
+            contacts: {
+                phone: {
+                    label: "Support Phone",
+                    value: "",
+                    description: "",
+                    id: null,
+                },
+                email: {
+                    label: "Support Email",
+                    value: "",
+                    description: "",
+                    id: null,
+                },
+                hours: {
+                    label: "Support Hours",
+                    value: "",
+                    description: "",
+                    id: null,
+                },
+                address: {
+                    label: "School Address",
+                    value: "",
+                    description: "",
+                    id: null,
+                    readOnly: true,
+                },
+            },
+        },
     });
 
-    const contactTypes = [
+    const tabs = [
         {
-            value: "email",
-            label: "Email",
-            icon: Mail,
-            placeholder: "admin@tnhs.edu.ph",
+            id: "general",
+            name: "General Information",
+            icon: Building,
+            color: "blue",
         },
         {
-            value: "phone",
-            label: "Phone",
-            icon: Phone,
-            placeholder: "(02) 123-4567",
+            id: "admissions",
+            name: "Admissions Office",
+            icon: GraduationCap,
+            color: "green",
         },
         {
-            value: "address",
-            label: "Address",
-            icon: MapPin,
-            placeholder: "Taft, Surigao City, Philippines",
-        },
-        {
-            value: "hours",
-            label: "Office Hours",
-            icon: Clock,
-            placeholder: "Monday - Friday: 7:00 AM - 5:00 PM",
-        },
-        {
-            value: "website",
-            label: "Website",
-            icon: ExternalLink,
-            placeholder: "https://www.tnhs.edu.ph",
-        },
-        {
-            value: "social",
-            label: "Social Media",
-            icon: ExternalLink,
-            placeholder: "Facebook: @tnhs",
+            id: "support",
+            name: "Student Support",
+            icon: Users,
+            color: "purple",
         },
     ];
 
@@ -81,11 +156,33 @@ const ContactInfo = () => {
     const fetchContactInfo = async () => {
         try {
             setLoading(true);
-            const response = await adminService.contactInfo.getAll({
-                type: filterType,
-                active: null,
+            const response = await adminService.contactInfo.getAll();
+            const contacts = response.data || [];
+
+            // Organize contacts into sections
+            const organized = { ...contactSections };
+
+            contacts.forEach((contact) => {
+                const category = contact.category || "general";
+                const type = contact.type;
+
+                if (organized[category] && organized[category].contacts[type]) {
+                    organized[category].contacts[type] = {
+                        id: contact.id,
+                        label:
+                            contact.label ||
+                            organized[category].contacts[type].label,
+                        value: contact.value || "",
+                        description: contact.description || "",
+                        department: contact.department || "",
+                        position: contact.position || "",
+                        is_active: contact.is_active ?? true,
+                        display_order: contact.display_order || 0,
+                    };
+                }
             });
-            setContactInfo(response.data || []);
+
+            setContactSections(organized);
             setError("");
         } catch (err) {
             setError("Failed to fetch contact information");
@@ -95,122 +192,100 @@ const ContactInfo = () => {
         }
     };
 
-    const handleCreate = async (e) => {
-        e.preventDefault();
+    const handleSaveSection = async (sectionId) => {
         try {
-            const response = await adminService.contactInfo.create(formData);
-            if (response.success) {
-                setShowForm(false);
-                setFormData({
-                    contact_type: "email",
-                    title: "",
-                    value: "",
-                    icon: "",
-                    display_order: 0,
-                    is_active: true,
-                });
-                fetchContactInfo();
+            setSaving(true);
+            const section = contactSections[sectionId];
+
+            // Save each contact in the section
+            for (const [type, contact] of Object.entries(section.contacts)) {
+                if (contact.value && contact.value.trim()) {
+                    const contactData = {
+                        type: type,
+                        label: contact.label,
+                        value: contact.value,
+                        description: contact.description || "",
+                        department: section.name,
+                        position: "",
+                        category: sectionId,
+                        featured: true,
+                        color: section.color,
+                        is_active: true,
+                        display_order: 0,
+                    };
+
+                    if (contact.id) {
+                        // Update existing
+                        await adminService.contactInfo.update(
+                            contact.id,
+                            contactData
+                        );
+                    } else {
+                        // Create new
+                        const response = await adminService.contactInfo.create(
+                            contactData
+                        );
+                        if (response.success && response.data) {
+                            // Update the contact with the new ID
+                            setContactSections((prev) => ({
+                                ...prev,
+                                [sectionId]: {
+                                    ...prev[sectionId],
+                                    contacts: {
+                                        ...prev[sectionId].contacts,
+                                        [type]: {
+                                            ...prev[sectionId].contacts[type],
+                                            id: response.data.id,
+                                        },
+                                    },
+                                },
+                            }));
+                        }
+                    }
+                }
             }
+
+            setEditingSection(null);
+            await fetchContactInfo();
+            setError("");
         } catch (err) {
-            setError("Failed to create contact information");
-            console.error("Error creating contact info:", err);
+            setError("Failed to save contact information");
+            console.error("Error saving contact info:", err);
+        } finally {
+            setSaving(false);
         }
     };
 
-    const handleUpdate = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await adminService.contactInfo.update(
-                editingInfo.id,
-                formData
-            );
-            if (response.success) {
-                setShowForm(false);
-                setEditingInfo(null);
-                setFormData({
-                    contact_type: "email",
-                    title: "",
-                    value: "",
-                    icon: "",
-                    display_order: 0,
-                    is_active: true,
-                });
-                fetchContactInfo();
-            }
-        } catch (err) {
-            setError("Failed to update contact information");
-            console.error("Error updating contact info:", err);
+    const handleUpdateContact = (sectionId, type, field, value) => {
+        setContactSections((prev) => ({
+            ...prev,
+            [sectionId]: {
+                ...prev[sectionId],
+                contacts: {
+                    ...prev[sectionId].contacts,
+                    [type]: {
+                        ...prev[sectionId].contacts[type],
+                        [field]: value,
+                    },
+                },
+            },
+        }));
+    };
+
+    const getContactIcon = (type) => {
+        switch (type) {
+            case "phone":
+                return <Phone className="w-5 h-5" />;
+            case "email":
+                return <Mail className="w-5 h-5" />;
+            case "address":
+                return <MapPin className="w-5 h-5" />;
+            case "hours":
+                return <Clock className="w-5 h-5" />;
+            default:
+                return <Phone className="w-5 h-5" />;
         }
     };
-
-    const handleDelete = async (id) => {
-        if (
-            window.confirm(
-                "Are you sure you want to delete this contact information?"
-            )
-        ) {
-            try {
-                await adminService.contactInfo.delete(id);
-                fetchContactInfo();
-            } catch (err) {
-                setError("Failed to delete contact information");
-                console.error("Error deleting contact info:", err);
-            }
-        }
-    };
-
-    const handleToggleActive = async (id) => {
-        try {
-            await adminService.contactInfo.toggleActive(id);
-            fetchContactInfo();
-        } catch (err) {
-            setError("Failed to toggle contact information status");
-            console.error("Error toggling contact info:", err);
-        }
-    };
-
-    const handleEdit = (info) => {
-        setEditingInfo(info);
-        setFormData({
-            contact_type: info.contact_type,
-            title: info.title || "",
-            value: info.value,
-            icon: info.icon || "",
-            display_order: info.display_order,
-            is_active: info.is_active,
-        });
-        setShowForm(true);
-    };
-
-    const getContactTypeIcon = (type) => {
-        const contactType = contactTypes.find((t) => t.value === type);
-        return contactType ? contactType.icon : Phone;
-    };
-
-    const getContactTypeColor = (type) => {
-        const colors = {
-            email: "bg-blue-100 text-blue-800",
-            phone: "bg-green-100 text-green-800",
-            address: "bg-purple-100 text-purple-800",
-            hours: "bg-orange-100 text-orange-800",
-            website: "bg-indigo-100 text-indigo-800",
-            social: "bg-pink-100 text-pink-800",
-        };
-        return colors[type] || "bg-gray-100 text-gray-800";
-    };
-
-    const getContactTypePlaceholder = (type) => {
-        const contactType = contactTypes.find((t) => t.value === type);
-        return contactType ? contactType.placeholder : "";
-    };
-
-    const filteredInfo = contactInfo.filter((info) => {
-        const matchesSearch =
-            info.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            info.value?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesFilter = !filterType || info.contact_type === filterType;
-        return matchesSearch && matchesFilter;
-    });
 
     if (loading) {
         return (
@@ -222,375 +297,220 @@ const ContactInfo = () => {
 
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">
-                        Contact Information
+            {/* Compact Header */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
+                <div className="text-center">
+                    <h1 className="text-xl font-bold text-gray-900 mb-1">
+                        Contact Information Management
                     </h1>
-                    <p className="text-gray-600">
-                        Manage contact details, addresses, and communication
-                        information
+                    <p className="text-sm text-gray-600 max-w-xl mx-auto">
+                        Manage contact details organized by department and
+                        purpose
                     </p>
-                </div>
-                <button
-                    onClick={() => setShowForm(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
-                >
-                    <Plus className="h-4 w-4" />
-                    Add Contact Info
-                </button>
-            </div>
-
-            {/* Filters */}
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-                <div className="flex gap-4">
-                    <div className="flex-1">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                            <input
-                                type="text"
-                                placeholder="Search contact information..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                        </div>
-                    </div>
-                    <div className="w-48">
-                        <select
-                            value={filterType}
-                            onChange={(e) => setFilterType(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                            <option value="">All Types</option>
-                            {contactTypes.map((type) => (
-                                <option key={type.value} value={type.value}>
-                                    {type.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
                 </div>
             </div>
 
             {/* Error Message */}
             {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2">
-                    <AlertCircle className="h-5 w-5" />
-                    {error}
+                <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-6 py-4 rounded-r-lg flex items-center gap-3 shadow-sm">
+                    <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                    <span className="font-medium">{error}</span>
                 </div>
             )}
 
-            {/* Contact Information List */}
-            <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-                {filteredInfo.length === 0 ? (
-                    <div className="text-center py-12">
-                        <Phone className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">
-                            No contact information found
-                        </h3>
-                        <p className="text-gray-600">
-                            {searchTerm || filterType
-                                ? "Try adjusting your search or filters"
-                                : "Get started by adding your first contact information"}
-                        </p>
-                    </div>
-                ) : (
-                    <div className="divide-y divide-gray-200">
-                        {filteredInfo.map((info) => {
-                            const Icon = getContactTypeIcon(info.contact_type);
-                            return (
-                                <div
-                                    key={info.id}
-                                    className="p-6 hover:bg-gray-100 transition-colors"
-                                >
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-3">
-                                                <div
-                                                    className={`p-2 rounded-lg ${getContactTypeColor(
-                                                        info.contact_type
-                                                    )}`}
-                                                >
-                                                    <Icon className="h-5 w-5" />
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-lg font-semibold text-gray-900">
-                                                        {info.title ||
-                                                            info.contact_type
-                                                                .charAt(0)
-                                                                .toUpperCase() +
-                                                                info.contact_type.slice(
-                                                                    1
-                                                                )}
-                                                    </h3>
-                                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                        <span className="capitalize">
-                                                            {info.contact_type.replace(
-                                                                "_",
-                                                                " "
-                                                            )}
-                                                        </span>
-                                                        <span>•</span>
-                                                        <span>
-                                                            Order:{" "}
-                                                            {info.display_order}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
+            {/* Compact Centered Tabs */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                    <nav className="flex justify-center">
+                        <div className="flex space-x-1 bg-gray-100 p-1 rounded-md">
+                            {tabs.map((tab) => {
+                                const Icon = tab.icon;
+                                const isActive = activeTab === tab.id;
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`${
+                                            isActive
+                                                ? `bg-white text-${tab.color}-600 shadow-sm border border-gray-200`
+                                                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                        } px-3 py-2 rounded-md font-medium text-sm flex items-center gap-2 transition-all duration-200 min-w-[120px] justify-center`}
+                                    >
+                                        <Icon className="w-4 h-4" />
+                                        {tab.name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </nav>
+                </div>
 
-                                            <div className="mb-3">
-                                                <p className="text-gray-900 font-medium">
-                                                    {info.value}
-                                                </p>
-                                                {info.icon && (
-                                                    <p className="text-sm text-gray-500 mt-1">
-                                                        Icon: {info.icon}
-                                                    </p>
-                                                )}
-                                            </div>
+                {/* Enhanced Content */}
+                {Object.entries(contactSections).map(([sectionId, section]) => {
+                    if (activeTab !== sectionId) return null;
 
-                                            <div className="flex items-center gap-2">
-                                                <span
-                                                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                                                        info.is_active
-                                                            ? "bg-green-100 text-green-800"
-                                                            : "bg-red-100 text-red-800"
-                                                    }`}
-                                                >
-                                                    {info.is_active ? (
-                                                        <CheckCircle className="h-3 w-3" />
-                                                    ) : (
-                                                        <AlertCircle className="h-3 w-3" />
-                                                    )}
-                                                    {info.is_active
-                                                        ? "Active"
-                                                        : "Inactive"}
-                                                </span>
-                                            </div>
-                                        </div>
+                    const Icon = section.icon;
+                    const isEditing = editingSection === sectionId;
 
-                                        <div className="flex items-center gap-2 ml-4">
-                                            <button
-                                                onClick={() =>
-                                                    handleToggleActive(info.id)
-                                                }
-                                                className={`p-2 rounded-lg transition-colors ${
-                                                    info.is_active
-                                                        ? "text-red-600 hover:bg-red-50"
-                                                        : "text-green-600 hover:bg-green-50"
-                                                }`}
-                                                title={
-                                                    info.is_active
-                                                        ? "Deactivate"
-                                                        : "Activate"
-                                                }
-                                            >
-                                                {info.is_active ? (
-                                                    <EyeOff className="h-4 w-4" />
-                                                ) : (
-                                                    <Eye className="h-4 w-4" />
-                                                )}
-                                            </button>
-                                            <button
-                                                onClick={() => handleEdit(info)}
-                                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                title="Edit"
-                                            >
-                                                <Edit className="h-4 w-4" />
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(info.id)
-                                                }
-                                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Delete"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
-                                        </div>
+                    return (
+                        <div key={sectionId} className="p-6">
+                            {/* Compact Section Header */}
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-3">
+                                    <div
+                                        className={`w-10 h-10 bg-gradient-to-br from-${section.color}-100 to-${section.color}-200 rounded-lg flex items-center justify-center shadow-sm border border-${section.color}-200`}
+                                    >
+                                        <Icon
+                                            className={`w-5 h-5 text-${section.color}-600`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-bold text-gray-900">
+                                            {section.name}
+                                        </h2>
+                                        <p className="text-sm text-gray-600">
+                                            Manage contact information for{" "}
+                                            {section.name.toLowerCase()}
+                                        </p>
                                     </div>
                                 </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
 
-            {/* Form Modal */}
-            {showForm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-                        <div className="p-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">
-                                {editingInfo
-                                    ? "Edit Contact Information"
-                                    : "Add New Contact Information"}
-                            </h2>
-
-                            <form
-                                onSubmit={
-                                    editingInfo ? handleUpdate : handleCreate
-                                }
-                                className="space-y-4"
-                            >
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Contact Type
-                                    </label>
-                                    <select
-                                        value={formData.contact_type}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                contact_type: e.target.value,
-                                            })
-                                        }
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        required
-                                    >
-                                        {contactTypes.map((type) => (
-                                            <option
-                                                key={type.value}
-                                                value={type.value}
+                                <div className="flex items-center gap-2">
+                                    {isEditing ? (
+                                        <>
+                                            <button
+                                                onClick={() =>
+                                                    handleSaveSection(sectionId)
+                                                }
+                                                disabled={saving}
+                                                className={`px-4 py-2 bg-gradient-to-r from-${section.color}-600 to-${section.color}-700 text-white rounded-lg hover:from-${section.color}-700 hover:to-${section.color}-800 flex items-center gap-2 disabled:opacity-50 shadow-md hover:shadow-lg transition-all duration-200 font-medium text-sm`}
                                             >
-                                                {type.label}
-                                            </option>
-                                        ))}
-                                    </select>
+                                                {saving ? (
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                ) : (
+                                                    <Save className="w-4 h-4" />
+                                                )}
+                                                Save Changes
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    setEditingSection(null)
+                                                }
+                                                className="px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 flex items-center gap-2 transition-all duration-200 font-medium text-sm"
+                                            >
+                                                <X className="w-4 h-4" />
+                                                Cancel
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <button
+                                            onClick={() =>
+                                                setEditingSection(sectionId)
+                                            }
+                                            className={`px-4 py-2 bg-gradient-to-r from-${section.color}-600 to-${section.color}-700 text-white rounded-lg hover:from-${section.color}-700 hover:to-${section.color}-800 flex items-center gap-2 shadow-md hover:shadow-lg transition-all duration-200 font-medium text-sm`}
+                                        >
+                                            <Edit className="w-4 h-4" />
+                                            Edit Section
+                                        </button>
+                                    )}
                                 </div>
+                            </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Title
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={formData.title}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                title: e.target.value,
-                                            })
-                                        }
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="Optional title for this contact info"
-                                    />
-                                </div>
+                            {/* Compact Contact Fields */}
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {Object.entries(section.contacts).map(
+                                    ([type, contact]) => (
+                                        <div
+                                            key={type}
+                                            className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-gray-300 transition-colors duration-200"
+                                        >
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <div
+                                                    className={`w-6 h-6 bg-${section.color}-100 rounded-md flex items-center justify-center`}
+                                                >
+                                                    {getContactIcon(type)}
+                                                </div>
+                                                <label className="block text-sm font-semibold text-gray-900">
+                                                    {contact.label}
+                                                </label>
+                                            </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Value
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={formData.value}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                value: e.target.value,
-                                            })
-                                        }
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder={getContactTypePlaceholder(
-                                            formData.contact_type
-                                        )}
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Icon
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={formData.icon}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                icon: e.target.value,
-                                            })
-                                        }
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="Optional icon name (e.g., mail, phone, map-pin)"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Display Order
-                                    </label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        value={formData.display_order}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                display_order:
-                                                    parseInt(e.target.value) ||
-                                                    0,
-                                            })
-                                        }
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
-                                </div>
-
-                                <div className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id="is_active"
-                                        checked={formData.is_active}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                is_active: e.target.checked,
-                                            })
-                                        }
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                    />
-                                    <label
-                                        htmlFor="is_active"
-                                        className="ml-2 block text-sm text-gray-900"
-                                    >
-                                        Active
-                                    </label>
-                                </div>
-
-                                <div className="flex justify-end gap-3 pt-4">
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setShowForm(false);
-                                            setEditingInfo(null);
-                                            setFormData({
-                                                contact_type: "email",
-                                                title: "",
-                                                value: "",
-                                                icon: "",
-                                                display_order: 0,
-                                                is_active: true,
-                                            });
-                                        }}
-                                        className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                                    >
-                                        {editingInfo ? "Update" : "Create"}
-                                    </button>
-                                </div>
-                            </form>
+                                            {isEditing ? (
+                                                <div className="space-y-3">
+                                                    <div>
+                                                        <input
+                                                            type={
+                                                                type === "email"
+                                                                    ? "email"
+                                                                    : "text"
+                                                            }
+                                                            value={
+                                                                contact.value
+                                                            }
+                                                            onChange={(e) =>
+                                                                handleUpdateContact(
+                                                                    sectionId,
+                                                                    type,
+                                                                    "value",
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-${section.color}-500 focus:border-${section.color}-500 transition-colors duration-200 bg-white text-sm`}
+                                                            placeholder={`Enter ${contact.label.toLowerCase()}`}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <textarea
+                                                            value={
+                                                                contact.description
+                                                            }
+                                                            onChange={(e) =>
+                                                                handleUpdateContact(
+                                                                    sectionId,
+                                                                    type,
+                                                                    "description",
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-${section.color}-500 focus:border-${section.color}-500 transition-colors duration-200 bg-white resize-none text-sm`}
+                                                            placeholder="Optional description"
+                                                            rows="2"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2">
+                                                    <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                                        <div className="text-gray-900 font-medium text-sm">
+                                                            {contact.value || (
+                                                                <span className="text-gray-400 italic text-base">
+                                                                    Not set -
+                                                                    Click "Edit
+                                                                    Section" to
+                                                                    add
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {contact.description && (
+                                                            <div className="text-gray-600 mt-2 text-sm leading-relaxed">
+                                                                {
+                                                                    contact.description
+                                                                }
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )
+                                )}
+                            </div>
                         </div>
-                    </div>
-                </div>
-            )}
+                    );
+                })}
+            </div>
         </div>
     );
 };

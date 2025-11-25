@@ -880,7 +880,7 @@ export const adminService = {
         async toggleActive(id) {
             try {
                 const response = await makeRequest(
-                    `/admin/contact-info/${id}/toggle-active`,
+                    `/api/admin/contact-info/${id}/toggle-active`,
                     {
                         method: "POST",
                         headers: getHeaders(),

@@ -104,6 +104,14 @@ const AdminLayout = () => {
         //     icon: ExternalLink,
         // },
 
+        // Contact Management
+        {
+            name: "Contact Information",
+            description: "Manage contact details",
+            href: "/admin/contact-info",
+            icon: Phone,
+        },
+
         // Site Management
         {
             name: "About Management",
