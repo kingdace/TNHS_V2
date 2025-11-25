@@ -89,6 +89,16 @@ Route::prefix('api')->group(function () {
     Route::get('/contact-info/addresses', [\App\Http\Controllers\Api\ContactInfoController::class, 'addresses']);
     Route::get('/contact-info/hours', [\App\Http\Controllers\Api\ContactInfoController::class, 'hours']);
 
+    // Enrollment Guidelines API routes
+    Route::prefix('enrollment-guidelines')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\EnrollmentGuidelinesController::class, 'index']);
+        Route::get('/info-cards', [\App\Http\Controllers\Api\EnrollmentGuidelinesController::class, 'getInfoCards']);
+        Route::get('/grade-categories', [\App\Http\Controllers\Api\EnrollmentGuidelinesController::class, 'getGradeCategories']);
+        Route::get('/special-programs', [\App\Http\Controllers\Api\EnrollmentGuidelinesController::class, 'getSpecialPrograms']);
+        Route::get('/category/{categoryId}', [\App\Http\Controllers\Api\EnrollmentGuidelinesController::class, 'getCategory']);
+        Route::get('/special-program/{programId}', [\App\Http\Controllers\Api\EnrollmentGuidelinesController::class, 'getSpecialProgram']);
+    });
+
     // Notification routes (no auth required for now - can be added later)
     Route::prefix('notifications')->group(function () {
         Route::get('/', [\App\Http\Controllers\Api\NotificationController::class, 'index']);
@@ -142,6 +152,14 @@ Route::prefix('api')->group(function () {
 
         // Privacy Policy Management
         Route::apiResource('privacy-policies', \App\Http\Controllers\Admin\PrivacyPolicyController::class);
+
+        // Enrollment Guidelines Management
+        Route::prefix('enrollment-guidelines')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\EnrollmentGuidelinesController::class, 'index']);
+            Route::put('/info-cards', [\App\Http\Controllers\Admin\EnrollmentGuidelinesController::class, 'updateInfoCards']);
+            Route::put('/category/{categoryId}', [\App\Http\Controllers\Admin\EnrollmentGuidelinesController::class, 'updateCategory']);
+            Route::put('/special-program/{programId}', [\App\Http\Controllers\Admin\EnrollmentGuidelinesController::class, 'updateSpecialProgram']);
+        });
 
         // Toggle active status routes
         Route::post('/missions/{mission}/toggle-active', [\App\Http\Controllers\Admin\MissionController::class, 'toggleActive']);

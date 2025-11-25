@@ -4,6 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Targeted fix for horizontal scrolling - minimal impact */
+html,
+body {
+    overflow-x: hidden;
+}
+
 /* Custom animations for login page */
 @keyframes fade-in {
     from {

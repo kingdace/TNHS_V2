@@ -112,6 +112,14 @@ const AdminLayout = () => {
             icon: Phone,
         },
 
+        // Enrollment Management
+        {
+            name: "Enrollment Guidelines",
+            description: "Manage enrollment information",
+            href: "/admin/enrollment-guidelines",
+            icon: GraduationCap,
+        },
+
         // Site Management
         {
             name: "About Management",
@@ -186,6 +194,8 @@ const AdminLayout = () => {
         if (path.includes("/admin/resources")) return "Resources Management";
         if (path.includes("/admin/about")) return "About Management";
         if (path.includes("/admin/contact-info")) return "Contact Information";
+        if (path.includes("/admin/enrollment-guidelines"))
+            return "Enrollment Guidelines";
         if (path.includes("/admin/page-content")) return "Page Content";
         if (path.includes("/admin/users")) return "User Management";
         if (path.includes("/admin/download-files")) return "Download Files";

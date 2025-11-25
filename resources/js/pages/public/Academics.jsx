@@ -264,14 +264,14 @@ const Academics = () => {
                         {/* Junior High School Program - Enhanced Image Design */}
                         <div
                             id="junior-high-section"
-                            className="relative rounded-3xl shadow-2xl overflow-hidden transform hover:scale-105 transition-all duration-500 group"
+                            className="relative rounded-3xl shadow-2xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300 group"
                         >
                             {/* Background Image */}
                             <div className="relative h-80 overflow-hidden">
                                 <img
                                     src="/images/JHS.jpg"
                                     alt="Junior High School Students"
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
                                 {/* Gradient Overlay for Better Text Readability */}
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -280,8 +280,8 @@ const Academics = () => {
                             {/* Content Below Image - Enhanced */}
                             <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 text-center relative overflow-hidden">
                                 {/* Decorative Background Elements */}
-                                <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200/30 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500"></div>
-                                <div className="absolute bottom-0 left-0 w-16 h-16 bg-blue-300/30 rounded-full translate-y-8 -translate-x-8 group-hover:scale-125 transition-transform duration-500"></div>
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200/30 rounded-full -translate-y-10 translate-x-10 group-hover:scale-110 transition-transform duration-300"></div>
+                                <div className="absolute bottom-0 left-0 w-16 h-16 bg-blue-300/30 rounded-full translate-y-8 -translate-x-8 group-hover:scale-105 transition-transform duration-300"></div>
 
                                 {/* Title */}
                                 <div className="mb-4 relative z-10">
@@ -293,7 +293,7 @@ const Academics = () => {
 
                                 {/* Button - Enhanced */}
                                 <button
-                                    className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 relative overflow-hidden group/btn"
+                                    className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] hover:-translate-y-0.5 relative overflow-hidden group/btn"
                                     onClick={() => {
                                         // Open Junior High dropdown in navigation
                                         const academicDropdown =
@@ -332,14 +332,14 @@ const Academics = () => {
                         {/* Senior High School Program - Enhanced Image Design */}
                         <div
                             id="senior-high-section"
-                            className="relative rounded-3xl shadow-2xl overflow-hidden transform hover:scale-105 transition-all duration-500 group"
+                            className="relative rounded-3xl shadow-2xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300 group"
                         >
                             {/* Background Image */}
                             <div className="relative h-80 overflow-hidden">
                                 <img
                                     src="/images/SHS.jpg"
                                     alt="Senior High School Students"
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
                                 {/* Gradient Overlay for Better Text Readability */}
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -348,8 +348,8 @@ const Academics = () => {
                             {/* Content Below Image - Enhanced */}
                             <div className="bg-gradient-to-r from-green-50 to-green-100 p-6 text-center relative overflow-hidden">
                                 {/* Decorative Background Elements */}
-                                <div className="absolute top-0 right-0 w-20 h-20 bg-green-200/30 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500"></div>
-                                <div className="absolute bottom-0 left-0 w-16 h-16 bg-green-300/30 rounded-full translate-y-8 -translate-x-8 group-hover:scale-125 transition-transform duration-500"></div>
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-green-200/30 rounded-full -translate-y-10 translate-x-10 group-hover:scale-110 transition-transform duration-300"></div>
+                                <div className="absolute bottom-0 left-0 w-16 h-16 bg-green-300/30 rounded-full translate-y-8 -translate-x-8 group-hover:scale-105 transition-transform duration-300"></div>
 
                                 {/* Title */}
                                 <div className="mb-4 relative z-10">
@@ -361,7 +361,7 @@ const Academics = () => {
 
                                 {/* Button - Enhanced */}
                                 <button
-                                    className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 relative overflow-hidden group/btn"
+                                    className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] hover:-translate-y-0.5 relative overflow-hidden group/btn"
                                     onClick={() => {
                                         // Open Senior High dropdown in navigation
                                         const academicDropdown =

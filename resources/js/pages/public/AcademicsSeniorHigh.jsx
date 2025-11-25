@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { ChevronRight, ArrowLeft } from "lucide-react";
+import Breadcrumb from "../../components/ui/Breadcrumb";
 
 const AcademicsSeniorHigh = () => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -61,7 +60,7 @@ const AcademicsSeniorHigh = () => {
             shortTitle: "STEM",
             description:
                 "Advanced program focusing on science, technology, engineering, and mathematics. Prepare for college and university education in STEM fields.",
-                features: [
+            features: [
                 "Advanced Mathematics & Science",
                 "Research & Development Projects",
                 "Technology Integration",
@@ -81,7 +80,7 @@ const AcademicsSeniorHigh = () => {
             shortTitle: "HUMSS",
             description:
                 "Program focusing on human behavior, society, and cultural understanding. Develop critical thinking and communication skills.",
-                features: [
+            features: [
                 "Social & Behavioral Sciences",
                 "Communication Excellence",
                 "Research Methodology",
@@ -101,7 +100,7 @@ const AcademicsSeniorHigh = () => {
             shortTitle: "TVL",
             description:
                 "Skills-based education with specialized strands for immediate employment and entrepreneurship opportunities.",
-                    features: [
+            features: [
                 "ICT Strand",
                 "Computer Systems Servicing",
                 "Hands-on Training",
@@ -119,43 +118,17 @@ const AcademicsSeniorHigh = () => {
 
     const currentStrand = strands[currentPage];
 
+    const breadcrumbItems = [
+        { label: "Academics", href: "/academics" },
+        { label: "Senior High School" },
+    ];
+
     return (
         <div className="min-h-screen bg-white">
+            {/* Breadcrumb */}
+            <Breadcrumb items={breadcrumbItems} />
+
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Breadcrumbs */}
-                <nav className="mb-8">
-                    <div className="flex items-center space-x-4 text-lg">
-                        <Link
-                            to="/"
-                            className="hover:text-blue-600 transition-all duration-300 font-bold text-gray-800 hover:underline hover:scale-105 transform"
-                        >
-                            Home
-                        </Link>
-                        <ChevronRight className="h-6 w-6 text-gray-500" />
-                        <Link
-                            to="/academics"
-                            className="hover:text-blue-600 transition-all duration-300 font-bold text-gray-800 hover:underline hover:scale-105 transform"
-                        >
-                            Academics
-                        </Link>
-                        <ChevronRight className="h-6 w-6 text-gray-500" />
-                        <span className="text-blue-600 font-bold text-xl bg-blue-50 px-3 py-1 rounded-lg shadow-sm">
-                            Senior High School
-                        </span>
-                    </div>
-                </nav>
-
-                {/* Back to Programs Overview */}
-                <div className="mb-8">
-                    <Link
-                        to="/academics"
-                        className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-all duration-300 font-bold text-lg hover:underline hover:scale-105 transform bg-blue-50 px-4 py-2 rounded-lg shadow-sm hover:shadow-md"
-                    >
-                        <ArrowLeft className="h-5 w-5 mr-3" />
-                        Back to Programs Overview
-                    </Link>
-                </div>
-
                 {/* Header Section - Same Size as JHS */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-green-800 mb-4">
@@ -196,7 +169,7 @@ const AcademicsSeniorHigh = () => {
                     >
                         <div className="bg-gradient-to-br from-blue-50 to-green-50 p-8 rounded-xl shadow-lg">
                             {/* Dynamic Career Matching Guide */}
-                <div className="text-center mb-8">
+                            <div className="text-center mb-8">
                                 {currentStrand.id === "tvl" && (
                                     <>
                                         <div className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white py-4 px-6 rounded-xl shadow-lg mb-4">
@@ -204,7 +177,7 @@ const AcademicsSeniorHigh = () => {
                                                 🔧 From Circuits to Careers -
                                                 CSS Begins at Taft NHS
                                             </h3>
-                        </div>
+                                        </div>
 
                                         {/* CSS Strands Information */}
                                         <div className="mb-6">
@@ -240,12 +213,12 @@ const AcademicsSeniorHigh = () => {
                                                     </div>
                                                     <div className="flex items-center space-x-3">
                                                         <span className="w-6 h-6 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                                3
-                            </span>
+                                                            3
+                                                        </span>
                                                         <span className="text-gray-700 font-medium">
                                                             Software Development
-                            </span>
-                        </div>
+                                                        </span>
+                                                    </div>
                                                     <div className="flex items-center space-x-3">
                                                         <span className="w-6 h-6 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                                                             4
@@ -253,7 +226,7 @@ const AcademicsSeniorHigh = () => {
                                                         <span className="text-gray-700 font-medium">
                                                             ICT Teaching
                                                         </span>
-                    </div>
+                                                    </div>
                                                     <div className="flex items-center space-x-3">
                                                         <span className="w-6 h-6 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                                                             5
@@ -286,7 +259,7 @@ const AcademicsSeniorHigh = () => {
                                                 that aligns with what you're
                                                 good at and passionate about:
                                             </p>
-                </div>
+                                        </div>
                                     </>
                                 )}
 
@@ -307,7 +280,7 @@ const AcademicsSeniorHigh = () => {
                                                         <span className="text-xl">
                                                             🌍
                                                         </span>
-                            </div>
+                                                    </div>
                                                     <h4 className="text-lg font-bold text-blue-800">
                                                         HUMSS Strand Overview
                                                     </h4>
@@ -380,7 +353,7 @@ const AcademicsSeniorHigh = () => {
                                                 courses and possible career
                                                 paths:
                                             </p>
-                        </div>
+                                        </div>
                                     </>
                                 )}
 
@@ -407,7 +380,7 @@ const AcademicsSeniorHigh = () => {
                                                     </h4>
                                                 </div>
                                                 <div className="space-y-3">
-                                        <div className="flex items-center space-x-3">
+                                                    <div className="flex items-center space-x-3">
                                                         <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                                                             1
                                                         </span>
@@ -415,7 +388,7 @@ const AcademicsSeniorHigh = () => {
                                                             Biology & Life
                                                             Sciences
                                                         </span>
-                                            </div>
+                                                    </div>
                                                     <div className="flex items-center space-x-3">
                                                         <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                                                             2
@@ -423,8 +396,8 @@ const AcademicsSeniorHigh = () => {
                                                         <span className="text-gray-700 font-medium">
                                                             Mathematics &
                                                             Statistics
-                                                    </span>
-                                                </div>
+                                                        </span>
+                                                    </div>
                                                     <div className="flex items-center space-x-3">
                                                         <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                                                             3
@@ -433,7 +406,7 @@ const AcademicsSeniorHigh = () => {
                                                             Computer Science &
                                                             Technology
                                                         </span>
-                                            </div>
+                                                    </div>
                                                     <div className="flex items-center space-x-3">
                                                         <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                                                             4
@@ -442,7 +415,7 @@ const AcademicsSeniorHigh = () => {
                                                             Engineering &
                                                             Architecture
                                                         </span>
-                                        </div>
+                                                    </div>
                                                     <div className="flex items-center space-x-3">
                                                         <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                                                             5
@@ -451,7 +424,7 @@ const AcademicsSeniorHigh = () => {
                                                             Environmental &
                                                             Earth Sciences
                                                         </span>
-                                    </div>
+                                                    </div>
                                                     <div className="flex items-center space-x-3">
                                                         <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                                                             6
@@ -459,8 +432,8 @@ const AcademicsSeniorHigh = () => {
                                                         <span className="text-gray-700 font-medium">
                                                             STEM Education &
                                                             Teaching
-                                            </span>
-                                        </div>
+                                                        </span>
+                                                    </div>
                                                     <div className="flex items-center space-x-3">
                                                         <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                                                             7
@@ -468,10 +441,10 @@ const AcademicsSeniorHigh = () => {
                                                         <span className="text-gray-700 font-medium">
                                                             Design & Innovation
                                                         </span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        </div>
-                                    </div>
-                                </div>
 
                                         <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-green-500">
                                             <p className="text-gray-700 text-base leading-relaxed font-medium">
@@ -508,7 +481,7 @@ const AcademicsSeniorHigh = () => {
                                         {/* CSS Section 1 */}
                                         <details className="group">
                                             <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
-                                        <div className="flex items-center space-x-3">
+                                                <div className="flex items-center space-x-3">
                                                     <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
                                                         1
                                                     </div>
@@ -574,12 +547,12 @@ const AcademicsSeniorHigh = () => {
                                                             </li>
                                                         </ul>
                                                     </div>
-                                            </div>
-                                            <div>
+                                                </div>
+                                                <div>
                                                     <h5 className="font-bold text-purple-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
                                                             💼
-                                                    </span>
+                                                        </span>
                                                         Career Matches
                                                     </h5>
                                                     <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
@@ -613,9 +586,9 @@ const AcademicsSeniorHigh = () => {
                                                                 SHS)
                                                             </li>
                                                         </ul>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
                                         </details>
 
                                         {/* CSS Section 2 */}
@@ -624,13 +597,13 @@ const AcademicsSeniorHigh = () => {
                                                 <div className="flex items-center space-x-3">
                                                     <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
                                                         2
-                                        </div>
+                                                    </div>
                                                     <span className="font-semibold text-gray-800 text-lg">
                                                         You're Interested in
                                                         Networking and Internet
                                                         Systems
                                                     </span>
-                                    </div>
+                                                </div>
                                                 <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
                                                     ▼
                                                 </span>
@@ -743,12 +716,12 @@ const AcademicsSeniorHigh = () => {
                                                 <div className="flex items-center space-x-3">
                                                     <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
                                                         3
-                                                </div>
+                                                    </div>
                                                     <span className="font-semibold text-gray-800 text-lg">
                                                         You're Curious About
                                                         Software and Coding
-                                                </span>
-                                            </div>
+                                                    </span>
+                                                </div>
                                                 <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
                                                     ▼
                                                 </span>
@@ -790,7 +763,7 @@ const AcademicsSeniorHigh = () => {
                                                                     ✓
                                                                 </span>
                                                                 BS Infirmation
-                                                Technology
+                                                                Technology
                                                                 (Software or Web
                                                                 Dev track)
                                                             </li>
@@ -875,8 +848,8 @@ const AcademicsSeniorHigh = () => {
                                                             understand toch,
                                                             guiding odors,
                                                             patience in teaching
-                                            </p>
-                                        </div>
+                                                        </p>
+                                                    </div>
                                                 </div>
                                                 <div className="mb-4">
                                                     <h5 className="font-bold text-green-700 mb-2 flex items-center">
@@ -957,13 +930,13 @@ const AcademicsSeniorHigh = () => {
                                                 <div className="flex items-center space-x-3">
                                                     <div className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
                                                         5
-                                                </div>
+                                                    </div>
                                                     <span className="font-semibold text-gray-800 text-lg">
                                                         You're Organized and
                                                         Want to Mix IT with
                                                         Business
-                                                </span>
-                                            </div>
+                                                    </span>
+                                                </div>
                                                 <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
                                                     ▼
                                                 </span>
@@ -982,9 +955,9 @@ const AcademicsSeniorHigh = () => {
                                                             troubleshooting lech
                                                             in offices, managing
                                                             witems
-                                            </p>
-                                        </div>
-                                    </div>
+                                                        </p>
+                                                    </div>
+                                                </div>
                                                 <div className="mb-4">
                                                     <h5 className="font-bold text-green-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
@@ -1019,8 +992,8 @@ const AcademicsSeniorHigh = () => {
                                                                 track)
                                                             </li>
                                                         </ul>
-                                </div>
-                            </div>
+                                                    </div>
+                                                </div>
                                                 <div>
                                                     <h5 className="font-bold text-purple-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
@@ -1072,7 +1045,7 @@ const AcademicsSeniorHigh = () => {
                                         {/* HUMSS Section 1 */}
                                         <details className="group">
                                             <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
-                                        <div className="flex items-center space-x-3">
+                                                <div className="flex items-center space-x-3">
                                                     <div className="w-8 h-8 bg-pink-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
                                                         1
                                                     </div>
@@ -1143,12 +1116,12 @@ const AcademicsSeniorHigh = () => {
                                                             </li>
                                                         </ul>
                                                     </div>
-                                            </div>
-                                            <div>
+                                                </div>
+                                                <div>
                                                     <h5 className="font-bold text-purple-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
                                                             💼
-                                                    </span>
+                                                        </span>
                                                         Potential Careers:
                                                     </h5>
                                                     <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
@@ -1166,9 +1139,9 @@ const AcademicsSeniorHigh = () => {
                                                                 debotertunanet
                                                             </li>
                                                         </ul>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
                                         </details>
 
                                         {/* HUMSS Section 2 */}
@@ -1177,7 +1150,7 @@ const AcademicsSeniorHigh = () => {
                                                 <div className="flex items-center space-x-3">
                                                     <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
                                                         2
-                                    </div>
+                                                    </div>
                                                     <span className="font-semibold text-gray-800 text-lg">
                                                         You're Into Writing,
                                                         Storytelling, or Media
@@ -1208,7 +1181,7 @@ const AcademicsSeniorHigh = () => {
                                                     <h5 className="font-bold text-green-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
                                                             🎓
-                                            </span>
+                                                        </span>
                                                         Recommended Courses:
                                                     </h5>
                                                     <div className="bg-green-50 p-3 rounded-lg border border-green-200">
@@ -1243,13 +1216,13 @@ const AcademicsSeniorHigh = () => {
                                                                 Track)
                                                             </li>
                                                         </ul>
-                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div>
                                                     <h5 className="font-bold text-purple-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
                                                             💼
-                                            </span>
+                                                        </span>
                                                         Potential Careers:
                                                     </h5>
                                                     <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
@@ -1266,9 +1239,9 @@ const AcademicsSeniorHigh = () => {
                                                                 officer
                                                             </li>
                                                         </ul>
-                                        </div>
-                                        </div>
-                                    </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </details>
 
                                         {/* HUMSS Section 3 */}
@@ -1277,13 +1250,13 @@ const AcademicsSeniorHigh = () => {
                                                 <div className="flex items-center space-x-3">
                                                     <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
                                                         3
-                                </div>
+                                                    </div>
                                                     <span className="font-semibold text-gray-800 text-lg">
                                                         You're Curious About
                                                         Human Behavior or Mental
                                                         Health
                                                     </span>
-                            </div>
+                                                </div>
                                                 <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
                                                     ▼
                                                 </span>
@@ -1303,7 +1276,7 @@ const AcademicsSeniorHigh = () => {
                                                             advice, anclyriig
                                                             zmotions
                                                         </p>
-                        </div>
+                                                    </div>
                                                 </div>
                                                 <div className="mb-4">
                                                     <h5 className="font-bold text-green-700 mb-2 flex items-center">
@@ -1369,16 +1342,16 @@ const AcademicsSeniorHigh = () => {
                                                 <div className="flex items-center space-x-3">
                                                     <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
                                                         4
-                                    </div>
+                                                    </div>
                                                     <span className="font-semibold text-gray-800 text-lg">
                                                         You Enjoy Teaching,
                                                         Explaining Ideas, or
                                                         Mentoring
                                                     </span>
-                                </div>
+                                                </div>
                                                 <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
                                                     ▼
-                                    </span>
+                                                </span>
                                             </summary>
                                             <div className="p-6 bg-white border-l-4 border-green-400 rounded-r-lg mt-2 shadow-sm">
                                                 <div className="mb-4">
@@ -1394,9 +1367,9 @@ const AcademicsSeniorHigh = () => {
                                                             classroom setap,
                                                             lesson planning,
                                                             helping others leam
-                                </p>
-                            </div>
-                        </div>
+                                                        </p>
+                                                    </div>
+                                                </div>
                                                 <div className="mb-4">
                                                     <h5 className="font-bold text-green-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
@@ -1434,8 +1407,8 @@ const AcademicsSeniorHigh = () => {
                                                                 Education
                                                             </li>
                                                         </ul>
-                    </div>
-                </div>
+                                                    </div>
+                                                </div>
                                                 <div>
                                                     <h5 className="font-bold text-purple-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
@@ -1492,7 +1465,7 @@ const AcademicsSeniorHigh = () => {
                                                             music, cesign,
                                                             creativity
                                                         </p>
-                    </div>
+                                                    </div>
                                                 </div>
                                                 <div className="mb-4">
                                                     <h5 className="font-bold text-green-700 mb-2 flex items-center">
@@ -1571,8 +1544,8 @@ const AcademicsSeniorHigh = () => {
                                                         Love for Biology, Life
                                                         Sciences, or Helping
                                                         People
-                                                        </span>
-                                                    </div>
+                                                    </span>
+                                                </div>
                                                 <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
                                                     ▼
                                                 </span>
@@ -1593,8 +1566,8 @@ const AcademicsSeniorHigh = () => {
                                                             henithcare,
                                                             community service
                                                         </p>
-                                                            </div>
-                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <div className="mb-4">
                                                     <h5 className="font-bold text-green-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
@@ -1642,8 +1615,8 @@ const AcademicsSeniorHigh = () => {
                                                                 Nutricion
                                                             </li>
                                                         </ul>
-                                                </div>
                                                     </div>
+                                                </div>
                                                 <div>
                                                     <h5 className="font-bold text-purple-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
@@ -1664,7 +1637,7 @@ const AcademicsSeniorHigh = () => {
                                                                 scalh researcher
                                                             </li>
                                                         </ul>
-                                                </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </details>
@@ -1699,7 +1672,7 @@ const AcademicsSeniorHigh = () => {
                                                             analytics, patterns,
                                                             theoretical thinking
                                                         </p>
-                                            </div>
+                                                    </div>
                                                 </div>
                                                 <div className="mb-4">
                                                     <h5 className="font-bold text-green-700 mb-2 flex items-center">
@@ -1777,11 +1750,11 @@ const AcademicsSeniorHigh = () => {
                                                         Passionate About
                                                         Computers, Tech, or
                                                         Coding
-                                                        </span>
-                                                    </div>
+                                                    </span>
+                                                </div>
                                                 <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
                                                     ▼
-                                                        </span>
+                                                </span>
                                             </summary>
                                             <div className="p-6 bg-white border-l-4 border-green-400 rounded-r-lg mt-2 shadow-sm">
                                                 <div className="mb-4">
@@ -1877,8 +1850,8 @@ const AcademicsSeniorHigh = () => {
                                                         Interested in Building,
                                                         Designing, or
                                                         Engineering Systems
-                                                        </span>
-                                                    </div>
+                                                    </span>
+                                                </div>
                                                 <span className="text-gray-600 group-open:rotate-180 transition-transform text-xl">
                                                     ▼
                                                 </span>
@@ -1898,8 +1871,8 @@ const AcademicsSeniorHigh = () => {
                                                             hectare, ictures,
                                                             problem-solving
                                                         </p>
+                                                    </div>
                                                 </div>
-                                            </div>
                                                 <div className="mb-4">
                                                     <h5 className="font-bold text-green-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
@@ -1942,8 +1915,8 @@ const AcademicsSeniorHigh = () => {
                                                                 Engineering
                                                             </li>
                                                         </ul>
-                                        </div>
-                                    </div>
+                                                    </div>
+                                                </div>
                                                 <div>
                                                     <h5 className="font-bold text-purple-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
@@ -1965,8 +1938,8 @@ const AcademicsSeniorHigh = () => {
                                                                 designer
                                                             </li>
                                                         </ul>
-                    </div>
-                </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </details>
 
@@ -2001,8 +1974,8 @@ const AcademicsSeniorHigh = () => {
                                                             sustenability,
                                                             fieldwors
                                                         </p>
-                        </div>
-                    </div>
+                                                    </div>
+                                                </div>
                                                 <div className="mb-4">
                                                     <h5 className="font-bold text-green-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
@@ -2036,8 +2009,8 @@ const AcademicsSeniorHigh = () => {
                                                                 Biology
                                                             </li>
                                                         </ul>
-                </div>
-            </div>
+                                                    </div>
+                                                </div>
                                                 <div>
                                                     <h5 className="font-bold text-purple-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
@@ -2124,8 +2097,8 @@ const AcademicsSeniorHigh = () => {
                                                             </li>
                                                         </ul>
                                                     </div>
-                                </div>
-                                <div>
+                                                </div>
+                                                <div>
                                                     <h5 className="font-bold text-purple-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm mr-2">
                                                             💼
@@ -2177,9 +2150,9 @@ const AcademicsSeniorHigh = () => {
                                                         <p className="text-gray-700 font-medium">
                                                             Dowology, mesation,
                                                             UIN, vants with logi
-                                    </p>
-                                </div>
-                            </div>
+                                                        </p>
+                                                    </div>
+                                                </div>
                                                 <div className="mb-4">
                                                     <h5 className="font-bold text-green-700 mb-2 flex items-center">
                                                         <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm mr-2">
@@ -2240,7 +2213,7 @@ const AcademicsSeniorHigh = () => {
                                 )}
                             </div>
                         </div>
-                        </div>
+                    </div>
 
                     {/* Right Column - Original Size Image */}
                     <div className="relative">
@@ -2269,7 +2242,7 @@ const AcademicsSeniorHigh = () => {
                                         alt={currentStrand.shortTitle}
                                         className="w-full h-full object-contain"
                                     />
-                            </div>
+                                </div>
 
                                 {/* Theme Color Overlay */}
                                 <div
@@ -2298,7 +2271,7 @@ const AcademicsSeniorHigh = () => {
                                             : currentStrand.id === "humss"
                                             ? "🌍"
                                             : "💻"}
-                                </div>
+                                    </div>
                                 </div>
 
                                 {/* Additional Color Accents */}
@@ -2323,8 +2296,8 @@ const AcademicsSeniorHigh = () => {
                                 ></div>
                             </div>
                         </div>
-                                </div>
-                            </div>
+                    </div>
+                </div>
 
                 {/* Page Indicators - Same Size as JHS */}
                 {/* Manual Navigation Controls */}
@@ -2358,7 +2331,7 @@ const AcademicsSeniorHigh = () => {
                                 {strand.shortTitle}
                             </button>
                         ))}
-                            </div>
+                    </div>
 
                     {/* Next Button */}
                     <button
@@ -2372,7 +2345,7 @@ const AcademicsSeniorHigh = () => {
                         <span className="font-medium">Next</span>
                         <span className="text-lg">→</span>
                     </button>
-                        </div>
+                </div>
 
                 {/* Auto-switch Status Indicator */}
                 <div className="flex justify-center mt-4">

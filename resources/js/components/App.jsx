@@ -70,6 +70,7 @@ import HeroCarouselForm from "../pages/admin/HeroCarouselForm";
 import AcademicPrograms from "../pages/admin/AcademicPrograms";
 import SchoolInfo from "../pages/admin/SchoolInfo";
 import ContactInfo from "../pages/admin/ContactInfo";
+import EnrollmentGuidelines from "../pages/admin/EnrollmentGuidelines";
 import AdminPageContent from "../pages/admin/PageContent";
 import AdminEvents from "../pages/admin/Events.jsx";
 import AboutManagement from "../pages/admin/About";
@@ -321,6 +322,10 @@ function App() {
                                 <Route
                                     path="contact-info"
                                     element={<ContactInfo />}
+                                />
+                                <Route
+                                    path="enrollment-guidelines"
+                                    element={<EnrollmentGuidelines />}
                                 />
                                 <Route
                                     path="page-content"

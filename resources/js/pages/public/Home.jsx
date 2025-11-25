@@ -431,7 +431,7 @@ const Home = () => {
             </section>
 
             {/* PASEO VERDE STORM Section */}
-            <section className="pt-16 pb-4 bg-gradient-to-br from-blue-50 to-slate-100 relative overflow-hidden">
+            <section className="pt-12 pb-4 bg-gradient-to-br from-blue-50 to-slate-100 relative overflow-hidden">
                 {/* Clean decorative elements */}
                 <div className="absolute inset-0 opacity-30">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-royal-blue to-transparent"></div>
@@ -461,19 +461,19 @@ const Home = () => {
                 </div>
 
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                    <h1 className="text-4xl md:text-6xl font-bold text-royal-blue tracking-wider leading-tight">
+                    <h1 className="text-5xl md:text-7xl font-bold text-royal-blue tracking-wider leading-tight">
                         <div className="mb-1">
-                            <span className="text-5xl md:text-7xl text-royal-blue drop-shadow-sm">
+                            <span className="text-6xl md:text-8xl text-royal-blue drop-shadow-sm">
                                 P
                             </span>
                             <span className="text-royal-blue">ASEO.</span>{" "}
-                            <span className="text-5xl md:text-7xl text-royal-blue drop-shadow-sm">
+                            <span className="text-6xl md:text-8xl text-royal-blue drop-shadow-sm">
                                 V
                             </span>
                             <span className="text-royal-blue">ERDE.</span>
                         </div>
                         <div>
-                            <span className="text-5xl md:text-7xl text-royal-blue drop-shadow-sm">
+                            <span className="text-6xl md:text-8xl text-royal-blue drop-shadow-sm">
                                 S
                             </span>
                             <span className="text-royal-blue">TORM.</span>
