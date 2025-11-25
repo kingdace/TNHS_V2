@@ -10,19 +10,57 @@ export const publicService = {
      * Hero Carousel - Public endpoints
      */
     heroCarousel: {
-        // Get all active hero carousel slides
+        // Cache for carousel data
+        _cache: null,
+        _cacheTime: null,
+        _cacheDuration: 5 * 60 * 1000, // 5 minutes
+
+        // Get all active hero carousel slides with caching
         async getActive() {
             try {
-                const response = await fetch(`${API_BASE_URL}/hero-carousel`);
+                // Check cache first
+                const now = Date.now();
+                if (
+                    this._cache &&
+                    this._cacheTime &&
+                    now - this._cacheTime < this._cacheDuration
+                ) {
+                    return this._cache;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/hero-carousel`, {
+                    // Add performance optimizations
+                    headers: {
+                        Accept: "application/json",
+                        "Cache-Control": "max-age=300", // 5 minutes browser cache
+                    },
+                    // Enable compression
+                    compress: true,
+                });
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
+
                 const data = await response.json();
-                return data.success ? data.data : [];
+                const result = data.success ? data.data : [];
+
+                // Cache the result
+                this._cache = result;
+                this._cacheTime = now;
+
+                return result;
             } catch (error) {
                 console.error("Error fetching hero carousel slides:", error);
-                return [];
+                // Return cached data if available, otherwise empty array
+                return this._cache || [];
             }
+        },
+
+        // Clear cache (useful for admin updates)
+        clearCache() {
+            this._cache = null;
+            this._cacheTime = null;
         },
     },
 

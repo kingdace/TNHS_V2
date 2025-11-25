@@ -14,12 +14,6 @@ import {
     Users,
     Award,
     Newspaper,
-    Play,
-    Facebook,
-    Globe,
-    MapPin,
-    Phone,
-    Mail,
     ChevronLeft,
     ChevronRight,
 } from "lucide-react";
@@ -34,10 +28,30 @@ const Home = () => {
     const [announcements, setAnnouncements] = useState([]);
     const [heroSlides, setHeroSlides] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [imagesLoaded, setImagesLoaded] = useState(new Set());
+    const [preloadedImages, setPreloadedImages] = useState(new Set());
 
     // Dynamic content hooks
     const { content: featuresContent } = useDynamicContent("home", "features");
-    const { content: statsContent } = useDynamicContent("home", "statistics");
+
+    // Image preloading function for faster carousel loading
+    const preloadImage = (src) => {
+        return new Promise((resolve, reject) => {
+            if (preloadedImages.has(src)) {
+                resolve(src);
+                return;
+            }
+
+            const img = new Image();
+            img.onload = () => {
+                setPreloadedImages((prev) => new Set([...prev, src]));
+                setImagesLoaded((prev) => new Set([...prev, src]));
+                resolve(src);
+            };
+            img.onerror = reject;
+            img.src = src;
+        });
+    };
 
     // Fetch announcements and hero slides on component mount
     useEffect(() => {
@@ -45,7 +59,16 @@ const Home = () => {
             try {
                 setLoading(true);
 
-                // Fetch announcements
+                // Fetch hero carousel slides FIRST (priority for faster loading)
+                const heroData = await publicService.heroCarousel.getActive();
+                setHeroSlides(heroData);
+
+                // Preload first slide image immediately for instant display
+                if (heroData.length > 0 && heroData[0].image_path) {
+                    preloadImage(heroData[0].image_path);
+                }
+
+                // Fetch announcements in parallel (non-blocking)
                 const announcementsData =
                     await announcementService.getFeaturedAnnouncements();
                 const transformedAnnouncements = announcementsData.map(
@@ -53,10 +76,6 @@ const Home = () => {
                         announcementService.transformAnnouncement(announcement)
                 );
                 setAnnouncements(transformedAnnouncements);
-
-                // Fetch hero carousel slides
-                const heroData = await publicService.heroCarousel.getActive();
-                setHeroSlides(heroData);
             } catch (error) {
                 console.error("Error fetching data:", error);
                 // Keep empty arrays as fallback
@@ -70,19 +89,71 @@ const Home = () => {
         fetchData();
     }, []);
 
+    // Preload carousel images after initial load for smooth transitions
+    useEffect(() => {
+        if (heroSlides.length > 0) {
+            // Preload next few images in background
+            const preloadNext = async () => {
+                const imagesToPreload = heroSlides.slice(1, 4); // Preload next 3 images
+                for (const slide of imagesToPreload) {
+                    if (slide.image_path) {
+                        try {
+                            await preloadImage(slide.image_path);
+                        } catch (error) {
+                            console.warn(
+                                "Failed to preload image:",
+                                slide.image_path
+                            );
+                        }
+                    }
+                }
+            };
+
+            // Delay preloading to not block initial render
+            setTimeout(preloadNext, 100);
+        }
+    }, [heroSlides]);
+
+    // Preload upcoming slide images for seamless transitions
+    useEffect(() => {
+        if (heroSlides.length > 0) {
+            const nextSlideIndex = (currentSlide + 1) % heroSlides.length;
+            const nextSlide = heroSlides[nextSlideIndex];
+            if (
+                nextSlide?.image_path &&
+                !preloadedImages.has(nextSlide.image_path)
+            ) {
+                preloadImage(nextSlide.image_path);
+            }
+        }
+    }, [currentSlide, heroSlides, preloadedImages]);
+
     // Display all announcements (search is now handled by EnhancedSearch component)
     const displayAnnouncements = announcements;
 
-    // Auto-advance slides every 10 seconds
+    // Auto-advance slides every 8 seconds (faster for better UX)
     useEffect(() => {
-        if (heroSlides.length === 0) return;
+        if (heroSlides.length <= 1) return;
 
         const interval = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-        }, 10000);
+            setCurrentSlide((prev) => {
+                const nextSlide = (prev + 1) % heroSlides.length;
+                // Preload the slide after next for seamless experience
+                const slideAfterNext = (nextSlide + 1) % heroSlides.length;
+                const slideAfterNextImage =
+                    heroSlides[slideAfterNext]?.image_path;
+                if (
+                    slideAfterNextImage &&
+                    !preloadedImages.has(slideAfterNextImage)
+                ) {
+                    preloadImage(slideAfterNextImage);
+                }
+                return nextSlide;
+            });
+        }, 8000);
 
         return () => clearInterval(interval);
-    }, [heroSlides.length]);
+    }, [heroSlides.length, preloadedImages]);
 
     // Get features data - use dynamic content if available, otherwise fallback to hardcoded
     const getFeatures = () => {
@@ -140,8 +211,6 @@ const Home = () => {
             )
         );
     };
-
-    const features = getFeatures();
 
     return (
         <div className="min-h-screen">
@@ -202,43 +271,106 @@ const Home = () => {
                             </div>
                         </div>
                     ) : (
-                        // Slides carousel
-                        heroSlides.map((slide, index) => (
-                            <div
-                                key={slide.id}
-                                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                                    index === currentSlide
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                }`}
-                            >
-                                <img
-                                    src={slide.image_path || "/images/BG1.jpg"}
-                                    alt={slide.title}
-                                    className={`absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[3000ms] ease-out ${
-                                        index === currentSlide
-                                            ? "scale-[1.01]"
-                                            : "scale-100"
+                        // Optimized slides carousel with smart loading
+                        heroSlides.map((slide, index) => {
+                            const isActive = index === currentSlide;
+                            const isNext =
+                                index ===
+                                (currentSlide + 1) % heroSlides.length;
+                            const isPrev =
+                                index ===
+                                (currentSlide - 1 + heroSlides.length) %
+                                    heroSlides.length;
+                            const shouldLoad =
+                                isActive ||
+                                isNext ||
+                                isPrev ||
+                                preloadedImages.has(slide.image_path);
+
+                            return (
+                                <div
+                                    key={slide.id}
+                                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                                        isActive ? "opacity-100" : "opacity-0"
                                     }`}
-                                />
-                                {/* Readability overlays: gradient + vignette + subtle grid */}
-                                <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/40"></div>
-                                <div
-                                    className="absolute inset-0 pointer-events-none"
-                                    style={{
-                                        background:
-                                            "radial-gradient(ellipse at center, rgba(0,0,0,0) 60%, rgba(0,0,0,0.35) 100%)",
-                                    }}
-                                ></div>
-                                <div
-                                    className="absolute inset-0 opacity-[0.06]"
-                                    style={{
-                                        backgroundImage:
-                                            "repeating-linear-gradient(45deg, #fff, #fff 2px, transparent 2px, transparent 12px)",
-                                    }}
-                                ></div>
-                            </div>
-                        ))
+                                >
+                                    {/* Optimized image container with loading states */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-gray-300 to-gray-400">
+                                        {shouldLoad && (
+                                            <img
+                                                src={
+                                                    slide.image_path ||
+                                                    "/images/BG1.jpg"
+                                                }
+                                                alt={slide.title}
+                                                loading={
+                                                    isActive ? "eager" : "lazy"
+                                                }
+                                                decoding={
+                                                    isActive ? "sync" : "async"
+                                                }
+                                                className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-[3000ms] ease-out ${
+                                                    isActive
+                                                        ? "scale-[1.01]"
+                                                        : "scale-100"
+                                                } ${
+                                                    imagesLoaded.has(
+                                                        slide.image_path
+                                                    )
+                                                        ? "opacity-100"
+                                                        : "opacity-0"
+                                                }`}
+                                                onLoad={() => {
+                                                    setImagesLoaded(
+                                                        (prev) =>
+                                                            new Set([
+                                                                ...prev,
+                                                                slide.image_path,
+                                                            ])
+                                                    );
+                                                }}
+                                                onError={(e) => {
+                                                    // Fallback to default image
+                                                    e.target.src =
+                                                        "/images/BG1.jpg";
+                                                }}
+                                                style={{
+                                                    willChange: isActive
+                                                        ? "transform"
+                                                        : "auto",
+                                                }}
+                                            />
+                                        )}
+
+                                        {/* Loading shimmer effect for better UX */}
+                                        {!imagesLoaded.has(
+                                            slide.image_path
+                                        ) && (
+                                            <div className="absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-pulse">
+                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Readability overlays: gradient + vignette + subtle grid */}
+                                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/40"></div>
+                                    <div
+                                        className="absolute inset-0 pointer-events-none"
+                                        style={{
+                                            background:
+                                                "radial-gradient(ellipse at center, rgba(0,0,0,0) 60%, rgba(0,0,0,0.35) 100%)",
+                                        }}
+                                    ></div>
+                                    <div
+                                        className="absolute inset-0 opacity-[0.06]"
+                                        style={{
+                                            backgroundImage:
+                                                "repeating-linear-gradient(45deg, #fff, #fff 2px, transparent 2px, transparent 12px)",
+                                        }}
+                                    ></div>
+                                </div>
+                            );
+                        })
                     )}
                 </div>
 
@@ -299,69 +431,137 @@ const Home = () => {
             </section>
 
             {/* PASEO VERDE STORM Section */}
-            <section className="py-0">
-                {/* PASEO VERDE STORM Section */}
-                <div className="bg-gradient-to-br from-blue-50 to-slate-100 py-16 relative overflow-hidden">
-                    {/* Half Border Decorative Elements */}
-                    <div className="absolute top-0 left-0 w-1/2 h-1 bg-gradient-to-r from-royal-blue to-transparent"></div>
-                    <div className="absolute top-0 right-0 w-1/2 h-1 bg-gradient-to-l from-royal-blue to-transparent"></div>
-                    <div className="absolute bottom-0 left-0 w-1/3 h-1 bg-gradient-to-r from-blue-600 to-transparent"></div>
-                    <div className="absolute bottom-0 right-0 w-1/3 h-1 bg-gradient-to-l from-blue-600 to-transparent"></div>
+            <section className="pt-16 pb-4 bg-gradient-to-br from-blue-50 to-slate-100 relative overflow-hidden">
+                {/* Clean decorative elements */}
+                <div className="absolute inset-0 opacity-30">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-royal-blue to-transparent"></div>
+                </div>
 
-                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        {/* Core Values Section */}
-                        <div className="mb-8 relative">
-                            <h1 className="text-4xl md:text-5xl font-bold text-royal-blue mb-6 tracking-wide leading-tight font-display">
-                                <div>
-                                    <span className="text-5xl md:text-6xl">
-                                        P
-                                    </span>
-                                    ASEO.{" "}
-                                    <span className="text-5xl md:text-6xl">
-                                        V
-                                    </span>
-                                    ERDE.
-                                </div>
-                                <div>
-                                    <span className="text-5xl md:text-6xl">
-                                        S
-                                    </span>
-                                    TORM.
-                                </div>
-                            </h1>
+                {/* Sophisticated top corner design */}
+                <div className="absolute inset-0 pointer-events-none">
+                    {/* Top left corner - adjust left-6 and top-6 to change margins */}
+                    <div className="absolute top-6 left-8 opacity-25">
+                        {/* Main lines */}
+                        <div className="w-20 h-0.5 bg-gradient-to-r from-royal-blue via-blue-500 to-transparent rounded-full"></div>
+                        <div className="w-0.5 h-20 bg-gradient-to-b from-royal-blue via-blue-500 to-transparent rounded-full"></div>
+                        {/* Accent dots */}
+                        <div className="absolute top-2 left-8 w-1 h-1 bg-blue-400 rounded-full"></div>
+                        <div className="absolute top-8 left-2 w-1 h-1 bg-blue-400 rounded-full"></div>
+                    </div>
+
+                    {/* Top right corner - adjust right-6 and top-6 to change margins */}
+                    <div className="absolute top-6 right-8 opacity-25">
+                        {/* Main lines */}
+                        <div className="w-20 h-0.5 bg-gradient-to-l from-royal-blue via-blue-500 to-transparent rounded-full"></div>
+                        <div className="w-0.5 h-20 bg-gradient-to-b from-royal-blue via-blue-500 to-transparent rounded-full ml-20"></div>
+                        {/* Accent dots */}
+                        <div className="absolute top-2 right-8 w-1 h-1 bg-blue-400 rounded-full"></div>
+                        <div className="absolute top-8 right-2 w-1 h-1 bg-blue-400 rounded-full"></div>
+                    </div>
+                </div>
+
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                    <h1 className="text-4xl md:text-6xl font-bold text-royal-blue tracking-wider leading-tight">
+                        <div className="mb-1">
+                            <span className="text-5xl md:text-7xl text-royal-blue drop-shadow-sm">
+                                P
+                            </span>
+                            <span className="text-royal-blue">ASEO.</span>{" "}
+                            <span className="text-5xl md:text-7xl text-royal-blue drop-shadow-sm">
+                                V
+                            </span>
+                            <span className="text-royal-blue">ERDE.</span>
                         </div>
+                        <div>
+                            <span className="text-5xl md:text-7xl text-royal-blue drop-shadow-sm">
+                                S
+                            </span>
+                            <span className="text-royal-blue">TORM.</span>
+                        </div>
+                    </h1>
+                </div>
+            </section>
 
-                        {/* Explore Section */}
-                        <div
-                            className="relative"
-                            style={{ zIndex: 999999, position: "relative" }}
-                        >
-                            {/* Half border around search area */}
-                            <div className="absolute -top-2 left-1/4 w-1/2 h-1 bg-gradient-to-r from-transparent via-royal-blue to-transparent"></div>
-                            <div className="absolute -bottom-2 left-1/4 w-1/2 h-1 bg-gradient-to-r from-transparent via-blue-600 to-transparent"></div>
+            {/* Search Section */}
+            <section className="pt-10 pb-20 bg-gradient-to-br from-blue-50 to-slate-100 relative">
+                {/* Sophisticated bottom corner design */}
+                <div className="absolute inset-0 pointer-events-none">
+                    {/* Bottom left corner - adjust left-6 and bottom-6 to change margins */}
+                    <div className="absolute bottom-6 left-8 opacity-25">
+                        {/* Main lines */}
+                        <div className="w-20 h-0.5 bg-gradient-to-r from-blue-600 via-royal-blue to-transparent rounded-full"></div>
+                        <div className="w-0.5 h-20 bg-gradient-to-t from-blue-600 via-royal-blue to-transparent rounded-full -mt-20"></div>
+                        {/* Accent dots */}
+                        <div className="absolute -top-12 left-8 w-1 h-1 bg-blue-400 rounded-full"></div>
+                        <div className="absolute -top-6 left-2 w-1 h-1 bg-blue-400 rounded-full"></div>
+                    </div>
 
-                            <h2 className="text-lg font-semibold text-royal-blue mb-4 tracking-wide">
-                                EXPLORE
-                            </h2>
-                            <div
-                                className="max-w-2xl mx-auto"
-                                style={{ position: "relative", zIndex: 999999 }}
-                            >
+                    {/* Bottom right corner - adjust right-6 and bottom-6 to change margins */}
+                    <div className="absolute bottom-6 right-8 opacity-25">
+                        {/* Main lines */}
+                        <div className="w-20 h-0.5 bg-gradient-to-l from-blue-600 via-royal-blue to-transparent rounded-full"></div>
+                        <div className="w-0.5 h-20 bg-gradient-to-t from-blue-600 via-royal-blue to-transparent rounded-full ml-20 -mt-20"></div>
+                        {/* Accent dots */}
+                        <div className="absolute -top-12 right-8 w-1 h-1 bg-blue-400 rounded-full"></div>
+                        <div className="absolute -top-6 right-2 w-1 h-1 bg-blue-400 rounded-full"></div>
+                    </div>
+                </div>
+
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                    <div className="relative">
+                        <h2 className="pb-2 text-xl font-bold text-royal-blue mb-1 tracking-wide">
+                            Explore Our School
+                        </h2>
+
+                        {/* Enhanced Search Container */}
+                        <div className="bg-white rounded-xl p-6 shadow-xl border border-blue-100 max-w-2xl mx-auto relative z-20">
+                            {/* Subtle gradient overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl pointer-events-none"></div>
+
+                            <div className="relative z-10">
                                 <EnhancedSearch
                                     placeholder="Search announcements, events, staff, programs..."
                                     className="w-full"
                                 />
+
+                                {/* Enhanced Quick Links */}
+                                <div className="flex flex-wrap justify-center gap-2 mt-4">
+                                    <Link
+                                        to="/announcements"
+                                        className="px-3 py-1.5 bg-gradient-to-r from-royal-blue/10 to-royal-blue/5 hover:from-royal-blue/20 hover:to-royal-blue/10 text-royal-blue rounded-full text-xs font-medium transition-all duration-300 hover:scale-105 border border-royal-blue/20"
+                                    >
+                                        📢 Announcements
+                                    </Link>
+                                    <Link
+                                        to="/events"
+                                        className="px-3 py-1.5 bg-gradient-to-r from-royal-blue/10 to-royal-blue/5 hover:from-royal-blue/20 hover:to-royal-blue/10 text-royal-blue rounded-full text-xs font-medium transition-all duration-300 hover:scale-105 border border-royal-blue/20"
+                                    >
+                                        📅 Events
+                                    </Link>
+                                    <Link
+                                        to="/academics"
+                                        className="px-3 py-1.5 bg-gradient-to-r from-royal-blue/10 to-royal-blue/5 hover:from-royal-blue/20 hover:to-royal-blue/10 text-royal-blue rounded-full text-xs font-medium transition-all duration-300 hover:scale-105 border border-royal-blue/20"
+                                    >
+                                        📚 Academics
+                                    </Link>
+                                    <Link
+                                        to="/faculty"
+                                        className="px-3 py-1.5 bg-gradient-to-r from-royal-blue/10 to-royal-blue/5 hover:from-royal-blue/20 hover:to-royal-blue/10 text-royal-blue rounded-full text-xs font-medium transition-all duration-300 hover:scale-105 border border-royal-blue/20"
+                                    >
+                                        👥 Faculty
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div className="absolute inset-0 opacity-30">
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-royal-blue to-transparent"></div>
+                </div>
             </section>
 
             {/* Combined Search & News Section */}
-            <section
-                className="py-16 bg-[#F7F7F7]"
-                style={{ position: "relative", zIndex: 1 }}
-            >
+            <section className="py-16 bg-[#F7F7F7] relative z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Two-Column Layout */}
                     <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
