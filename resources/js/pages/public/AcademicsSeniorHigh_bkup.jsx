@@ -11,7 +11,7 @@ const AcademicsSeniorHigh = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
 
-        // Auto-switch pages every 1 minute with enhanced effects
+        // Auto-switch pages every 5 seconds with enhanced effects
         const interval = setInterval(() => {
             if (isAutoSwitching && !userInteracted) {
                 setIsTransitioning(true);
@@ -22,7 +22,7 @@ const AcademicsSeniorHigh = () => {
                     setIsTransitioning(false);
                 }, 300);
             }
-        }, 60000);
+        }, 5000);
 
         return () => clearInterval(interval);
     }, [isAutoSwitching, userInteracted]);
@@ -128,24 +128,6 @@ const AcademicsSeniorHigh = () => {
             {/* Breadcrumb */}
             <Breadcrumb items={breadcrumbItems} />
 
-            {/* Custom Scrollbar Styles */}
-            <style jsx>{`
-                div::-webkit-scrollbar {
-                    width: 6px;
-                }
-                div::-webkit-scrollbar-track {
-                    background: #f7fafc;
-                    border-radius: 10px;
-                }
-                div::-webkit-scrollbar-thumb {
-                    background: #cbd5e0;
-                    border-radius: 10px;
-                }
-                div::-webkit-scrollbar-thumb:hover {
-                    background: #a0aec0;
-                }
-            `}</style>
-
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header Section - Same Size as JHS */}
                 <div className="mb-8">
@@ -173,8 +155,8 @@ const AcademicsSeniorHigh = () => {
                     <div className="w-full h-px bg-gray-200 mb-6"></div>
                 </div>
 
-                {/* Main Content - Equal Height Columns */}
-                <div className="grid lg:grid-cols-2 gap-8 items-stretch mb-12">
+                {/* Main Content - Bigger Image + Readable Text */}
+                <div className="grid lg:grid-cols-2 gap-8 items-start">
                     {/* Left Column - Content with Readable Text */}
                     <div
                         className={`transform transition-all duration-500 ${
@@ -185,15 +167,9 @@ const AcademicsSeniorHigh = () => {
                                 : "translate-x-0 opacity-100"
                         }`}
                     >
-                        <div className="bg-gradient-to-br from-blue-50 to-green-50 p-8 rounded-xl shadow-lg h-full flex flex-col">
+                        <div className="bg-gradient-to-br from-blue-50 to-green-50 p-8 rounded-xl shadow-lg">
                             {/* Dynamic Career Matching Guide */}
-                            <div
-                                className="mb-4 overflow-y-auto max-h-[500px] pr-2"
-                                style={{
-                                    scrollbarWidth: "thin",
-                                    scrollbarColor: "#cbd5e0 #f7fafc",
-                                }}
-                            >
+                            <div className="text-center mb-8">
                                 {currentStrand.id === "tvl" && (
                                     <>
                                         <div className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white py-4 px-6 rounded-xl shadow-lg mb-4">
@@ -493,33 +469,10 @@ const AcademicsSeniorHigh = () => {
                                     </>
                                 )}
                             </div>
-                        </div>
-                    </div>
 
-                    {/* Right Column - Collapsible Sections */}
-                    <div
-                        className={`transform transition-all duration-500 ${
-                            isTransitioning
-                                ? direction === "next"
-                                    ? "translate-x-6 opacity-0"
-                                    : "-translate-x-6 opacity-0"
-                                : "translate-x-0 opacity-100"
-                        }`}
-                    >
-                        <div className="bg-white p-6 rounded-xl shadow-lg h-full border border-gray-100 flex flex-col">
-                            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center justify-center">
-                                <span className="w-8 h-8 bg-gradient-to-br from-blue-500 to-green-500 text-white rounded-lg flex items-center justify-center mr-3 text-sm">
-                                    📋
-                                </span>
-                                Career Path Options
-                            </h3>
-                            {/* Scrollable Dynamic Collapsible Sections */}
+                            {/* Dynamic Collapsible Sections */}
                             <div
-                                className="space-y-4 overflow-y-auto max-h-[500px] pr-2"
-                                style={{
-                                    scrollbarWidth: "thin",
-                                    scrollbarColor: "#cbd5e0 #f7fafc",
-                                }}
+                                className="space-y-4"
                                 onClick={() => setUserInteracted(true)}
                             >
                                 {/* CSS Sections */}
@@ -527,9 +480,9 @@ const AcademicsSeniorHigh = () => {
                                     <>
                                         {/* CSS Section 1 */}
                                         <details className="group">
-                                            <summary className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
+                                            <summary className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all duration-300 border">
                                                 <div className="flex items-center space-x-3">
-                                                    <div className="w-7 h-7 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-sm">
+                                                    <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
                                                         1
                                                     </div>
                                                     <span className="font-semibold text-gray-800 text-lg">
@@ -2261,174 +2214,86 @@ const AcademicsSeniorHigh = () => {
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Full Width Image Section with Decorative Background */}
-                <div className="w-full mb-16 mt-8 relative overflow-hidden">
-                    {/* Decorative Background Elements */}
-                    <div className="absolute inset-0 pointer-events-none">
-                        {/* Left side decorations */}
+                    {/* Right Column - Original Size Image */}
+                    <div className="relative">
                         <div
-                            className={`absolute left-0 top-1/4 w-64 h-64 rounded-full blur-3xl opacity-20 ${
-                                currentStrand.id === "stem"
-                                    ? "bg-gradient-to-br from-green-400 to-emerald-500"
-                                    : currentStrand.id === "humss"
-                                    ? "bg-gradient-to-br from-blue-400 to-indigo-500"
-                                    : "bg-gradient-to-br from-yellow-400 to-orange-500"
-                            }`}
-                        ></div>
-                        <div
-                            className={`absolute left-10 bottom-20 w-32 h-32 rounded-full blur-2xl opacity-30 ${
-                                currentStrand.id === "stem"
-                                    ? "bg-emerald-300"
-                                    : currentStrand.id === "humss"
-                                    ? "bg-indigo-300"
-                                    : "bg-orange-300"
-                            }`}
-                        ></div>
-
-                        {/* Right side decorations */}
-                        <div
-                            className={`absolute right-0 top-1/3 w-72 h-72 rounded-full blur-3xl opacity-20 ${
-                                currentStrand.id === "stem"
-                                    ? "bg-gradient-to-bl from-green-500 to-emerald-400"
-                                    : currentStrand.id === "humss"
-                                    ? "bg-gradient-to-bl from-blue-500 to-indigo-400"
-                                    : "bg-gradient-to-bl from-yellow-500 to-orange-400"
-                            }`}
-                        ></div>
-                        <div
-                            className={`absolute right-16 top-10 w-40 h-40 rounded-full blur-2xl opacity-25 ${
-                                currentStrand.id === "stem"
-                                    ? "bg-green-400"
-                                    : currentStrand.id === "humss"
-                                    ? "bg-blue-400"
-                                    : "bg-yellow-400"
-                            }`}
-                        ></div>
-
-                        {/* Floating geometric shapes */}
-                        <div
-                            className={`absolute left-1/4 top-10 w-16 h-16 rotate-45 opacity-10 ${
-                                currentStrand.id === "stem"
-                                    ? "bg-green-500"
-                                    : currentStrand.id === "humss"
-                                    ? "bg-blue-500"
-                                    : "bg-yellow-500"
-                            }`}
-                        ></div>
-                        <div
-                            className={`absolute right-1/4 bottom-10 w-20 h-20 rounded-full opacity-15 ${
-                                currentStrand.id === "stem"
-                                    ? "bg-emerald-400"
-                                    : currentStrand.id === "humss"
-                                    ? "bg-indigo-400"
-                                    : "bg-orange-400"
-                            }`}
-                        ></div>
-                    </div>
-
-                    {/* Image Container */}
-                    <div className="relative max-w-6xl mx-auto">
-                        <div
-                            className={`transform transition-all duration-700 ${
+                            className={`transform transition-all duration-500 ${
                                 isTransitioning
-                                    ? "opacity-0 scale-95 translate-y-4"
-                                    : "opacity-100 scale-100 translate-y-0"
+                                    ? direction === "next"
+                                        ? "translate-x-6 scale-95 opacity-0"
+                                        : "-translate-x-6 scale-95 opacity-0"
+                                    : "translate-x-0 scale-100 opacity-100"
                             }`}
                         >
-                            {/* Large Image Display */}
-                            <div className="text-center relative group">
+                            {/* Original Size Image - Matches Content Height with Theme Colors */}
+                            <div className="text-center">
                                 <div
-                                    className={`w-full max-h-[600px] mx-auto rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 flex items-center justify-center relative ${
+                                    className={`w-full h-full mx-auto rounded-lg overflow-hidden shadow-xl ${
                                         currentStrand.id === "stem"
-                                            ? "bg-gradient-to-br from-green-100 to-emerald-100 border-4 border-green-200 group-hover:border-green-400"
+                                            ? "bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300"
                                             : currentStrand.id === "humss"
-                                            ? "bg-gradient-to-br from-blue-100 to-indigo-100 border-4 border-blue-200 group-hover:border-blue-400"
-                                            : "bg-gradient-to-br from-yellow-100 to-orange-100 border-4 border-yellow-200 group-hover:border-yellow-400"
+                                            ? "bg-gradient-to-br from-blue-100 to-indigo-100 border-2 border-blue-300"
+                                            : "bg-gradient-to-br from-yellow-100 to-orange-100 border-2 border-yellow-300"
                                     }`}
                                 >
-                                    {/* Background Decorative Elements Inside Image Container */}
-                                    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                                        {/* Large Strand Icon Watermark */}
-                                        <div
-                                            className={`absolute left-8 top-1/2 -translate-y-1/2 text-9xl opacity-5 ${
-                                                currentStrand.id === "stem"
-                                                    ? "text-green-600"
-                                                    : currentStrand.id ===
-                                                      "humss"
-                                                    ? "text-blue-600"
-                                                    : "text-yellow-600"
-                                            }`}
-                                        >
-                                            {currentStrand.id === "stem"
-                                                ? "🧬"
-                                                : currentStrand.id === "humss"
-                                                ? "🌍"
-                                                : "💻"}
-                                        </div>
-
-                                        {/* Strand Name Text */}
-                                        <div
-                                            className={`absolute right-8 bottom-8 font-black text-6xl opacity-5 rotate-[-5deg] ${
-                                                currentStrand.id === "stem"
-                                                    ? "text-green-600"
-                                                    : currentStrand.id ===
-                                                      "humss"
-                                                    ? "text-blue-600"
-                                                    : "text-yellow-600"
-                                            }`}
-                                        >
-                                            {currentStrand.shortTitle}
-                                        </div>
-
-                                        {/* Decorative Circles */}
-                                        <div
-                                            className={`absolute right-1/4 top-1/4 w-24 h-24 rounded-full opacity-10 ${
-                                                currentStrand.id === "stem"
-                                                    ? "bg-emerald-400"
-                                                    : currentStrand.id ===
-                                                      "humss"
-                                                    ? "bg-indigo-400"
-                                                    : "bg-orange-400"
-                                            }`}
-                                        ></div>
-                                    </div>
-
                                     <img
                                         src={currentStrand.image}
                                         alt={currentStrand.shortTitle}
-                                        className="max-w-full max-h-[600px] w-auto h-auto object-contain transform transition-transform duration-700 group-hover:scale-105 relative z-10"
+                                        className="w-full h-full object-contain"
                                     />
                                 </div>
 
                                 {/* Theme Color Overlay */}
                                 <div
-                                    className={`absolute inset-0 rounded-3xl pointer-events-none z-5 ${
+                                    className={`absolute inset-0 rounded-lg pointer-events-none ${
                                         currentStrand.id === "stem"
-                                            ? "bg-gradient-to-br from-green-500/10 to-emerald-500/10"
+                                            ? "bg-gradient-to-br from-green-400/20 to-emerald-400/20"
                                             : currentStrand.id === "humss"
-                                            ? "bg-gradient-to-br from-blue-500/10 to-indigo-500/10"
-                                            : "bg-gradient-to-br from-yellow-500/10 to-orange-500/10"
+                                            ? "bg-gradient-to-br from-blue-400/20 to-indigo-400/20"
+                                            : "bg-gradient-to-br from-yellow-400/20 to-orange-400/20"
                                     }`}
                                 ></div>
 
-                                {/* Floating Icons/Accents */}
+                                {/* Strand Color Accent */}
                                 <div
-                                    className={`absolute -top-6 -right-6 w-16 h-16 rounded-2xl shadow-xl rotate-12 flex items-center justify-center text-3xl ${
+                                    className={`absolute top-4 right-4 w-8 h-8 rounded-full shadow-lg ${
                                         currentStrand.id === "stem"
-                                            ? "bg-gradient-to-br from-green-500 to-emerald-600 text-white"
+                                            ? "bg-gradient-to-br from-green-500 to-emerald-500"
                                             : currentStrand.id === "humss"
-                                            ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
-                                            : "bg-gradient-to-br from-yellow-500 to-orange-600 text-white"
+                                            ? "bg-gradient-to-br from-blue-500 to-indigo-500"
+                                            : "bg-gradient-to-br from-yellow-500 to-orange-500"
                                     }`}
                                 >
-                                    {currentStrand.id === "stem"
-                                        ? "🧬"
-                                        : currentStrand.id === "humss"
-                                        ? "🌍"
-                                        : "💻"}
+                                    <div className="flex items-center justify-center h-full text-white font-bold text-sm">
+                                        {currentStrand.id === "stem"
+                                            ? "🧬"
+                                            : currentStrand.id === "humss"
+                                            ? "🌍"
+                                            : "💻"}
+                                    </div>
                                 </div>
+
+                                {/* Additional Color Accents */}
+                                <div
+                                    className={`absolute bottom-4 left-4 w-6 h-6 rounded-full ${
+                                        currentStrand.id === "stem"
+                                            ? "bg-green-300"
+                                            : currentStrand.id === "humss"
+                                            ? "bg-blue-300"
+                                            : "bg-yellow-300"
+                                    }`}
+                                ></div>
+
+                                <div
+                                    className={`absolute top-1/2 left-4 w-4 h-4 rounded-full ${
+                                        currentStrand.id === "stem"
+                                            ? "bg-emerald-300"
+                                            : currentStrand.id === "humss"
+                                            ? "bg-indigo-300"
+                                            : "bg-orange-300"
+                                    }`}
+                                ></div>
                             </div>
                         </div>
                     </div>

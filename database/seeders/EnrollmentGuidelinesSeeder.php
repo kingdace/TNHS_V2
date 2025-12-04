@@ -199,18 +199,18 @@ class EnrollmentGuidelinesSeeder extends Seeder
             [
                 'program_id' => 'sped',
                 'name' => 'Special Education Program (SPED)',
-                'description' => 'Inclusive education program for learners with special needs',
+                'description' => 'Future program - To be announced for upcoming academic years',
                 'icon' => 'Brain',
-                'color_gradient' => 'from-purple-500 to-purple-600',
-                'bg_color' => 'bg-purple-50',
-                'border_color' => 'border-purple-200',
-                'notes' => 'Individualized learning approach with specialized support services',
+                'color_gradient' => 'from-gray-400 to-gray-500',
+                'bg_color' => 'bg-gray-50',
+                'border_color' => 'border-gray-300',
+                'notes' => 'This program is currently under development and will be available in future academic years. Stay tuned for announcements!',
                 'features' => [
-                    'Individualized Education Program (IEP)',
-                    'Specialized teaching methods',
-                    'Assistive technology support',
-                    'Therapeutic services integration',
-                    'Inclusive classroom environment',
+                    'Program under development',
+                    'Comprehensive planning in progress',
+                    'Faculty training scheduled',
+                    'Facility preparation ongoing',
+                    'Community consultation planned',
                 ],
                 'display_order' => 2,
             ],
@@ -255,15 +255,13 @@ class EnrollmentGuidelinesSeeder extends Seeder
             ]);
         }
 
-        // Seed SPED Requirements
+        // Seed SPED Requirements (Future Program)
         $spedRequirements = [
-            'PSA Birth Certificate (Original + 2 photocopies)',
-            'Medical Certificate with diagnosis (from licensed physician)',
-            'Psychological Assessment Report (if available)',
-            '2x2 ID Pictures (3 copies, white background)',
-            'Certificate of Good Moral Character',
-            'Parent/Guardian\'s Valid ID (2 photocopies)',
-            'Previous school records and IEP (if any)',
+            'Program currently under development',
+            'Requirements will be announced soon',
+            'Stay tuned for official updates',
+            'Contact school for more information',
+            'Expected launch: Future academic year',
         ];
 
         foreach ($spedRequirements as $index => $requirement) {
@@ -274,12 +272,12 @@ class EnrollmentGuidelinesSeeder extends Seeder
             ]);
         }
 
-        // Seed SPED Processes
+        // Seed SPED Processes (Future Program)
         $spedProcesses = [
-            'Submit all required documents',
-            'Initial assessment and evaluation',
-            'IEP development and planning',
-            'Enrollment completion and support services setup',
+            'Program development in progress',
+            'Faculty training and preparation',
+            'Facility setup and equipment installation',
+            'Official announcement and enrollment opening',
         ];
 
         foreach ($spedProcesses as $index => $process) {

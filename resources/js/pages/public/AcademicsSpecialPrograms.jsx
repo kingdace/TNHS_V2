@@ -1,18 +1,120 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import Breadcrumb from "../../components/ui/Breadcrumb";
+import { academicProgramService } from "../../services/academicProgramService";
+import { Loader2 } from "lucide-react";
 
 const AcademicsSpecialPrograms = () => {
+    const [loading, setLoading] = useState(true);
+    const [alsData, setAlsData] = useState(null);
+    const [error, setError] = useState(null);
+
     const breadcrumbItems = [
         { label: "Academics", href: "/academics" },
         { label: "Special Programs" },
     ];
 
+    // Fallback data (current hardcoded content)
+    const fallbackData = {
+        page_content: {
+            header_title: "TAFT NATIONAL HIGH SCHOOL ALS SHS",
+            call_to_action: "Ready to Join Our Alternative Learning System?",
+            cta_description:
+                "Contact our academic department to learn more about the ALS program, enrollment process, and flexible learning schedules.",
+        },
+        program_benefits: [
+            {
+                title: "Age Requirement",
+                description: "Must be 18 years old",
+                icon: "👤",
+                color: "blue",
+            },
+            {
+                title: "Educational Background",
+                description: "ALS JHS Passer / Grade 10 Completer",
+                icon: "📚",
+                color: "blue",
+            },
+            {
+                title: "Alternative Path",
+                description: "Old Curriculum Graduate (4th Year High School)",
+                icon: "🎓",
+                color: "blue",
+            },
+        ],
+        admission_requirements: {
+            documents: [
+                { id: 1, text: "PSA Birth Certificate" },
+                { id: 2, text: "Report Card / A & E Certificate" },
+                { id: 3, text: "ALS Enrollment Form" },
+            ],
+            contact_info: [
+                { id: 1, text: "+639505358285", type: "phone" },
+                {
+                    id: 2,
+                    text: "Nueva Ext. Brgy. Taft, Surigao City",
+                    type: "address",
+                },
+            ],
+        },
+    };
+
+    useEffect(() => {
+        fetchALSData();
+    }, []);
+
+    const fetchALSData = async () => {
+        try {
+            setLoading(true);
+            const response = await academicProgramService.getALS();
+
+            if (response.success && response.data) {
+                setAlsData(response.data);
+            } else {
+                console.warn("Failed to fetch ALS data, using fallback");
+                setAlsData(fallbackData);
+            }
+        } catch (error) {
+            console.error("Error fetching ALS data:", error);
+            setError("Failed to load ALS content");
+            setAlsData(fallbackData);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Use dynamic data or fallback
+    const data = alsData || fallbackData;
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-white">
+                <Breadcrumb items={breadcrumbItems} />
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                    <span className="ml-2 text-gray-600">
+                        Loading ALS program information...
+                    </span>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-white">
             {/* Breadcrumb */}
             <Breadcrumb items={breadcrumbItems} />
+
+            {error && (
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <p className="text-yellow-800">
+                            {error}. Showing default content.
+                        </p>
+                    </div>
+                </div>
+            )}
 
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Main Content - Same Design as Senior High School */}
@@ -23,7 +125,8 @@ const AcademicsSpecialPrograms = () => {
                         <div className="text-center mb-8">
                             <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white py-4 px-6 rounded-xl shadow-lg mb-4">
                                 <h3 className="text-2xl font-black uppercase tracking-wide">
-                                    TAFT NATIONAL HIGH SCHOOL ALS SHS
+                                    {data.page_content?.header_title ||
+                                        "TAFT NATIONAL HIGH SCHOOL ALS SHS"}
                                 </h3>
                             </div>
                         </div>
@@ -36,35 +139,27 @@ const AcademicsSpecialPrograms = () => {
                                         <span className="text-xl">📋</span>
                                     </div>
                                     <h4 className="text-lg font-bold text-blue-800">
-                                        QUALIFICATIONS
+                                        {data.page_content?.section_titles
+                                            ?.qualifications ||
+                                            "QUALIFICATIONS"}
                                     </h4>
                                 </div>
                                 <div className="space-y-3">
-                                    <div className="flex items-center space-x-3">
-                                        <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                                            1
-                                        </span>
-                                        <span className="text-gray-700 font-medium">
-                                            Must be 18 years old
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center space-x-3">
-                                        <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                                            2
-                                        </span>
-                                        <span className="text-gray-700 font-medium">
-                                            ALS JHS Passer / Grade 10 Completer
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center space-x-3">
-                                        <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                                            3
-                                        </span>
-                                        <span className="text-gray-700 font-medium">
-                                            Old Curriculum Graduate (4th Year
-                                            High School)
-                                        </span>
-                                    </div>
+                                    {data.program_benefits?.map(
+                                        (qualification, index) => (
+                                            <div
+                                                key={index}
+                                                className="flex items-center space-x-3"
+                                            >
+                                                <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                    {index + 1}
+                                                </span>
+                                                <span className="text-gray-700 font-medium">
+                                                    {qualification.description}
+                                                </span>
+                                            </div>
+                                        )
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -77,34 +172,26 @@ const AcademicsSpecialPrograms = () => {
                                         <span className="text-xl">📄</span>
                                     </div>
                                     <h4 className="text-lg font-bold text-green-800">
-                                        REQUIREMENTS
+                                        {data.page_content?.section_titles
+                                            ?.requirements || "REQUIREMENTS"}
                                     </h4>
                                 </div>
                                 <div className="space-y-3">
-                                    <div className="flex items-center space-x-3">
-                                        <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                                            1
-                                        </span>
-                                        <span className="text-gray-700 font-medium">
-                                            PSA Birth Certificate
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center space-x-3">
-                                        <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                                            2
-                                        </span>
-                                        <span className="text-gray-700 font-medium">
-                                            Report Card / A & E Certificate
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center space-x-3">
-                                        <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                                            3
-                                        </span>
-                                        <span className="text-gray-700 font-medium">
-                                            ALS Enrollment Form
-                                        </span>
-                                    </div>
+                                    {data.admission_requirements?.documents?.map(
+                                        (document, index) => (
+                                            <div
+                                                key={document.id || index}
+                                                className="flex items-center space-x-3"
+                                            >
+                                                <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                    {index + 1}
+                                                </span>
+                                                <span className="text-gray-700 font-medium">
+                                                    {document.text}
+                                                </span>
+                                            </div>
+                                        )
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -113,22 +200,38 @@ const AcademicsSpecialPrograms = () => {
                         <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
                             <p className="text-gray-700 text-base leading-relaxed font-medium">
                                 <span className="text-blue-600 font-bold">
-                                    📞 Contact Information
+                                    📞{" "}
+                                    {data.page_content?.section_titles
+                                        ?.contact || "Contact Information"}
                                 </span>
                             </p>
                             <div className="mt-3 space-y-2">
-                                <p className="text-gray-700 font-medium">
-                                    <span className="bg-yellow-200 px-2 py-1 rounded font-bold">
-                                        📱
-                                    </span>{" "}
-                                    +639505358285
-                                </p>
-                                <p className="text-gray-700 font-medium">
-                                    <span className="bg-green-200 px-2 py-1 rounded font-bold">
-                                        📍
-                                    </span>{" "}
-                                    Nueva Ext. Brgy. Taft, Surigao City
-                                </p>
+                                {data.admission_requirements?.contact_info?.map(
+                                    (contact, index) => (
+                                        <p
+                                            key={contact.id || index}
+                                            className="text-gray-700 font-medium"
+                                        >
+                                            <span
+                                                className={`px-2 py-1 rounded font-bold ${
+                                                    contact.type === "phone"
+                                                        ? "bg-yellow-200"
+                                                        : contact.type ===
+                                                          "address"
+                                                        ? "bg-green-200"
+                                                        : "bg-blue-200"
+                                                }`}
+                                            >
+                                                {contact.type === "phone"
+                                                    ? "📱"
+                                                    : contact.type === "address"
+                                                    ? "📍"
+                                                    : "📧"}
+                                            </span>{" "}
+                                            {contact.text}
+                                        </p>
+                                    )
+                                )}
                             </div>
                         </div>
                     </div>
@@ -172,12 +275,12 @@ const AcademicsSpecialPrograms = () => {
                 <div className="text-center mt-8">
                     <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
                         <h2 className="text-xl font-bold text-gray-900 mb-3">
-                            Ready to Join Our Alternative Learning System?
+                            {data.page_content?.call_to_action ||
+                                "Ready to Join Our Alternative Learning System?"}
                         </h2>
                         <p className="text-gray-600 mb-4 max-w-2xl mx-auto text-sm">
-                            Contact our academic department to learn more about
-                            the ALS program, enrollment process, and flexible
-                            learning schedules.
+                            {data.page_content?.cta_description ||
+                                "Contact our academic department to learn more about the ALS program, enrollment process, and flexible learning schedules."}
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <Button

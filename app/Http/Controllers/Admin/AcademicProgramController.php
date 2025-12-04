@@ -67,6 +67,21 @@ class AcademicProgramController extends Controller
                 'duration' => 'nullable|string|max:100',
                 'is_active' => 'boolean',
                 'display_order' => 'integer|min:0',
+                // Rich content fields
+                'page_content' => 'nullable|array',
+                'program_benefits' => 'nullable|array',
+                'why_choose_features' => 'nullable|array',
+                'admission_requirements' => 'nullable|array',
+                'images' => 'nullable|array',
+                'curriculum_highlights' => 'nullable|array',
+                'facilities' => 'nullable|array',
+                'extracurricular_activities' => 'nullable|array',
+                'meta_title' => 'nullable|string|max:255',
+                'meta_description' => 'nullable|string',
+                'meta_keywords' => 'nullable|array',
+                'featured' => 'boolean',
+                'banner_color' => 'nullable|string|max:50',
+                'theme_color' => 'nullable|string|max:50',
             ]);
 
             $program = AcademicProgram::create($validated);
@@ -128,6 +143,21 @@ class AcademicProgramController extends Controller
                 'duration' => 'nullable|string|max:100',
                 'is_active' => 'boolean',
                 'display_order' => 'integer|min:0',
+                // Rich content fields
+                'page_content' => 'nullable|array',
+                'program_benefits' => 'nullable|array',
+                'why_choose_features' => 'nullable|array',
+                'admission_requirements' => 'nullable|array',
+                'images' => 'nullable|array',
+                'curriculum_highlights' => 'nullable|array',
+                'facilities' => 'nullable|array',
+                'extracurricular_activities' => 'nullable|array',
+                'meta_title' => 'nullable|string|max:255',
+                'meta_description' => 'nullable|string',
+                'meta_keywords' => 'nullable|array',
+                'featured' => 'boolean',
+                'banner_color' => 'nullable|string|max:50',
+                'theme_color' => 'nullable|string|max:50',
             ]);
 
             $academicProgram->update($validated);

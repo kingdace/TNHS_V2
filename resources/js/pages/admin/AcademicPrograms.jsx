@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
+import AcademicProgramForm from "../../components/admin/AcademicProgramForm";
 import {
     Plus,
     Edit,
@@ -35,8 +36,37 @@ const AcademicPrograms = () => {
         duration: "",
         is_active: true,
         display_order: 0,
+        // Rich content fields
+        page_content: {
+            header_title: "",
+            main_description: "",
+            section_titles: {
+                benefits: "PROGRAM BENEFITS",
+                features: "Why Choose This Program?",
+                requirements: "Admission Requirements",
+            },
+        },
+        program_benefits: [],
+        why_choose_features: [],
+        admission_requirements: {
+            documents: [],
+            schedule: [],
+        },
+        images: {
+            logo: "",
+            academic_excellence: "",
+            student_life: "",
+        },
+        curriculum_highlights: [],
+        facilities: [],
+        extracurricular_activities: [],
+        meta_title: "",
+        meta_description: "",
+        meta_keywords: [],
+        featured: false,
+        banner_color: "blue",
+        theme_color: "blue",
     });
-    const [newSubject, setNewSubject] = useState("");
 
     useEffect(() => {
         fetchPrograms();
@@ -59,25 +89,14 @@ const AcademicPrograms = () => {
         }
     };
 
-    const handleCreate = async (e) => {
-        e.preventDefault();
+    const handleCreate = async (formData) => {
         try {
             const response = await adminService.academicPrograms.create(
                 formData
             );
             if (response.success) {
                 setShowForm(false);
-                setFormData({
-                    program_type: "junior_high",
-                    grade_level: "",
-                    program_name: "",
-                    description: "",
-                    subjects: [],
-                    requirements: "",
-                    duration: "",
-                    is_active: true,
-                    display_order: 0,
-                });
+                resetFormData();
                 fetchPrograms();
             }
         } catch (err) {
@@ -86,8 +105,7 @@ const AcademicPrograms = () => {
         }
     };
 
-    const handleUpdate = async (e) => {
-        e.preventDefault();
+    const handleUpdate = async (formData) => {
         try {
             const response = await adminService.academicPrograms.update(
                 editingProgram.id,
@@ -96,17 +114,7 @@ const AcademicPrograms = () => {
             if (response.success) {
                 setShowForm(false);
                 setEditingProgram(null);
-                setFormData({
-                    program_type: "junior_high",
-                    grade_level: "",
-                    program_name: "",
-                    description: "",
-                    subjects: [],
-                    requirements: "",
-                    duration: "",
-                    is_active: true,
-                    display_order: 0,
-                });
+                resetFormData();
                 fetchPrograms();
             }
         } catch (err) {
@@ -149,24 +157,81 @@ const AcademicPrograms = () => {
             duration: program.duration || "",
             is_active: program.is_active,
             display_order: program.display_order,
+            // Rich content fields with fallbacks
+            page_content: program.page_content || {
+                header_title: "",
+                main_description: "",
+                section_titles: {
+                    benefits: "PROGRAM BENEFITS",
+                    features: "Why Choose This Program?",
+                    requirements: "Admission Requirements",
+                },
+            },
+            program_benefits: program.program_benefits || [],
+            why_choose_features: program.why_choose_features || [],
+            admission_requirements: program.admission_requirements || {
+                documents: [],
+                schedule: [],
+            },
+            images: program.images || {
+                logo: "",
+                academic_excellence: "",
+                student_life: "",
+            },
+            curriculum_highlights: program.curriculum_highlights || [],
+            facilities: program.facilities || [],
+            extracurricular_activities:
+                program.extracurricular_activities || [],
+            meta_title: program.meta_title || "",
+            meta_description: program.meta_description || "",
+            meta_keywords: program.meta_keywords || [],
+            featured: program.featured || false,
+            banner_color: program.banner_color || "blue",
+            theme_color: program.theme_color || "blue",
         });
         setShowForm(true);
     };
 
-    const addSubject = () => {
-        if (newSubject.trim()) {
-            setFormData({
-                ...formData,
-                subjects: [...formData.subjects, newSubject.trim()],
-            });
-            setNewSubject("");
-        }
-    };
-
-    const removeSubject = (index) => {
+    const resetFormData = () => {
         setFormData({
-            ...formData,
-            subjects: formData.subjects.filter((_, i) => i !== index),
+            program_type: "junior_high",
+            grade_level: "",
+            program_name: "",
+            description: "",
+            subjects: [],
+            requirements: "",
+            duration: "",
+            is_active: true,
+            display_order: 0,
+            page_content: {
+                header_title: "",
+                main_description: "",
+                section_titles: {
+                    benefits: "PROGRAM BENEFITS",
+                    features: "Why Choose This Program?",
+                    requirements: "Admission Requirements",
+                },
+            },
+            program_benefits: [],
+            why_choose_features: [],
+            admission_requirements: {
+                documents: [],
+                schedule: [],
+            },
+            images: {
+                logo: "",
+                academic_excellence: "",
+                student_life: "",
+            },
+            curriculum_highlights: [],
+            facilities: [],
+            extracurricular_activities: [],
+            meta_title: "",
+            meta_description: "",
+            meta_keywords: [],
+            featured: false,
+            banner_color: "blue",
+            theme_color: "blue",
         });
     };
 
@@ -449,270 +514,19 @@ const AcademicPrograms = () => {
                 )}
             </div>
 
-            {/* Form Modal */}
+            {/* Enhanced Form Modal */}
             {showForm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                        <div className="p-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">
-                                {editingProgram
-                                    ? "Edit Program"
-                                    : "Add New Program"}
-                            </h2>
-
-                            <form
-                                onSubmit={
-                                    editingProgram ? handleUpdate : handleCreate
-                                }
-                                className="space-y-4"
-                            >
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Program Type
-                                        </label>
-                                        <select
-                                            value={formData.program_type}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    program_type:
-                                                        e.target.value,
-                                                })
-                                            }
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            required
-                                        >
-                                            <option value="junior_high">
-                                                Junior High School
-                                            </option>
-                                            <option value="senior_high">
-                                                Senior High School
-                                            </option>
-                                            <option value="special">
-                                                ALS Program
-                                            </option>
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Grade Level
-                                        </label>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            max="12"
-                                            value={formData.grade_level}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    grade_level: e.target.value,
-                                                })
-                                            }
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Program Name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={formData.program_name}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                program_name: e.target.value,
-                                            })
-                                        }
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Description
-                                    </label>
-                                    <textarea
-                                        value={formData.description}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                description: e.target.value,
-                                            })
-                                        }
-                                        rows={3}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Subjects
-                                    </label>
-                                    <div className="flex gap-2 mb-2">
-                                        <input
-                                            type="text"
-                                            value={newSubject}
-                                            onChange={(e) =>
-                                                setNewSubject(e.target.value)
-                                            }
-                                            placeholder="Add a subject"
-                                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            onKeyPress={(e) => {
-                                                if (e.key === "Enter") {
-                                                    e.preventDefault();
-                                                    addSubject();
-                                                }
-                                            }}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={addSubject}
-                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                                        >
-                                            Add
-                                        </button>
-                                    </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        {formData.subjects.map(
-                                            (subject, index) => (
-                                                <span
-                                                    key={index}
-                                                    className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
-                                                >
-                                                    {subject}
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            removeSubject(index)
-                                                        }
-                                                        className="text-blue-600 hover:text-blue-800"
-                                                    >
-                                                        ×
-                                                    </button>
-                                                </span>
-                                            )
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Requirements
-                                    </label>
-                                    <textarea
-                                        value={formData.requirements}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                requirements: e.target.value,
-                                            })
-                                        }
-                                        rows={2}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Duration
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={formData.duration}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    duration: e.target.value,
-                                                })
-                                            }
-                                            placeholder="e.g., 1 Year, 2 Semesters"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Display Order
-                                        </label>
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            value={formData.display_order}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    display_order:
-                                                        parseInt(
-                                                            e.target.value
-                                                        ) || 0,
-                                                })
-                                            }
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id="is_active"
-                                        checked={formData.is_active}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                is_active: e.target.checked,
-                                            })
-                                        }
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                    />
-                                    <label
-                                        htmlFor="is_active"
-                                        className="ml-2 block text-sm text-gray-900"
-                                    >
-                                        Active
-                                    </label>
-                                </div>
-
-                                <div className="flex justify-end gap-3 pt-4">
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setShowForm(false);
-                                            setEditingProgram(null);
-                                            setFormData({
-                                                program_type: "junior_high",
-                                                grade_level: "",
-                                                program_name: "",
-                                                description: "",
-                                                subjects: [],
-                                                requirements: "",
-                                                duration: "",
-                                                is_active: true,
-                                                display_order: 0,
-                                            });
-                                        }}
-                                        className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                                    >
-                                        {editingProgram ? "Update" : "Create"}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                <AcademicProgramForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    onSubmit={editingProgram ? handleUpdate : handleCreate}
+                    onCancel={() => {
+                        setShowForm(false);
+                        setEditingProgram(null);
+                        resetFormData();
+                    }}
+                    editingProgram={editingProgram}
+                />
             )}
         </div>
     );

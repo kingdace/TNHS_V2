@@ -1,27 +1,205 @@
-import React from "react";
-import { ArrowRight } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { academicProgramService } from "../services/academicProgramService";
 
 const JHSProgramSection = () => {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [programData, setProgramData] = useState(null);
+
+    useEffect(() => {
+        fetchJuniorHighData();
+    }, []);
+
+    const fetchJuniorHighData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const response = await academicProgramService.getJuniorHigh();
+
+            if (response.success) {
+                setProgramData(response.data);
+            } else {
+                setError(response.error);
+                // Use fallback data if API fails
+                setFallbackData();
+            }
+        } catch (err) {
+            console.error("Error fetching Junior High data:", err);
+            setError("Failed to load program information");
+            // Use fallback data if API fails
+            setFallbackData();
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fallback data (current hardcoded content)
+    const setFallbackData = () => {
+        setProgramData({
+            program_name: "Junior High School Program",
+            description:
+                "Taft NHS Junior High School offers a comprehensive academic program that covers the four years of Junior High School (Grades 7-10). The curriculum features the interaction of nine subject areas designed to meet the goals of integrative and transformative education.",
+            page_content: {
+                header_title: "WHY CHOOSE TAFT NHS JUNIOR HIGH SCHOOL?",
+                main_description:
+                    "Taft NHS Junior High School offers a comprehensive academic program that covers the four years of Junior High School (Grades 7-10). The curriculum features the interaction of nine subject areas designed to meet the goals of integrative and transformative education.",
+                section_titles: {
+                    benefits: "PROGRAM BENEFITS",
+                    features: "Why Choose Our Junior High School?",
+                    requirements: "Admission Requirements",
+                },
+            },
+            program_benefits: [
+                {
+                    id: 1,
+                    title: "Excel in Core Subjects",
+                    description:
+                        "Master essential subjects including Mathematics, English, Filipino, Science, and Social Studies to build a strong foundation for Senior High School.",
+                    icon: "📚",
+                    color: "blue",
+                },
+                {
+                    id: 2,
+                    title: "Develop Life Skills",
+                    description:
+                        "Participate in MAPEH, TLE, and Values Education programs that promote physical health, creativity, technical skills, and moral development.",
+                    icon: "👤",
+                    color: "green",
+                },
+            ],
+            why_choose_features: [
+                {
+                    id: 1,
+                    text: "Comprehensive curriculum aligned with DepEd standards",
+                    color: "green",
+                },
+                {
+                    id: 2,
+                    text: "Well-rounded education covering all subject areas",
+                    color: "green",
+                },
+                {
+                    id: 3,
+                    text: "Holistic student development programs",
+                    color: "green",
+                },
+                {
+                    id: 4,
+                    text: "Experienced and dedicated teaching staff",
+                    color: "green",
+                },
+                {
+                    id: 5,
+                    text: "Modern facilities and learning resources",
+                    color: "blue",
+                },
+                {
+                    id: 6,
+                    text: "Strong foundation for Senior High School",
+                    color: "blue",
+                },
+                {
+                    id: 7,
+                    text: "Character formation and values education",
+                    color: "blue",
+                },
+                {
+                    id: 8,
+                    text: "Safe and nurturing learning environment",
+                    color: "blue",
+                },
+            ],
+            admission_requirements: {
+                documents: [
+                    { text: "Report Card (Form 138)" },
+                    { text: "Birth Certificate (PSA)" },
+                    { text: "Certificate of Good Moral Character" },
+                    { text: "2x2 ID Photos (3 copies)" },
+                ],
+                schedule: [
+                    { text: "April - May: Early Enrollment" },
+                    { text: "June: Regular Enrollment" },
+                    { text: "Monday - Friday: 8:00 AM - 4:00 PM" },
+                    { text: "School Registrar Office" },
+                ],
+            },
+            images: {
+                logo: "/images/JLOGO.jpg",
+                academic_excellence: "/images/ACAD.jpg",
+                student_life: "/images/J1.jpg",
+            },
+        });
+    };
+
+    if (loading) {
+        return (
+            <div className="bg-white py-8">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-center h-64">
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                        <span className="ml-2 text-gray-600">
+                            Loading program information...
+                        </span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!programData) {
+        return (
+            <div className="bg-white py-8">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-center h-64">
+                        <AlertCircle className="h-8 w-8 text-red-600" />
+                        <span className="ml-2 text-gray-600">
+                            Failed to load program information
+                        </span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="bg-white py-8">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* WHY CHOOSE TAFT NHS JUNIOR HIGH SCHOOL Banner */}
+                {/* Error Message */}
+                {error && (
+                    <div className="mb-8 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg flex items-center">
+                        <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
+                        <div>
+                            <p className="font-medium">
+                                Using cached information
+                            </p>
+                            <p className="text-sm">{error}</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Dynamic Header Banner */}
                 <div className="mb-8">
                     <div className="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-4 px-8 rounded-t-lg shadow-lg text-center">
                         <h2 className="text-2xl font-bold uppercase">
-                            WHY CHOOSE TAFT NHS JUNIOR HIGH SCHOOL?
+                            {programData.page_content?.header_title ||
+                                "WHY CHOOSE TAFT NHS JUNIOR HIGH SCHOOL?"}
                         </h2>
                     </div>
                 </div>
 
                 {/* Main Content - Two Column Layout */}
                 <div className="grid lg:grid-cols-2 gap-8 items-center">
-                    {/* Left Column - JLOGO Image */}
+                    {/* Left Column - Dynamic Logo Image */}
                     <div className="flex justify-center">
                         <div className="bg-gradient-to-br from-blue-50 to-green-50 rounded-lg p-6 shadow-lg">
                             <img
-                                src="/images/JLOGO.jpg"
+                                src={
+                                    programData.images?.logo ||
+                                    "/images/JLOGO.jpg"
+                                }
                                 alt="Junior High School Logo"
                                 className="w-80 h-80 object-cover rounded-lg"
                             />
@@ -31,15 +209,13 @@ const JHSProgramSection = () => {
                     <div className="space-y-6">
                         <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6">
                             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                                Taft NHS Junior High School Program
+                                {programData.program_name ||
+                                    "Taft NHS Junior High School Program"}
                             </h2>
                             <p className="text-gray-600 leading-relaxed mb-6">
-                                Taft NHS Junior High School offers a
-                                comprehensive academic program that covers the
-                                four years of Junior High School (Grades 7-10).
-                                The curriculum features the interaction of nine
-                                subject areas designed to meet the goals of
-                                integrative and transformative education.
+                                {programData.page_content?.main_description ||
+                                    programData.description ||
+                                    "Taft NHS Junior High School offers a comprehensive academic program that covers the four years of Junior High School (Grades 7-10). The curriculum features the interaction of nine subject areas designed to meet the goals of integrative and transformative education."}
                             </p>
 
                             {/* Action Buttons */}
@@ -70,7 +246,11 @@ const JHSProgramSection = () => {
                                     <div className="text-center">
                                         <div className="bg-white rounded-xl shadow-xl overflow-hidden mb-4">
                                             <img
-                                                src="/images/ACAD.jpg"
+                                                src={
+                                                    programData.images
+                                                        ?.academic_excellence ||
+                                                    "/images/ACAD.jpg"
+                                                }
                                                 alt="Academic Excellence"
                                                 className="w-full h-80 object-cover"
                                             />
@@ -84,7 +264,11 @@ const JHSProgramSection = () => {
                                     <div className="text-center">
                                         <div className="bg-white rounded-xl shadow-xl overflow-hidden mb-4">
                                             <img
-                                                src="/images/J1.jpg"
+                                                src={
+                                                    programData.images
+                                                        ?.student_life ||
+                                                    "/images/J1.jpg"
+                                                }
                                                 alt="Student Life & Activities"
                                                 className="w-full h-80 object-cover"
                                             />
@@ -101,84 +285,48 @@ const JHSProgramSection = () => {
                             {/* Why Choose Our Junior High School - Moved to Left */}
                             <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-8">
                                 <h4 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-                                    Why Choose Our Junior High School?
+                                    {programData.page_content?.section_titles
+                                        ?.features ||
+                                        "Why Choose Our Junior High School?"}
                                 </h4>
                                 <div className="grid md:grid-cols-2 gap-6">
                                     <div className="space-y-4">
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-green-500 text-xl font-bold">
-                                                ✓
-                                            </span>
-                                            <span className="text-gray-800 text-base font-medium">
-                                                Comprehensive curriculum aligned
-                                                with DepEd standards
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-green-500 text-xl font-bold">
-                                                ✓
-                                            </span>
-                                            <span className="text-gray-800 text-base font-medium">
-                                                Well-rounded education covering
-                                                all subject areas
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-green-500 text-xl font-bold">
-                                                ✓
-                                            </span>
-                                            <span className="text-gray-800 text-base font-medium">
-                                                Holistic student development
-                                                programs
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-green-500 text-xl font-bold">
-                                                ✓
-                                            </span>
-                                            <span className="text-gray-800 text-base font-medium">
-                                                Experienced and dedicated
-                                                teaching staff
-                                            </span>
-                                        </div>
+                                        {programData.why_choose_features
+                                            ?.slice(0, 4)
+                                            .map((feature) => (
+                                                <div
+                                                    key={feature.id}
+                                                    className="flex items-center space-x-3"
+                                                >
+                                                    <span
+                                                        className={`text-${feature.color}-500 text-xl font-bold`}
+                                                    >
+                                                        ✓
+                                                    </span>
+                                                    <span className="text-gray-800 text-base font-medium">
+                                                        {feature.text}
+                                                    </span>
+                                                </div>
+                                            ))}
                                     </div>
                                     <div className="space-y-4">
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-blue-500 text-xl font-bold">
-                                                ✓
-                                            </span>
-                                            <span className="text-gray-800 text-base font-medium">
-                                                Modern facilities and learning
-                                                resources
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-blue-500 text-xl font-bold">
-                                                ✓
-                                            </span>
-                                            <span className="text-gray-800 text-base font-medium">
-                                                Strong foundation for Senior
-                                                High School
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-blue-500 text-xl font-bold">
-                                                ✓
-                                            </span>
-                                            <span className="text-gray-800 text-base font-medium">
-                                                Character formation and values
-                                                education
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-blue-500 text-xl font-bold">
-                                                ✓
-                                            </span>
-                                            <span className="text-gray-800 text-base font-medium">
-                                                Safe and nurturing learning
-                                                environment
-                                            </span>
-                                        </div>
+                                        {programData.why_choose_features
+                                            ?.slice(4, 8)
+                                            .map((feature) => (
+                                                <div
+                                                    key={feature.id}
+                                                    className="flex items-center space-x-3"
+                                                >
+                                                    <span
+                                                        className={`text-${feature.color}-500 text-xl font-bold`}
+                                                    >
+                                                        ✓
+                                                    </span>
+                                                    <span className="text-gray-800 text-base font-medium">
+                                                        {feature.text}
+                                                    </span>
+                                                </div>
+                                            ))}
                                     </div>
                                 </div>
                             </div>
@@ -188,79 +336,60 @@ const JHSProgramSection = () => {
                         <div className="space-y-8">
                             {/* Single Unified Table with Banner and Content - FIRST */}
                             <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                                {/* PROGRAM BENEFITS Banner - Integrated into the table */}
+                                {/* Dynamic PROGRAM BENEFITS Banner */}
                                 <div className="bg-blue-600 text-white py-4 px-8 text-center">
                                     <h3 className="text-2xl font-bold uppercase tracking-wide">
-                                        PROGRAM BENEFITS
+                                        {programData.page_content
+                                            ?.section_titles?.benefits ||
+                                            "PROGRAM BENEFITS"}
                                     </h3>
                                 </div>
 
-                                {/* Content Section */}
+                                {/* Dynamic Content Section */}
                                 <div className="p-8">
                                     <div className="space-y-8">
-                                        {/* Excel in Core Subjects */}
-                                        <div className="flex items-start space-x-6">
-                                            <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                                <span className="text-white text-2xl">
-                                                    📚
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <h4 className="text-xl font-bold text-gray-900 mb-3">
-                                                    Excel in Core Subjects
-                                                </h4>
-                                                <div className="flex items-start space-x-3">
-                                                    <span className="text-green-500 text-xl font-bold">
-                                                        ✓
-                                                    </span>
-                                                    <p className="text-gray-700 leading-relaxed text-base">
-                                                        Master essential
-                                                        subjects including
-                                                        Mathematics, English,
-                                                        Filipino, Science, and
-                                                        Social Studies to build
-                                                        a strong foundation for
-                                                        Senior High School.
-                                                    </p>
+                                        {programData.program_benefits?.map(
+                                            (benefit) => (
+                                                <div
+                                                    key={benefit.id}
+                                                    className="flex items-start space-x-6"
+                                                >
+                                                    <div
+                                                        className={`w-16 h-16 bg-${benefit.color}-500 rounded-full flex items-center justify-center flex-shrink-0`}
+                                                    >
+                                                        <span className="text-white text-2xl">
+                                                            {benefit.icon}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-xl font-bold text-gray-900 mb-3">
+                                                            {benefit.title}
+                                                        </h4>
+                                                        <div className="flex items-start space-x-3">
+                                                            <span className="text-green-500 text-xl font-bold">
+                                                                ✓
+                                                            </span>
+                                                            <p className="text-gray-700 leading-relaxed text-base">
+                                                                {
+                                                                    benefit.description
+                                                                }
+                                                            </p>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Develop Life Skills */}
-                                        <div className="flex items-start space-x-6">
-                                            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                                <span className="text-white text-2xl">
-                                                    👤
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <h4 className="text-xl font-bold text-gray-900 mb-3">
-                                                    Develop Life Skills
-                                                </h4>
-                                                <div className="flex items-start space-x-3">
-                                                    <span className="text-green-500 text-xl font-bold">
-                                                        ✓
-                                                    </span>
-                                                    <p className="text-gray-700 leading-relaxed text-base">
-                                                        Participate in MAPEH,
-                                                        TLE, and Values
-                                                        Education programs that
-                                                        promote physical health,
-                                                        creativity, technical
-                                                        skills, and moral
-                                                        development.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
+                                            )
+                                        )}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Admission Requirements Section - SECOND */}
+                            {/* Dynamic Admission Requirements Section */}
                             <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-8">
                                 <h4 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-                                    📋 Admission Requirements
+                                    📋{" "}
+                                    {programData.page_content?.section_titles
+                                        ?.requirements ||
+                                        "Admission Requirements"}
                                 </h4>
                                 <div className="grid md:grid-cols-2 gap-8">
                                     <div>
@@ -268,39 +397,21 @@ const JHSProgramSection = () => {
                                             📄 Required Documents
                                         </h5>
                                         <div className="space-y-3">
-                                            <div className="flex items-start space-x-3">
-                                                <span className="text-purple-500 text-lg font-bold">
-                                                    •
-                                                </span>
-                                                <span className="text-gray-700 text-sm">
-                                                    Report Card (Form 138)
-                                                </span>
-                                            </div>
-                                            <div className="flex items-start space-x-3">
-                                                <span className="text-purple-500 text-lg font-bold">
-                                                    •
-                                                </span>
-                                                <span className="text-gray-700 text-sm">
-                                                    Birth Certificate (PSA)
-                                                </span>
-                                            </div>
-                                            <div className="flex items-start space-x-3">
-                                                <span className="text-purple-500 text-lg font-bold">
-                                                    •
-                                                </span>
-                                                <span className="text-gray-700 text-sm">
-                                                    Certificate of Good Moral
-                                                    Character
-                                                </span>
-                                            </div>
-                                            <div className="flex items-start space-x-3">
-                                                <span className="text-purple-500 text-lg font-bold">
-                                                    •
-                                                </span>
-                                                <span className="text-gray-700 text-sm">
-                                                    2x2 ID Photos (3 copies)
-                                                </span>
-                                            </div>
+                                            {programData.admission_requirements?.documents?.map(
+                                                (doc, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-start space-x-3"
+                                                    >
+                                                        <span className="text-purple-500 text-lg font-bold">
+                                                            •
+                                                        </span>
+                                                        <span className="text-gray-700 text-sm">
+                                                            {doc.text}
+                                                        </span>
+                                                    </div>
+                                                )
+                                            )}
                                         </div>
                                     </div>
                                     <div>
@@ -308,40 +419,21 @@ const JHSProgramSection = () => {
                                             📅 Enrollment Schedule
                                         </h5>
                                         <div className="space-y-3">
-                                            <div className="flex items-start space-x-3">
-                                                <span className="text-pink-500 text-lg font-bold">
-                                                    •
-                                                </span>
-                                                <span className="text-gray-700 text-sm">
-                                                    April - May: Early
-                                                    Enrollment
-                                                </span>
-                                            </div>
-                                            <div className="flex items-start space-x-3">
-                                                <span className="text-pink-500 text-lg font-bold">
-                                                    •
-                                                </span>
-                                                <span className="text-gray-700 text-sm">
-                                                    June: Regular Enrollment
-                                                </span>
-                                            </div>
-                                            <div className="flex items-start space-x-3">
-                                                <span className="text-pink-500 text-lg font-bold">
-                                                    •
-                                                </span>
-                                                <span className="text-gray-700 text-sm">
-                                                    Monday - Friday: 8:00 AM -
-                                                    4:00 PM
-                                                </span>
-                                            </div>
-                                            <div className="flex items-start space-x-3">
-                                                <span className="text-pink-500 text-lg font-bold">
-                                                    •
-                                                </span>
-                                                <span className="text-gray-700 text-sm">
-                                                    School Registrar Office
-                                                </span>
-                                            </div>
+                                            {programData.admission_requirements?.schedule?.map(
+                                                (item, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-start space-x-3"
+                                                    >
+                                                        <span className="text-pink-500 text-lg font-bold">
+                                                            •
+                                                        </span>
+                                                        <span className="text-gray-700 text-sm">
+                                                            {item.text}
+                                                        </span>
+                                                    </div>
+                                                )
+                                            )}
                                         </div>
                                     </div>
                                 </div>

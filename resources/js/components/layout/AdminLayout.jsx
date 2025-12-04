@@ -69,6 +69,26 @@ const AdminLayout = () => {
             icon: Image,
         },
 
+        // Academic Management
+        {
+            name: "Academic Programs",
+            description: "Manage academic programs",
+            href: "/admin/academic-programs",
+            icon: BookOpen,
+        },
+        {
+            name: "Junior High Content",
+            description: "Manage Junior High page content",
+            href: "/admin/junior-high-content",
+            icon: School,
+        },
+        {
+            name: "ALS Content",
+            description: "Manage ALS program content",
+            href: "/admin/als-content",
+            icon: GraduationCap,
+        },
+
         // People Management
         {
             name: "Faculty & Staff",
@@ -194,6 +214,8 @@ const AdminLayout = () => {
         if (path.includes("/admin/resources")) return "Resources Management";
         if (path.includes("/admin/about")) return "About Management";
         if (path.includes("/admin/contact-info")) return "Contact Information";
+        if (path.includes("/admin/academic-programs"))
+            return "Academic Programs";
         if (path.includes("/admin/enrollment-guidelines"))
             return "Enrollment Guidelines";
         if (path.includes("/admin/page-content")) return "Page Content";

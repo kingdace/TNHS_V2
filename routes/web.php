@@ -79,6 +79,8 @@ Route::prefix('api')->group(function () {
     Route::get('/events/public-list', [PublicEventController::class, 'publicList']);
 
     // Academic Programs API routes
+    Route::get('/academic-programs/junior-high-content', [\App\Http\Controllers\Api\AcademicProgramController::class, 'getJuniorHigh']);
+    Route::get('/academic-programs/als-content', [\App\Http\Controllers\Api\AcademicProgramController::class, 'getALS']);
     Route::get('/academic-programs/grade/{grade}', [\App\Http\Controllers\Api\AcademicProgramController::class, 'byGrade']);
     Route::get('/academic-programs/type/{type}', [\App\Http\Controllers\Api\AcademicProgramController::class, 'byType']);
 

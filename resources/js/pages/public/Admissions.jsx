@@ -473,18 +473,55 @@ const Admissions = () => {
                                         className={`${program.bgColor} rounded-xl border-2 ${program.borderColor} shadow-lg hover:shadow-xl transition-all duration-300`}
                                     >
                                         {/* Program Header */}
-                                        <div className="p-4 border-b border-gray-200">
-                                            <div className="flex items-center gap-3">
+                                        <div className="p-4 border-b border-gray-200 relative">
+                                            {/* Compact Coming Soon Badge - Centered */}
+                                            {program.id === "sped" && (
+                                                <div className="absolute top-3 left-1/2 transform -translate-x-1/2">
+                                                    <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-medium px-2 py-1 rounded-md shadow-sm">
+                                                        Coming Soon
+                                                    </span>
+                                                </div>
+                                            )}
+                                            <div className="flex items-center gap-3 mt-6">
                                                 <div
-                                                    className={`w-12 h-12 bg-gradient-to-r ${program.color} rounded-lg flex items-center justify-center shadow-md`}
+                                                    className={`w-12 h-12 bg-gradient-to-r ${
+                                                        program.color_gradient ||
+                                                        program.color
+                                                    } rounded-lg flex items-center justify-center shadow-md ${
+                                                        program.id === "sped"
+                                                            ? "opacity-60"
+                                                            : ""
+                                                    }`}
                                                 >
                                                     <IconComponent className="w-6 h-6 text-white" />
                                                 </div>
-                                                <div>
-                                                    <h3 className="text-xl font-bold text-gray-800">
-                                                        {program.name}
-                                                    </h3>
-                                                    <p className="text-sm text-gray-600">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <h3
+                                                            className={`text-xl font-bold ${
+                                                                program.id ===
+                                                                "sped"
+                                                                    ? "text-gray-500"
+                                                                    : "text-gray-800"
+                                                            }`}
+                                                        >
+                                                            {program.name}
+                                                        </h3>
+                                                        {program.id ===
+                                                            "sped" && (
+                                                            <span className="text-orange-600 text-sm font-medium">
+                                                                (Future Program)
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <p
+                                                        className={`text-sm ${
+                                                            program.id ===
+                                                            "sped"
+                                                                ? "text-gray-500"
+                                                                : "text-gray-600"
+                                                        }`}
+                                                    >
                                                         {program.description}
                                                     </p>
                                                 </div>
@@ -498,12 +535,18 @@ const Admissions = () => {
                                                 <div className="bg-white/60 rounded-lg p-3">
                                                     <div className="flex items-center gap-2 mb-3">
                                                         <div
-                                                            className={`w-6 h-6 bg-gradient-to-r ${program.color} rounded-md flex items-center justify-center`}
+                                                            className={`w-6 h-6 bg-gradient-to-r ${
+                                                                program.color_gradient ||
+                                                                program.color
+                                                            } rounded-md flex items-center justify-center`}
                                                         >
                                                             <FileText className="w-3 h-3 text-white" />
                                                         </div>
                                                         <h4 className="font-bold text-gray-800 text-sm">
-                                                            Requirements
+                                                            {program.id ===
+                                                            "sped"
+                                                                ? "Development Status"
+                                                                : "Requirements"}
                                                         </h4>
                                                     </div>
                                                     <ul className="space-y-1">
@@ -521,10 +564,29 @@ const Admissions = () => {
                                                                         }
                                                                         className="flex items-start gap-2"
                                                                     >
-                                                                        <div className="w-3 h-3 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                                                                            <CheckCircle className="w-2 h-2 text-green-600" />
+                                                                        <div
+                                                                            className={`w-3 h-3 ${
+                                                                                program.id ===
+                                                                                "sped"
+                                                                                    ? "bg-orange-100"
+                                                                                    : "bg-green-100"
+                                                                            } rounded-full flex items-center justify-center flex-shrink-0 mt-1`}
+                                                                        >
+                                                                            {program.id ===
+                                                                            "sped" ? (
+                                                                                <AlertCircle className="w-2 h-2 text-orange-600" />
+                                                                            ) : (
+                                                                                <CheckCircle className="w-2 h-2 text-green-600" />
+                                                                            )}
                                                                         </div>
-                                                                        <span className="text-xs text-gray-700">
+                                                                        <span
+                                                                            className={`text-xs ${
+                                                                                program.id ===
+                                                                                "sped"
+                                                                                    ? "text-gray-600 italic"
+                                                                                    : "text-gray-700"
+                                                                            }`}
+                                                                        >
                                                                             {
                                                                                 req
                                                                             }
@@ -539,12 +601,18 @@ const Admissions = () => {
                                                 <div className="bg-white/60 rounded-lg p-3">
                                                     <div className="flex items-center gap-2 mb-3">
                                                         <div
-                                                            className={`w-6 h-6 bg-gradient-to-r ${program.color} rounded-md flex items-center justify-center`}
+                                                            className={`w-6 h-6 bg-gradient-to-r ${
+                                                                program.color_gradient ||
+                                                                program.color
+                                                            } rounded-md flex items-center justify-center`}
                                                         >
                                                             <BookOpen className="w-3 h-3 text-white" />
                                                         </div>
                                                         <h4 className="font-bold text-gray-800 text-sm">
-                                                            Process
+                                                            {program.id ===
+                                                            "sped"
+                                                                ? "Development Timeline"
+                                                                : "Process"}
                                                         </h4>
                                                     </div>
                                                     <ul className="space-y-1">
