@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
+import { router } from "@inertiajs/react";
 import { searchService } from "../services/searchService";
 import {
     Search,
@@ -13,19 +14,23 @@ import {
 
 const EnhancedSearch = ({
     className = "",
-    placeholder = "Search announcements, events, staff, programs...",
+    placeholder = "Search announcements, events, academics...",
 }) => {
-    const navigate = useNavigate();
     const [query, setQuery] = useState("");
     const [results, setResults] = useState({ categories: [], totalResults: 0 });
     const [suggestions, setSuggestions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showResults, setShowResults] = useState(false);
-    const [showSuggestions, setShowSuggestions] = useState(false);
+    // Suggestions removed - search is now simpler
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [showFilters, setShowFilters] = useState(false);
     const [error, setError] = useState("");
     const [isInteracting, setIsInteracting] = useState(false);
+    const [dropdownPosition, setDropdownPosition] = useState({
+        top: 0,
+        left: 0,
+        width: 0,
+    });
 
     const searchRef = useRef(null);
     const inputRef = useRef(null);
@@ -72,23 +77,7 @@ const EnhancedSearch = ({
         );
     }, []);
 
-    // Handle suggestions
-    const handleSuggestions = useCallback((searchQuery) => {
-        if (searchQuery.trim().length === 0) {
-            setSuggestions(searchService.getPopularSearches().slice(0, 8));
-            setShowSuggestions(true);
-            return;
-        }
-
-        searchService.debouncedSuggestions(
-            searchQuery,
-            (suggestionResults) => {
-                setSuggestions(suggestionResults.slice(0, 8));
-                setShowSuggestions(suggestionResults.length > 0);
-            },
-            200
-        );
-    }, []);
+    // Suggestions feature removed for simpler UX
 
     // Handle input change
     const handleInputChange = (e) => {
@@ -104,35 +93,54 @@ const EnhancedSearch = ({
         }
     };
 
-    // Handle input focus
+    // Handle input focus - just show results if query exists
     const handleInputFocus = () => {
-        if (query.trim().length >= 2) {
+        if (query.trim().length >= 1) {
             setShowResults(true);
-        } else {
-            handleSuggestions(query);
         }
     };
 
-    // Handle suggestion click
-    const handleSuggestionClick = (suggestion) => {
-        setQuery(suggestion);
-        setShowSuggestions(false);
-        handleSearch(suggestion);
-        inputRef.current?.focus();
-    };
+    // Update dropdown position when search bar moves or window resizes
+    useEffect(() => {
+        const updatePosition = () => {
+            if (searchRef.current) {
+                const rect = searchRef.current.getBoundingClientRect();
+                setDropdownPosition({
+                    top: rect.bottom + window.scrollY,
+                    left: rect.left + window.scrollX,
+                    width: rect.width,
+                });
+            }
+        };
 
-    // Handle result item click
+        updatePosition();
+        window.addEventListener("resize", updatePosition);
+        window.addEventListener("scroll", updatePosition);
+
+        return () => {
+            window.removeEventListener("resize", updatePosition);
+            window.removeEventListener("scroll", updatePosition);
+        };
+    }, [showResults, showFilters]);
+
+    // Suggestions removed - no longer needed
+
+    // Handle result item click - Navigate to page
     const handleResultClick = (item) => {
+        console.log("Result clicked:", item);
+
         if (item.url) {
+            console.log("Navigating to:", item.url);
+
+            // Navigate IMMEDIATELY - page will reload anyway
             if (item.is_external) {
                 window.open(item.url, "_blank");
             } else {
-                // Use React Router navigation for internal links
-                navigate(item.url);
+                window.location.href = item.url;
             }
+        } else {
+            console.warn("No URL found for item:", item);
         }
-        setShowResults(false);
-        setQuery("");
     };
 
     // Handle category filter toggle
@@ -176,44 +184,30 @@ const EnhancedSearch = ({
         let lastScrollY = window.scrollY;
 
         const handleClickOutside = (event) => {
+            // CRITICAL: Don't close if clicking on a link (our search results)
+            if (event.target.closest("a")) {
+                console.log("Clicked on link, keeping dropdown open");
+                return;
+            }
+
+            // Don't close if clicking on suggestion buttons
+            if (event.target.closest("button")) {
+                console.log("Clicked on button, keeping dropdown open");
+                return;
+            }
+
             if (
                 searchRef.current &&
                 !searchRef.current.contains(event.target)
             ) {
                 setShowResults(false);
-                setShowSuggestions(false);
                 setShowFilters(false);
             }
         };
 
         const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-            const scrollDelta = Math.abs(currentScrollY - lastScrollY);
-
-            // Don't close dropdowns if user is actively interacting with search
-            if (isInteracting) {
-                lastScrollY = currentScrollY;
-                return;
-            }
-
-            // Only close dropdowns if user scrolls more than 10px to prevent accidental closing
-            if (scrollDelta > 10) {
-                // Clear any existing timeout
-                if (scrollTimeout) {
-                    clearTimeout(scrollTimeout);
-                }
-
-                // Add responsive delay based on scroll speed
-                const delay = scrollDelta > 50 ? 50 : 150; // Faster close for rapid scrolling
-
-                scrollTimeout = setTimeout(() => {
-                    setShowResults(false);
-                    setShowSuggestions(false);
-                    setShowFilters(false);
-                }, delay);
-            }
-
-            lastScrollY = currentScrollY;
+            // Don't close dropdowns on scroll - let user scroll while viewing results
+            // Dropdowns will only close on click outside or manual close
         };
 
         document.addEventListener("mousedown", handleClickOutside);
@@ -301,207 +295,212 @@ const EnhancedSearch = ({
                 </div>
             </div>
 
-            {/* Category Filters */}
-            {showFilters && (
-                <div
-                    className="absolute top-full left-0 right-0 mt-2 p-4 bg-white rounded-xl shadow-lg border border-gray-200 z-40"
-                    onMouseEnter={() => setIsInteracting(true)}
-                    onMouseLeave={() => setIsInteracting(false)}
-                >
-                    <div className="text-sm font-medium text-gray-700 mb-3">
-                        Filter by category:
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        {categories.map((category) => (
-                            <button
-                                key={category.type}
-                                onClick={() =>
-                                    toggleCategoryFilter(category.type)
-                                }
-                                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
-                                    selectedCategories.includes(category.type)
-                                        ? `${category.color} text-white shadow-md`
-                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                }`}
-                            >
-                                <span>{category.icon}</span>
-                                <span>{category.label}</span>
-                            </button>
-                        ))}
-                    </div>
-                    {selectedCategories.length > 0 && (
-                        <button
-                            onClick={() => setSelectedCategories([])}
-                            className="mt-3 text-sm text-royal-blue hover:underline"
-                        >
-                            Clear all filters
-                        </button>
-                    )}
-                </div>
-            )}
-
-            {/* Search Suggestions - Natural Flow */}
-            {showSuggestions && suggestions.length > 0 && (
-                <div
-                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 z-40"
-                    onMouseEnter={() => setIsInteracting(true)}
-                    onMouseLeave={() => setIsInteracting(false)}
-                >
-                    <div className="p-4">
-                        <div className="flex items-center text-sm text-gray-600 mb-3">
-                            {query.trim().length === 0 ? (
-                                <>
-                                    <TrendingUp className="w-4 h-4 mr-2" />
-                                    Popular searches
-                                </>
-                            ) : (
-                                <>
-                                    <Clock className="w-4 h-4 mr-2" />
-                                    Suggestions
-                                </>
-                            )}
+            {/* Category Filters - Rendered via Portal */}
+            {showFilters &&
+                createPortal(
+                    <div
+                        className="p-4 bg-white rounded-xl shadow-2xl border-2 border-gray-300 z-[99999]"
+                        style={{
+                            position: "absolute",
+                            top: `${dropdownPosition.top + 8}px`,
+                            left: `${dropdownPosition.left}px`,
+                            width: `${dropdownPosition.width}px`,
+                        }}
+                        onMouseEnter={() => setIsInteracting(true)}
+                        onMouseLeave={() => setIsInteracting(false)}
+                    >
+                        <div className="text-sm font-medium text-gray-700 mb-3">
+                            Filter by category:
                         </div>
-                        <div className="space-y-1">
-                            {suggestions.map((suggestion, index) => (
+                        <div className="flex flex-wrap gap-2">
+                            {categories.map((category) => (
                                 <button
-                                    key={index}
+                                    key={category.type}
                                     onClick={() =>
-                                        handleSuggestionClick(suggestion)
+                                        toggleCategoryFilter(category.type)
                                     }
-                                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-700 flex items-center justify-between group"
+                                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
+                                        selectedCategories.includes(
+                                            category.type
+                                        )
+                                            ? `${category.color} text-white shadow-md`
+                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    }`}
                                 >
-                                    <span>{suggestion}</span>
-                                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+                                    <span>{category.icon}</span>
+                                    <span>{category.label}</span>
                                 </button>
                             ))}
                         </div>
-                    </div>
-                </div>
-            )}
+                        {selectedCategories.length > 0 && (
+                            <button
+                                onClick={() => setSelectedCategories([])}
+                                className="mt-3 text-sm text-royal-blue hover:underline"
+                            >
+                                Clear all filters
+                            </button>
+                        )}
+                    </div>,
+                    document.body
+                )}
 
-            {/* Search Results - Natural Flow */}
-            {showResults && (
-                <div
-                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 max-h-96 overflow-y-auto min-h-[200px] z-40"
-                    onMouseEnter={() => setIsInteracting(true)}
-                    onMouseLeave={() => setIsInteracting(false)}
-                >
-                    {error ? (
-                        <div className="p-4 text-center text-red-600">
-                            <div className="text-sm font-medium mb-1">
-                                Search Error
+            {/* Suggestions removed for simpler UX */}
+
+            {/* Search Results - Rendered via Portal at document root */}
+            {showResults &&
+                createPortal(
+                    <div
+                        className="bg-white rounded-xl shadow-2xl border-2 border-gray-300 overflow-y-auto z-[99999]"
+                        style={{
+                            position: "absolute",
+                            top: `${dropdownPosition.top + 8}px`,
+                            left: `${dropdownPosition.left}px`,
+                            width: `${dropdownPosition.width}px`,
+                            maxHeight: "500px",
+                            minHeight: "200px",
+                        }}
+                        onMouseEnter={() => setIsInteracting(true)}
+                        onMouseLeave={() => setIsInteracting(false)}
+                    >
+                        {error ? (
+                            <div className="p-4 text-center text-red-600">
+                                <div className="text-sm font-medium mb-1">
+                                    Search Error
+                                </div>
+                                <div className="text-xs">{error}</div>
                             </div>
-                            <div className="text-xs">{error}</div>
-                        </div>
-                    ) : results.totalResults > 0 ? (
-                        <div className="p-4">
-                            {/* Results Header */}
-                            <div className="text-sm text-gray-600 mb-4">
-                                Found <strong>{results.totalResults}</strong>{" "}
-                                results for "<strong>{query}</strong>"
-                            </div>
+                        ) : results.totalResults > 0 ? (
+                            <div className="p-4">
+                                {/* Results Header */}
+                                <div className="text-sm text-gray-600 mb-4">
+                                    Found{" "}
+                                    <strong>{results.totalResults}</strong>{" "}
+                                    results for "<strong>{query}</strong>"
+                                </div>
 
-                            {/* Simple Results List */}
-                            {results.categories &&
-                            results.categories.length > 0 ? (
-                                results.categories.map((category) => (
-                                    <div key={category.type} className="mb-4">
-                                        {/* Category Header */}
-                                        <div className="text-sm font-semibold text-gray-800 mb-2 flex items-center">
-                                            <span className="mr-2">
-                                                {category.icon}
-                                            </span>
-                                            {category.label} ({category.count})
-                                        </div>
+                                {/* Simple Results List */}
+                                {results.categories &&
+                                results.categories.length > 0 ? (
+                                    results.categories.map((category) => (
+                                        <div
+                                            key={category.type}
+                                            className="mb-4"
+                                        >
+                                            {/* Category Header */}
+                                            <div className="text-sm font-semibold text-gray-800 mb-2 flex items-center">
+                                                <span className="mr-2">
+                                                    {category.icon}
+                                                </span>
+                                                {category.label} (
+                                                {category.count})
+                                            </div>
 
-                                        {/* Results */}
-                                        <div className="space-y-2">
-                                            {category.results &&
-                                                category.results
-                                                    .slice(0, 3)
-                                                    .map((item, index) => (
-                                                        <div
-                                                            key={`${item.type}-${item.id}-${index}`}
-                                                            className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
-                                                            onClick={() =>
-                                                                handleResultClick(
-                                                                    item
-                                                                )
-                                                            }
-                                                        >
-                                                            <div className="text-sm font-medium text-gray-900 mb-1">
-                                                                {item.title}
-                                                            </div>
-                                                            {item.excerpt && (
-                                                                <div className="text-xs text-gray-600 mb-2">
-                                                                    {item
-                                                                        .excerpt
-                                                                        .length >
-                                                                    100
-                                                                        ? item.excerpt.substring(
-                                                                              0,
-                                                                              100
-                                                                          ) +
-                                                                          "..."
-                                                                        : item.excerpt}
+                                            {/* Results */}
+                                            <div className="space-y-2">
+                                                {category.results &&
+                                                    category.results
+                                                        .slice(0, 3)
+                                                        .map((item, index) => (
+                                                            <a
+                                                                key={`${item.type}-${item.id}-${index}`}
+                                                                href={
+                                                                    item.url ||
+                                                                    "#"
+                                                                }
+                                                                target={
+                                                                    item.is_external
+                                                                        ? "_blank"
+                                                                        : "_self"
+                                                                }
+                                                                rel={
+                                                                    item.is_external
+                                                                        ? "noopener noreferrer"
+                                                                        : ""
+                                                                }
+                                                                className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer no-underline"
+                                                                style={{
+                                                                    color: "inherit",
+                                                                    textDecoration:
+                                                                        "none",
+                                                                }}
+                                                            >
+                                                                <div className="text-sm font-medium text-gray-900 mb-1">
+                                                                    {item.title}
                                                                 </div>
-                                                            )}
-                                                            <div className="flex items-center space-x-2 text-xs text-gray-500">
-                                                                <span>📢</span>
-                                                                <span>
-                                                                    {
-                                                                        item.category
-                                                                    }
-                                                                </span>
-                                                                {item.date && (
+                                                                {item.excerpt && (
+                                                                    <div className="text-xs text-gray-600 mb-2">
+                                                                        {item
+                                                                            .excerpt
+                                                                            .length >
+                                                                        100
+                                                                            ? item.excerpt.substring(
+                                                                                  0,
+                                                                                  100
+                                                                              ) +
+                                                                              "..."
+                                                                            : item.excerpt}
+                                                                    </div>
+                                                                )}
+                                                                <div className="flex items-center space-x-2 text-xs text-gray-500">
                                                                     <span>
-                                                                        •{" "}
+                                                                        📢
+                                                                    </span>
+                                                                    <span>
                                                                         {
-                                                                            item.date
+                                                                            item.category
                                                                         }
                                                                     </span>
-                                                                )}
-                                                                {item.is_external && (
-                                                                    <span className="text-blue-600">
-                                                                        •
-                                                                        External
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                        </div>
+                                                                    {item.date && (
+                                                                        <span>
+                                                                            •{" "}
+                                                                            {
+                                                                                item.date
+                                                                            }
+                                                                        </span>
+                                                                    )}
+                                                                    {item.is_external && (
+                                                                        <span className="text-blue-600">
+                                                                            •
+                                                                            External
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            </a>
+                                                        ))}
+                                            </div>
 
-                                        {/* Show More */}
-                                        {category.results &&
-                                            category.results.length > 3 && (
-                                                <div className="text-xs text-royal-blue mt-2">
-                                                    +{" "}
-                                                    {category.results.length -
-                                                        3}{" "}
-                                                    more results
-                                                </div>
-                                            )}
+                                            {/* Show More */}
+                                            {category.results &&
+                                                category.results.length > 3 && (
+                                                    <div className="text-xs text-royal-blue mt-2">
+                                                        +{" "}
+                                                        {category.results
+                                                            .length - 3}{" "}
+                                                        more results
+                                                    </div>
+                                                )}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-gray-500 text-sm">
+                                        No categories found
                                     </div>
-                                ))
-                            ) : (
-                                <div className="text-gray-500 text-sm">
-                                    No categories found
+                                )}
+                            </div>
+                        ) : (
+                            <div className="p-4 text-center text-gray-600">
+                                <div className="text-sm font-medium mb-1">
+                                    No results found
                                 </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="p-4 text-center text-gray-600">
-                            <div className="text-sm font-medium mb-1">
-                                No results found
+                                <div className="text-xs">
+                                    Try different keywords or check your
+                                    spelling
+                                </div>
                             </div>
-                            <div className="text-xs">
-                                Try different keywords or check your spelling
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
+                        )}
+                    </div>,
+                    document.body
+                )}
         </div>
     );
 };

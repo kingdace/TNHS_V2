@@ -41,27 +41,17 @@ class SearchController extends Controller
 
             $results = [];
 
-            // Search Announcements
+            // Search Announcements (PUBLIC)
             if (empty($categories) || in_array('announcements', $categories)) {
                 $results['announcements'] = $this->searchAnnouncements($query, $limit);
             }
 
-            // Search Events
+            // Search Events (PUBLIC)
             if (empty($categories) || in_array('events', $categories)) {
                 $results['events'] = $this->searchEvents($query, $limit);
             }
 
-            // Search Staff Profiles
-            if (empty($categories) || in_array('staff', $categories)) {
-                $results['staff'] = $this->searchStaff($query, $limit);
-            }
-
-            // Search Academic Programs
-            if (empty($categories) || in_array('programs', $categories)) {
-                $results['programs'] = $this->searchAcademicPrograms($query, $limit);
-            }
-
-            // Search Hard-coded Academic Content
+            // Search Academic Content (PUBLIC - JHS, SHS, Strands)
             if (empty($categories) || in_array('academics', $categories)) {
                 $results['academics'] = $this->searchHardcodedAcademics($query, $limit);
             }
@@ -353,15 +343,13 @@ class SearchController extends Controller
     }
 
     /**
-     * Get all available search categories
+     * Get all available search categories (PUBLIC ONLY)
      */
     private function getAllCategories()
     {
         return [
             'announcements',
             'events',
-            'staff',
-            'programs',
             'academics'
         ];
     }

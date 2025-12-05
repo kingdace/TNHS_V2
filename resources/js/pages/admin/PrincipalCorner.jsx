@@ -12,6 +12,8 @@ import {
     Plus,
     AlertCircle,
 } from "lucide-react";
+import WorkExperienceDisplay from "../../components/principal/WorkExperienceDisplay";
+import PersonalDataSheetDisplay from "../../components/principal/PersonalDataSheetDisplay";
 
 const PrincipalCorner = () => {
     const navigate = useNavigate();
@@ -221,9 +223,7 @@ const PrincipalCorner = () => {
                         <FileText className="h-5 w-5 text-teal-600" />
                         About the Principal
                     </h2>
-                    <div className="text-base text-gray-900 bg-gray-100 p-4 rounded-lg border border-gray-200 whitespace-pre-line">
-                        {biography.content}
-                    </div>
+                    <WorkExperienceDisplay content={biography.content} />
                 </div>
             )}
 
@@ -234,9 +234,7 @@ const PrincipalCorner = () => {
                         <FileText className="h-5 w-5 text-purple-600" />
                         Personal Data Sheet
                     </h2>
-                    <div className="text-base text-gray-900 bg-gray-100 p-4 rounded-lg border border-gray-200 whitespace-pre-line">
-                        {pds.content}
-                    </div>
+                    <PersonalDataSheetDisplay content={pds.content} />
                 </div>
             )}
 

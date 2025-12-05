@@ -430,8 +430,8 @@ const Home = () => {
                 {/* Removed duplicate controls (kept single arrows and dots above) */}
             </section>
 
-            {/* PASEO VERDE STORM Section */}
-            <section className="pt-12 pb-4 bg-gradient-to-br from-blue-50 to-slate-100 relative overflow-hidden">
+            {/* PASEO VERDE STORM Section - NO overflow-hidden to allow search dropdown */}
+            <section className="pt-12 pb-4 bg-gradient-to-br from-blue-50 to-slate-100 relative">
                 {/* Clean decorative elements */}
                 <div className="absolute inset-0 opacity-30">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-royal-blue to-transparent"></div>
@@ -482,7 +482,7 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Search Section */}
+            {/* Search Section - NO overflow-hidden to allow dropdown */}
             <section className="pt-10 pb-20 bg-gradient-to-br from-blue-50 to-slate-100 relative">
                 {/* Sophisticated bottom corner design */}
                 <div className="absolute inset-0 pointer-events-none">
@@ -507,14 +507,14 @@ const Home = () => {
                     </div>
                 </div>
 
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                    <div className="relative">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
+                    <div>
                         <h2 className="pb-2 text-xl font-bold text-royal-blue mb-1 tracking-wide">
                             Explore Our School
                         </h2>
 
-                        {/* Enhanced Search Container */}
-                        <div className="bg-white rounded-xl p-6 shadow-xl border border-blue-100 max-w-2xl mx-auto relative z-20">
+                        {/* Enhanced Search Container - NO relative positioning to allow dropdown to escape */}
+                        <div className="bg-white rounded-xl p-6 shadow-xl border border-blue-100 max-w-2xl mx-auto">
                             {/* Subtle gradient overlay */}
                             <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent rounded-xl pointer-events-none"></div>
 

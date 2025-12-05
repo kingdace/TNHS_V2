@@ -35,6 +35,8 @@ import {
 } from "lucide-react";
 import { principalCornerService } from "../../../services/principalCornerService";
 import { principalProfileService } from "../../../services/principalProfileService";
+import WorkExperienceDisplay from "../../../components/principal/WorkExperienceDisplay";
+import PersonalDataSheetDisplay from "../../../components/principal/PersonalDataSheetDisplay";
 
 const Principal = () => {
     const [showAboutPrincipal, setShowAboutPrincipal] = useState(false);
@@ -797,34 +799,11 @@ const Principal = () => {
                             </button>
                         </div>
 
-                        {/* Modal Content - Clean */}
+                        {/* Modal Content - Enhanced with WorkExperienceDisplay */}
                         <div className="p-6 overflow-y-auto max-h-[calc(80vh-80px)]">
-                            {principalBiography?.content ? (
-                                <div className="space-y-4">
-                                    {principalBiography.content
-                                        .split("\n")
-                                        .filter((p) => p.trim())
-                                        .map((paragraph, index) => (
-                                            <p
-                                                key={index}
-                                                className="text-gray-700 leading-7 text-justify"
-                                            >
-                                                {paragraph.trim()}
-                                            </p>
-                                        ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-12 text-gray-500">
-                                    <User className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                                    <p className="font-medium">
-                                        No Biography Available
-                                    </p>
-                                    <p className="text-sm text-gray-400 mt-1">
-                                        Principal biography has not been set
-                                        yet.
-                                    </p>
-                                </div>
-                            )}
+                            <WorkExperienceDisplay
+                                content={principalBiography?.content}
+                            />
                         </div>
                     </div>
                 </div>
@@ -855,51 +834,11 @@ const Principal = () => {
                             </button>
                         </div>
 
-                        {/* Modal Content - Clean */}
+                        {/* Modal Content - Enhanced with PersonalDataSheetDisplay */}
                         <div className="p-6 overflow-y-auto max-h-[calc(80vh-80px)]">
-                            {principalVision?.content ? (
-                                <div className="space-y-3">
-                                    {principalVision.content
-                                        .split("\n")
-                                        .filter((p) => p.trim())
-                                        .map((line, index) => {
-                                            const isHeader =
-                                                line.includes(":") &&
-                                                line.length < 50;
-
-                                            if (isHeader) {
-                                                return (
-                                                    <h3
-                                                        key={index}
-                                                        className="font-bold text-blue-800 text-sm border-b border-blue-100 pb-1 mb-2"
-                                                    >
-                                                        {line.trim()}
-                                                    </h3>
-                                                );
-                                            } else {
-                                                return (
-                                                    <p
-                                                        key={index}
-                                                        className="text-gray-700 text-sm leading-6 ml-4"
-                                                    >
-                                                        {line.trim()}
-                                                    </p>
-                                                );
-                                            }
-                                        })}
-                                </div>
-                            ) : (
-                                <div className="text-center py-12 text-gray-500">
-                                    <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                                    <p className="font-medium">
-                                        No Personal Data Sheet Available
-                                    </p>
-                                    <p className="text-sm text-gray-400 mt-1">
-                                        Personal data sheet has not been
-                                        uploaded yet.
-                                    </p>
-                                </div>
-                            )}
+                            <PersonalDataSheetDisplay
+                                content={principalVision?.content}
+                            />
                         </div>
                     </div>
                 </div>
