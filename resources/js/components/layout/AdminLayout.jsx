@@ -41,26 +41,20 @@ const AdminLayout = () => {
     const userMenuRef = useRef(null);
 
     const navigation = [
-        // Core Management
+        // ========================================
+        // FREQUENTLY UPDATED (Daily/Weekly)
+        // ========================================
         {
             name: "Dashboard",
             description: "Overview and statistics",
             href: "/admin",
             icon: Home,
         },
-
-        // Content Management
         {
             name: "Announcements",
-            description: "News and events management",
+            description: "News and events",
             href: "/admin/news-events",
             icon: Bell,
-        },
-        {
-            name: "Principal Corner",
-            description: "Principal's messages",
-            href: "/admin/principal-corner",
-            icon: Crown,
         },
         {
             name: "Hero Carousel",
@@ -68,42 +62,6 @@ const AdminLayout = () => {
             href: "/admin/hero-carousel",
             icon: Image,
         },
-
-        // Academic Management
-        {
-            name: "Academic Programs",
-            description: "Manage academic programs",
-            href: "/admin/academic-programs",
-            icon: BookOpen,
-        },
-        {
-            name: "Junior High Content",
-            description: "Manage Junior High page content",
-            href: "/admin/junior-high-content",
-            icon: School,
-        },
-        {
-            name: "ALS Content",
-            description: "Manage ALS program content",
-            href: "/admin/als-content",
-            icon: GraduationCap,
-        },
-        {
-            name: "Senior High Strands",
-            description: "Manage Senior High strands",
-            href: "/admin/senior-high-strands",
-            icon: School,
-        },
-
-        // People Management
-        {
-            name: "Faculty & Staff",
-            description: "Staff management",
-            href: "/admin/staff-profiles",
-            icon: Users,
-        },
-
-        // Media Management
         {
             name: "Gallery",
             description: "Photo management",
@@ -111,47 +69,74 @@ const AdminLayout = () => {
             icon: Image,
         },
         {
+            name: "Faculty & Staff",
+            description: "Staff profiles",
+            href: "/admin/staff-profiles",
+            icon: Users,
+        },
+
+        // ========================================
+        // REGULARLY UPDATED (Monthly)
+        // ========================================
+        {
+            name: "Principal Corner",
+            description: "Principal's profile & messages",
+            href: "/admin/principal-corner",
+            icon: Crown,
+        },
+        {
             name: "Resources",
-            description: "File downloads",
+            description: "Downloadable files",
             href: "/admin/resources",
             icon: Download,
         },
-        // Hidden - Duplicate functionality with Resources
-        // {
-        //     name: "Download Files",
-        //     description: "Manage downloadable files",
-        //     href: "/admin/download-files",
-        //     icon: Download,
-        // },
-        // {
-        //     name: "External Links",
-        //     description: "Manage external links",
-        //     href: "/admin/external-links",
-        //     icon: ExternalLink,
-        // },
 
-        // Contact Management
+        // ========================================
+        // ACADEMIC PROGRAMS (Periodic Updates)
+        // ========================================
         {
-            name: "Contact Information",
-            description: "Manage contact details",
-            href: "/admin/contact-info",
-            icon: Phone,
+            name: "Junior High Content",
+            description: "JHS program content",
+            href: "/admin/junior-high-content",
+            icon: School,
         },
-
-        // Enrollment Management
         {
-            name: "Enrollment Guidelines",
-            description: "Manage enrollment information",
-            href: "/admin/enrollment-guidelines",
+            name: "Senior High Strands",
+            description: "SHS strands & tracks",
+            href: "/admin/senior-high-strands",
             icon: GraduationCap,
         },
+        {
+            name: "ALS Content",
+            description: "Alternative Learning System",
+            href: "/admin/als-content",
+            icon: BookOpen,
+        },
 
-        // Site Management
+        // ========================================
+        // SEASONAL (Enrollment Period)
+        // ========================================
+        {
+            name: "Enrollment Guidelines",
+            description: "Enrollment information",
+            href: "/admin/enrollment-guidelines",
+            icon: UserCheck,
+        },
+
+        // ========================================
+        // RARELY UPDATED (Static Content)
+        // ========================================
         {
             name: "About Management",
-            description: "School information",
+            description: "School information & history",
             href: "/admin/about",
             icon: FileText,
+        },
+        {
+            name: "Contact Information",
+            description: "School contact details",
+            href: "/admin/contact-info",
+            icon: Phone,
         },
     ];
 
