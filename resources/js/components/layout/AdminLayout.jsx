@@ -350,11 +350,10 @@ const AdminLayout = () => {
                 }`}
             >
                 <div className="h-full flex flex-col bg-white border-r border-gray-200 shadow-sm">
-                    {/* Navigation Content */}
-                    <div className="flex-1 flex flex-col overflow-y-auto sidebar-scrollbar">
-                        {/* Navigation */}
+                    {/* Scrollable Navigation Content */}
+                    <div className="flex-1 overflow-y-auto sidebar-scrollbar">
                         <nav
-                            className={`flex-1 py-6 ${
+                            className={`py-6 ${
                                 isSidebarCollapsed
                                     ? "space-y-0.5 px-2"
                                     : "space-y-1 px-4"
@@ -454,21 +453,21 @@ const AdminLayout = () => {
                                 );
                             })}
                         </nav>
-
-                        {/* Bottom Section - Only show when not collapsed */}
-                        {!isSidebarCollapsed && (
-                            <div className="px-4 py-4 border-t border-gray-100">
-                                <div className="text-center">
-                                    <p className="text-sm font-medium text-gray-700">
-                                        Taft National High School
-                                    </p>
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        © 2025 All rights reserved.
-                                    </p>
-                                </div>
-                            </div>
-                        )}
                     </div>
+
+                    {/* Fixed Footer - Only show when not collapsed */}
+                    {!isSidebarCollapsed && (
+                        <div className="flex-shrink-0 px-4 py-4 border-t border-gray-100 bg-white">
+                            <div className="text-center">
+                                <p className="text-sm font-medium text-gray-700">
+                                    Taft National High School
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    © 2025 All rights reserved.
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

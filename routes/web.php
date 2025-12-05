@@ -71,6 +71,13 @@ Route::prefix('api')->group(function () {
     Route::get('/school-info/facilities', [\App\Http\Controllers\Api\SchoolInfoController::class, 'facilities']);
     Route::apiResource('school-info', \App\Http\Controllers\Api\SchoolInfoController::class);
 
+    // Academic Programs API routes - MUST come BEFORE apiResource to avoid conflicts
+    Route::get('/academic-programs/junior-high-content', [\App\Http\Controllers\Api\AcademicProgramController::class, 'getJuniorHigh']);
+    Route::get('/academic-programs/als-content', [\App\Http\Controllers\Api\AcademicProgramController::class, 'getALS']);
+    Route::get('/academic-programs/senior-high-strands', [\App\Http\Controllers\Api\AcademicProgramController::class, 'getSeniorHighStrands']);
+    Route::get('/academic-programs/grade/{grade}', [\App\Http\Controllers\Api\AcademicProgramController::class, 'byGrade']);
+    Route::get('/academic-programs/type/{type}', [\App\Http\Controllers\Api\AcademicProgramController::class, 'byType']);
+    
     Route::apiResource('academic-programs', \App\Http\Controllers\Api\AcademicProgramController::class);
     Route::apiResource('contact-info', \App\Http\Controllers\Api\ContactInfoController::class);
 
@@ -78,12 +85,6 @@ Route::prefix('api')->group(function () {
     Route::get('/events/public', [PublicEventController::class, 'publicByMonth']);
     Route::get('/events/public-list', [PublicEventController::class, 'publicList']);
 
-    // Academic Programs API routes
-    Route::get('/academic-programs/junior-high-content', [\App\Http\Controllers\Api\AcademicProgramController::class, 'getJuniorHigh']);
-    Route::get('/academic-programs/als-content', [\App\Http\Controllers\Api\AcademicProgramController::class, 'getALS']);
-    Route::get('/academic-programs/senior-high-strands', [\App\Http\Controllers\Api\AcademicProgramController::class, 'getSeniorHighStrands']);
-    Route::get('/academic-programs/grade/{grade}', [\App\Http\Controllers\Api\AcademicProgramController::class, 'byGrade']);
-    Route::get('/academic-programs/type/{type}', [\App\Http\Controllers\Api\AcademicProgramController::class, 'byType']);
 
     // Contact Info API routes
     Route::get('/contact-info/type/{type}', [\App\Http\Controllers\Api\ContactInfoController::class, 'byType']);
