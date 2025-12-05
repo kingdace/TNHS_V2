@@ -249,4 +249,33 @@ class AcademicProgramController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get all Senior High strands with rich content.
+     */
+    public function getSeniorHighStrands(): JsonResponse
+    {
+        try {
+            $strands = \App\Models\SeniorHighStrand::active()->ordered()->get();
+
+            if ($strands->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No Senior High strands found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $strands,
+                'message' => 'Senior High strands retrieved successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve Senior High strands',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

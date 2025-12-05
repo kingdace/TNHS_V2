@@ -88,6 +88,12 @@ const AdminLayout = () => {
             href: "/admin/als-content",
             icon: GraduationCap,
         },
+        {
+            name: "Senior High Strands",
+            description: "Manage Senior High strands",
+            href: "/admin/senior-high-strands",
+            icon: School,
+        },
 
         // People Management
         {
@@ -218,6 +224,11 @@ const AdminLayout = () => {
             return "Academic Programs";
         if (path.includes("/admin/enrollment-guidelines"))
             return "Enrollment Guidelines";
+        if (path.includes("/admin/junior-high-content"))
+            return "Junior High Content";
+        if (path.includes("/admin/als-content")) return "ALS Content";
+        if (path.includes("/admin/senior-high-strands"))
+            return "Senior High Strands";
         if (path.includes("/admin/page-content")) return "Page Content";
         if (path.includes("/admin/users")) return "User Management";
         if (path.includes("/admin/download-files")) return "Download Files";

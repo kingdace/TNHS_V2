@@ -248,4 +248,25 @@ export const academicProgramService = {
             };
         }
     },
+
+    // Get all Senior High strands
+    async getSeniorHighStrands() {
+        try {
+            const response = await axios.get(
+                `${API_BASE_URL}/academic-programs/senior-high-strands`
+            );
+            return {
+                success: true,
+                data: response.data.data,
+            };
+        } catch (error) {
+            console.error("Error fetching Senior High strands:", error);
+            return {
+                success: false,
+                error:
+                    error.response?.data?.message ||
+                    "Failed to fetch Senior High strands",
+            };
+        }
+    },
 };

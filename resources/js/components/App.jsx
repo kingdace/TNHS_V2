@@ -70,6 +70,7 @@ import HeroCarouselForm from "../pages/admin/HeroCarouselForm";
 import AcademicPrograms from "../pages/admin/AcademicPrograms";
 import JuniorHighContent from "../pages/admin/JuniorHighContent";
 import ALSContent from "../pages/admin/ALSContent";
+import SeniorHighStrands from "../pages/admin/SeniorHighStrands";
 import SchoolInfo from "../pages/admin/SchoolInfo";
 import ContactInfo from "../pages/admin/ContactInfo";
 import EnrollmentGuidelines from "../pages/admin/EnrollmentGuidelines";
@@ -324,6 +325,10 @@ function App() {
                                 <Route
                                     path="als-content"
                                     element={<ALSContent />}
+                                />
+                                <Route
+                                    path="senior-high-strands"
+                                    element={<SeniorHighStrands />}
                                 />
                                 <Route
                                     path="school-info"

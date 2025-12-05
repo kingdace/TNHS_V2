@@ -81,6 +81,7 @@ Route::prefix('api')->group(function () {
     // Academic Programs API routes
     Route::get('/academic-programs/junior-high-content', [\App\Http\Controllers\Api\AcademicProgramController::class, 'getJuniorHigh']);
     Route::get('/academic-programs/als-content', [\App\Http\Controllers\Api\AcademicProgramController::class, 'getALS']);
+    Route::get('/academic-programs/senior-high-strands', [\App\Http\Controllers\Api\AcademicProgramController::class, 'getSeniorHighStrands']);
     Route::get('/academic-programs/grade/{grade}', [\App\Http\Controllers\Api\AcademicProgramController::class, 'byGrade']);
     Route::get('/academic-programs/type/{type}', [\App\Http\Controllers\Api\AcademicProgramController::class, 'byType']);
 
@@ -249,6 +250,11 @@ Route::middleware(['auth', 'admin.auth'])->group(function () {
         Route::apiResource('principal-awards', \App\Http\Controllers\Admin\PrincipalAwardController::class);
         Route::post('principal-awards/{principalAward}/toggle-active', [\App\Http\Controllers\Admin\PrincipalAwardController::class, 'toggleActive']);
         Route::post('principal-awards/reorder', [\App\Http\Controllers\Admin\PrincipalAwardController::class, 'reorder']);
+
+        // Senior High Strands Management
+        Route::apiResource('senior-high-strands', \App\Http\Controllers\Admin\SeniorHighStrandController::class);
+        Route::post('senior-high-strands/{seniorHighStrand}/toggle-active', [\App\Http\Controllers\Admin\SeniorHighStrandController::class, 'toggleActive']);
+        Route::post('senior-high-strands/reorder', [\App\Http\Controllers\Admin\SeniorHighStrandController::class, 'reorder']);
 
         // Gallery Management
         Route::apiResource('gallery', \App\Http\Controllers\Admin\GalleryController::class);
