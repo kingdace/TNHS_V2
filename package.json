@@ -4,7 +4,10 @@
     "type": "module",
     "scripts": {
         "build": "vite build && vite build --ssr",
-        "dev": "vite"
+        "dev": "vite",
+        "serve:network": "php artisan serve --host=0.0.0.0 --port=8000",
+        "dev:network": "vite --host=0.0.0.0",
+        "update:ip": "node update-ip.js"
     },
     "dependencies": {
         "@radix-ui/react-slot": "^1.2.3",
