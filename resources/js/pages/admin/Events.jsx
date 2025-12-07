@@ -267,21 +267,21 @@ export default function AdminEvents() {
 
     return (
         <div className="space-y-6">
-            <Card className="border-blue-100">
-                <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
-                    <div className="space-y-4">
+            <Card className="border-none shadow-xl">
+                <CardHeader className="bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 text-white pb-4">
+                    <div className="space-y-3">
                         {/* Title and Create Button */}
                         <div className="flex items-center justify-between">
                             <div>
-                                <CardTitle className="text-royal-blue text-2xl">
-                                    School Events & Activities
+                                <CardTitle className="text-white text-2xl font-bold drop-shadow-sm">
+                                    📅 School Events & Activities
                                 </CardTitle>
-                                <CardDescription className="text-blue-700 mt-1">
+                                <CardDescription className="text-blue-100 mt-1 text-sm">
                                     Manage school events and calendar activities
                                 </CardDescription>
                             </div>
                             <Button
-                                className="bg-royal-blue hover:bg-blue-700 text-white"
+                                className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all font-semibold"
                                 onClick={openCreate}
                             >
                                 <Plus className="mr-2 h-4 w-4" />
@@ -290,7 +290,7 @@ export default function AdminEvents() {
                         </div>
 
                         {/* Tab Navigation */}
-                        <div className="flex items-center gap-2 border-b border-blue-100 -mb-4">
+                        <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl p-1">
                             {[
                                 {
                                     id: "all",
@@ -323,69 +323,34 @@ export default function AdminEvents() {
                                         setActiveTab(tab.id);
                                     }}
                                     className={`
-                                        px-4 py-2.5 font-medium text-sm transition-all relative
+                                        px-4 py-2 font-bold text-sm transition-all rounded-lg relative
                                         ${
                                             activeTab === tab.id
-                                                ? `text-${tab.color}-700 border-b-2 border-${tab.color}-500`
-                                                : "text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300"
+                                                ? "text-white shadow-lg scale-105"
+                                                : "text-white/90 hover:text-white hover:scale-102"
                                         }
                                     `}
                                     style={{
-                                        color:
-                                            activeTab === tab.id
-                                                ? tab.color === "blue"
+                                        backgroundColor:
+                                            tab.color === "blue"
+                                                ? activeTab === tab.id
                                                     ? "#1e40af"
-                                                    : tab.color === "green"
-                                                    ? "#15803d"
-                                                    : tab.color === "gray"
-                                                    ? "#374151"
-                                                    : "#a16207"
-                                                : undefined,
-                                        borderBottomColor:
-                                            activeTab === tab.id
-                                                ? tab.color === "blue"
-                                                    ? "#3b82f6"
-                                                    : tab.color === "green"
-                                                    ? "#22c55e"
-                                                    : tab.color === "gray"
-                                                    ? "#6b7280"
-                                                    : "#eab308"
-                                                : undefined,
+                                                    : "#3b82f6"
+                                                : tab.color === "green"
+                                                ? activeTab === tab.id
+                                                    ? "#059669"
+                                                    : "#10b981"
+                                                : tab.color === "gray"
+                                                ? activeTab === tab.id
+                                                    ? "#4b5563"
+                                                    : "#6b7280"
+                                                : activeTab === tab.id
+                                                ? "#d97706"
+                                                : "#f59e0b",
                                     }}
                                 >
                                     {tab.label}
-                                    <span
-                                        className={`
-                                        ml-2 px-2 py-0.5 rounded-full text-xs font-semibold
-                                        ${
-                                            activeTab === tab.id
-                                                ? `bg-${tab.color}-100 text-${tab.color}-700`
-                                                : "bg-gray-100 text-gray-600"
-                                        }
-                                    `}
-                                        style={{
-                                            backgroundColor:
-                                                activeTab === tab.id
-                                                    ? tab.color === "blue"
-                                                        ? "#dbeafe"
-                                                        : tab.color === "green"
-                                                        ? "#dcfce7"
-                                                        : tab.color === "gray"
-                                                        ? "#f3f4f6"
-                                                        : "#fef3c7"
-                                                    : undefined,
-                                            color:
-                                                activeTab === tab.id
-                                                    ? tab.color === "blue"
-                                                        ? "#1e40af"
-                                                        : tab.color === "green"
-                                                        ? "#15803d"
-                                                        : tab.color === "gray"
-                                                        ? "#374151"
-                                                        : "#a16207"
-                                                    : undefined,
-                                        }}
-                                    >
+                                    <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold bg-white/30 text-white">
                                         {tab.count}
                                     </span>
                                 </button>

@@ -51,9 +51,9 @@ const NewsEvents = () => {
                 </div>
             </div> */}
             {/* Tab Navigation */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="border-b border-gray-200">
-                    <nav className="flex space-x-0">
+            <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <div className="border-b border-gray-200/50">
+                    <nav className="flex space-x-2 p-2">
                         {tabs.map((tab) => {
                             const IconComponent = tab.icon;
                             const isActive = activeTab === tab.id;
@@ -62,23 +62,33 @@ const NewsEvents = () => {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex-1 flex flex-col items-center justify-center px-4 py-4 text-center border-b-2 transition-all duration-200 ${
+                                    className={`flex-1 flex flex-col items-center justify-center px-4 py-2 text-center rounded-lg transition-all duration-300 ${
                                         isActive
-                                            ? "border-blue-600 bg-blue-50 text-blue-900"
-                                            : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                                            ? "bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 text-white shadow-lg"
+                                            : "bg-white text-gray-600 hover:text-blue-600 hover:bg-blue-50 hover:shadow-md border border-gray-200"
                                     }`}
                                 >
                                     <IconComponent
-                                        className={`h-5 w-5 mb-2 ${
+                                        className={`h-4 w-4 mb-1 transition-all duration-300 ${
                                             isActive
-                                                ? "text-blue-600"
-                                                : "text-gray-400"
+                                                ? "text-white drop-shadow-sm"
+                                                : "text-blue-500"
                                         }`}
                                     />
-                                    <span className="text-sm font-medium">
+                                    <span
+                                        className={`text-xs font-bold transition-all duration-300 ${
+                                            isActive ? "drop-shadow-sm" : ""
+                                        }`}
+                                    >
                                         {tab.title}
                                     </span>
-                                    <span className="text-xs mt-1 opacity-75">
+                                    <span
+                                        className={`text-[10px] mt-0.5 transition-all duration-300 ${
+                                            isActive
+                                                ? "text-blue-100"
+                                                : "text-gray-500"
+                                        }`}
+                                    >
                                         {tab.description}
                                     </span>
                                 </button>
@@ -88,7 +98,7 @@ const NewsEvents = () => {
                 </div>
 
                 {/* Tab Content */}
-                <div className="p-0">
+                <div className="p-0 animate-in fade-in duration-300">
                     <ActiveComponent />
                 </div>
             </div>

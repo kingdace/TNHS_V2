@@ -350,23 +350,23 @@ const AdminAnnouncements = () => {
 
     return (
         <div className="space-y-6">
-            <Card className="border-blue-100">
-                <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
-                    <div className="space-y-4">
+            <Card className="border-none shadow-xl">
+                <CardHeader className="bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 text-white pb-4">
+                    <div className="space-y-3">
                         {/* Title and Create Button */}
                         <div className="flex items-center justify-between">
                             <div>
-                                <CardTitle className="text-royal-blue text-2xl">
-                                    School Highlights & Announcements
+                                <CardTitle className="text-white text-2xl font-bold drop-shadow-sm">
+                                    📢 School Highlights & Announcements
                                 </CardTitle>
-                                <CardDescription className="text-blue-700 mt-1">
+                                <CardDescription className="text-blue-100 mt-1 text-sm">
                                     Manage campus highlights, events, and
                                     updates
                                 </CardDescription>
                             </div>
                             {activeTab !== "trash" && (
                                 <Button
-                                    className="bg-royal-blue hover:bg-blue-700 text-white"
+                                    className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all font-semibold"
                                     onClick={openCreate}
                                 >
                                     <Plus className="mr-2 h-4 w-4" />
@@ -376,7 +376,7 @@ const AdminAnnouncements = () => {
                         </div>
 
                         {/* Tab Navigation */}
-                        <div className="flex items-center gap-2 border-b border-blue-100 -mb-4">
+                        <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl p-1">
                             {[
                                 {
                                     id: "all",
@@ -419,77 +419,38 @@ const AdminAnnouncements = () => {
                                         }
                                     }}
                                     className={`
-                                        px-4 py-2.5 font-medium text-sm transition-all relative
+                                        px-4 py-2 font-bold text-sm transition-all rounded-lg relative
                                         ${
                                             activeTab === tab.id
-                                                ? `text-${tab.color}-700 border-b-2 border-${tab.color}-500`
-                                                : "text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300"
+                                                ? "text-white shadow-lg scale-105"
+                                                : "text-white/90 hover:text-white hover:scale-102"
                                         }
                                     `}
                                     style={{
-                                        color:
-                                            activeTab === tab.id
-                                                ? tab.color === "blue"
+                                        backgroundColor:
+                                            tab.color === "blue"
+                                                ? activeTab === tab.id
                                                     ? "#1e40af"
-                                                    : tab.color === "yellow"
-                                                    ? "#a16207"
-                                                    : tab.color === "green"
-                                                    ? "#15803d"
-                                                    : tab.color === "gray"
-                                                    ? "#374151"
-                                                    : "#b91c1c"
-                                                : undefined,
-                                        borderBottomColor:
-                                            activeTab === tab.id
-                                                ? tab.color === "blue"
-                                                    ? "#3b82f6"
-                                                    : tab.color === "yellow"
-                                                    ? "#eab308"
-                                                    : tab.color === "green"
-                                                    ? "#22c55e"
-                                                    : tab.color === "gray"
-                                                    ? "#6b7280"
-                                                    : "#ef4444"
-                                                : undefined,
+                                                    : "#3b82f6"
+                                                : tab.color === "yellow"
+                                                ? activeTab === tab.id
+                                                    ? "#d97706"
+                                                    : "#f59e0b"
+                                                : tab.color === "green"
+                                                ? activeTab === tab.id
+                                                    ? "#059669"
+                                                    : "#10b981"
+                                                : tab.color === "gray"
+                                                ? activeTab === tab.id
+                                                    ? "#4b5563"
+                                                    : "#6b7280"
+                                                : activeTab === tab.id
+                                                ? "#dc2626"
+                                                : "#ef4444",
                                     }}
                                 >
                                     {tab.label}
-                                    <span
-                                        className={`
-                                        ml-2 px-2 py-0.5 rounded-full text-xs font-semibold
-                                        ${
-                                            activeTab === tab.id
-                                                ? `bg-${tab.color}-100 text-${tab.color}-700`
-                                                : "bg-gray-100 text-gray-600"
-                                        }
-                                    `}
-                                        style={{
-                                            backgroundColor:
-                                                activeTab === tab.id
-                                                    ? tab.color === "blue"
-                                                        ? "#dbeafe"
-                                                        : tab.color === "yellow"
-                                                        ? "#fef3c7"
-                                                        : tab.color === "green"
-                                                        ? "#dcfce7"
-                                                        : tab.color === "gray"
-                                                        ? "#f3f4f6"
-                                                        : "#fee2e2"
-                                                    : undefined,
-                                            color:
-                                                activeTab === tab.id
-                                                    ? tab.color === "blue"
-                                                        ? "#1e40af"
-                                                        : tab.color === "yellow"
-                                                        ? "#a16207"
-                                                        : tab.color === "green"
-                                                        ? "#15803d"
-                                                        : tab.color === "gray"
-                                                        ? "#374151"
-                                                        : "#b91c1c"
-                                                    : undefined,
-                                        }}
-                                    >
+                                    <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold bg-white/30 text-white">
                                         {tab.count}
                                     </span>
                                 </button>
@@ -753,12 +714,12 @@ const AdminAnnouncements = () => {
                                     </p>
                                 </div>
                             ) : (
-                                <div className="divide-y divide-blue-100">
+                                <div className="divide-y divide-gray-100">
                                     {displayedItems.map((item) => (
-                                        <div key={item.id} className="py-4">
-                                            <div className="group flex items-start gap-4 p-3 rounded-lg transition-colors hover:bg-blue-50/50 hover:shadow-sm">
+                                        <div key={item.id} className="py-3">
+                                            <div className="group flex items-start gap-4 p-4 rounded-xl border border-gray-200 bg-white transition-all duration-200 hover:shadow-lg hover:border-blue-200 hover:-translate-y-0.5">
                                                 {/* Thumbnail */}
-                                                <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center border border-blue-100">
+                                                <div className="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center border border-gray-200 shadow-sm flex-shrink-0">
                                                     {item.image_path ? (
                                                         <img
                                                             src={(() => {
@@ -795,22 +756,22 @@ const AdminAnnouncements = () => {
                                                             }
                                                         />
                                                     ) : (
-                                                        <ImageIcon className="h-5 w-5 text-gray-400" />
+                                                        <ImageIcon className="h-6 w-6 text-gray-400" />
                                                     )}
                                                 </div>
                                                 {/* Main content */}
                                                 <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex items-center gap-2 mb-2 flex-wrap">
                                                         {item.is_featured && (
-                                                            <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-royal-blue/10 text-royal-blue border border-royal-blue/20">
-                                                                <Star className="h-3 w-3 mr-1" />{" "}
+                                                            <span className="inline-flex items-center text-xs px-3 py-1.5 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-none font-bold shadow-md">
+                                                                <Star className="h-3.5 w-3.5 mr-1 fill-current" />{" "}
                                                                 Featured
                                                             </span>
                                                         )}
                                                         {item.external_link && (
-                                                            <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                                                            <span className="inline-flex items-center text-xs px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-none font-bold shadow-md">
                                                                 <svg
-                                                                    className="h-3 w-3 mr-1"
+                                                                    className="h-3.5 w-3.5 mr-1"
                                                                     fill="none"
                                                                     stroke="currentColor"
                                                                     viewBox="0 0 24 24"
@@ -828,54 +789,71 @@ const AdminAnnouncements = () => {
                                                             </span>
                                                         )}
                                                         <span
-                                                            className={`text-[11px] px-2 py-0.5 rounded-full border ${
+                                                            className={`text-xs px-3 py-1.5 rounded-lg border-none font-bold shadow-md ${
                                                                 item.status ===
                                                                 "published"
-                                                                    ? "bg-green-50 text-green-700 border-green-200"
+                                                                    ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white"
                                                                     : item.status ===
                                                                       "archived"
-                                                                    ? "bg-gray-100 text-gray-700 border-gray-200"
-                                                                    : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                                                    ? "bg-gradient-to-r from-gray-400 to-gray-500 text-white"
+                                                                    : "bg-gradient-to-r from-amber-400 to-orange-500 text-white"
                                                             }`}
                                                         >
-                                                            {item.status}
+                                                            {item.status.toUpperCase()}
                                                         </span>
-                                                        <span className="text-xs text-gray-500">
+                                                        <span className="text-xs text-gray-600 font-semibold bg-gray-100 px-3 py-1.5 rounded-lg">
                                                             {item.published_at
-                                                                ? `Published: ${new Date(
+                                                                ? `📅 ${new Date(
                                                                       item.published_at
-                                                                  ).toLocaleString()}`
+                                                                  ).toLocaleDateString()}`
                                                                 : item.scheduled_publish_at
-                                                                ? `Scheduled: ${new Date(
+                                                                ? `⏰ ${new Date(
                                                                       item.scheduled_publish_at
-                                                                  ).toLocaleString()}`
-                                                                : `Created: ${new Date(
+                                                                  ).toLocaleDateString()}`
+                                                                : `📝 ${new Date(
                                                                       item.created_at
-                                                                  ).toLocaleString()}`}
+                                                                  ).toLocaleDateString()}`}
                                                         </span>
                                                     </div>
 
-                                                    <h3 className="text-lg font-semibold text-gray-900 mt-2 mb-1">
+                                                    <h3 className="text-lg font-bold text-gray-900 mt-1 mb-2 group-hover:text-blue-700 transition-colors">
                                                         {item.title}
                                                     </h3>
 
-                                                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                                                    <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
                                                         {item.content}
                                                     </p>
 
-                                                    <div className="flex items-center gap-4 text-xs text-gray-500">
-                                                        <span>
-                                                            By {item.author}
+                                                    <div className="flex items-center gap-3 text-xs text-gray-600">
+                                                        <span className="flex items-center gap-1.5 font-medium">
+                                                            <svg
+                                                                className="h-4 w-4 text-blue-500"
+                                                                fill="none"
+                                                                stroke="currentColor"
+                                                                viewBox="0 0 24 24"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth={
+                                                                        2
+                                                                    }
+                                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                                />
+                                                            </svg>
+                                                            {item.author}
                                                         </span>
-                                                        <span>•</span>
-                                                        <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full">
+                                                        <span className="text-gray-300">
+                                                            •
+                                                        </span>
+                                                        <span className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-bold shadow-md">
                                                             {item.category}
                                                         </span>
                                                     </div>
                                                 </div>
 
                                                 {/* Actions */}
-                                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 flex-shrink-0">
                                                     <label className="flex items-center gap-2 text-sm">
                                                         <input
                                                             type="checkbox"
