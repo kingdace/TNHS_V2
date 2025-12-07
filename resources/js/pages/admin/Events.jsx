@@ -48,7 +48,7 @@ export default function AdminEvents() {
     const [rows, setRows] = useState([]);
     const [search, setSearch] = useState("");
     const [type, setType] = useState("");
-    const [onlyActive, setOnlyActive] = useState(true);
+    const [activeTab, setActiveTab] = useState("all"); // all|active|inactive|featured
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -85,7 +85,7 @@ export default function AdminEvents() {
             };
             if (type) filters.types = type;
             if (search) filters.search = search;
-            if (onlyActive) filters.active = "1";
+            // Load all events, we'll filter client-side by tab
             const res = await adminService.events.getAll(filters);
             setRows(res.data || []);
         } catch (e) {
@@ -99,7 +99,7 @@ export default function AdminEvents() {
     useEffect(() => {
         load();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentMonth, type, onlyActive]);
+    }, [currentMonth, type]);
 
     function prevMonth() {
         const d = new Date(currentMonth);
@@ -240,19 +240,44 @@ export default function AdminEvents() {
         }
     };
 
+    // Calculate status counts
+    const activeCount = rows.filter((e) => e.is_active).length;
+    const inactiveCount = rows.filter((e) => !e.is_active).length;
+    const featuredCount = rows.filter((e) => e.is_featured).length;
+
+    // Filter events by active tab
+    const filteredRows = rows.filter((event) => {
+        if (activeTab === "active") return event.is_active;
+        if (activeTab === "inactive") return !event.is_active;
+        if (activeTab === "featured") return event.is_featured;
+        return true; // 'all' tab
+    });
+
+    // Smart sorting: active events first when viewing "all"
+    const sortedRows = [...filteredRows].sort((a, b) => {
+        if (activeTab === "all") {
+            // Prioritize active events
+            if (a.is_active !== b.is_active) {
+                return a.is_active ? -1 : 1;
+            }
+        }
+        // Then sort by start date (newest first)
+        return new Date(b.start_date) - new Date(a.start_date);
+    });
+
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             <Card className="border-blue-100">
-                <CardHeader className="bg-gray-75">
+                <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
                     <div className="space-y-4">
+                        {/* Title and Create Button */}
                         <div className="flex items-center justify-between">
                             <div>
-                                <CardTitle className="text-royal-blue">
-                                    All Events
+                                <CardTitle className="text-royal-blue text-2xl">
+                                    School Events & Activities
                                 </CardTitle>
-                                <CardDescription className="text-blue-700">
-                                    Manage school events and activities for the
-                                    calendar
+                                <CardDescription className="text-blue-700 mt-1">
+                                    Manage school events and calendar activities
                                 </CardDescription>
                             </div>
                             <Button
@@ -263,10 +288,114 @@ export default function AdminEvents() {
                                 Create Event
                             </Button>
                         </div>
-                        {/* Toolbar */}
+
+                        {/* Tab Navigation */}
+                        <div className="flex items-center gap-2 border-b border-blue-100 -mb-4">
+                            {[
+                                {
+                                    id: "all",
+                                    label: "All",
+                                    count: rows.length,
+                                    color: "blue",
+                                },
+                                {
+                                    id: "active",
+                                    label: "Active",
+                                    count: activeCount,
+                                    color: "green",
+                                },
+                                {
+                                    id: "inactive",
+                                    label: "Inactive",
+                                    count: inactiveCount,
+                                    color: "gray",
+                                },
+                                {
+                                    id: "featured",
+                                    label: "Featured",
+                                    count: featuredCount,
+                                    color: "yellow",
+                                },
+                            ].map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => {
+                                        setActiveTab(tab.id);
+                                    }}
+                                    className={`
+                                        px-4 py-2.5 font-medium text-sm transition-all relative
+                                        ${
+                                            activeTab === tab.id
+                                                ? `text-${tab.color}-700 border-b-2 border-${tab.color}-500`
+                                                : "text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300"
+                                        }
+                                    `}
+                                    style={{
+                                        color:
+                                            activeTab === tab.id
+                                                ? tab.color === "blue"
+                                                    ? "#1e40af"
+                                                    : tab.color === "green"
+                                                    ? "#15803d"
+                                                    : tab.color === "gray"
+                                                    ? "#374151"
+                                                    : "#a16207"
+                                                : undefined,
+                                        borderBottomColor:
+                                            activeTab === tab.id
+                                                ? tab.color === "blue"
+                                                    ? "#3b82f6"
+                                                    : tab.color === "green"
+                                                    ? "#22c55e"
+                                                    : tab.color === "gray"
+                                                    ? "#6b7280"
+                                                    : "#eab308"
+                                                : undefined,
+                                    }}
+                                >
+                                    {tab.label}
+                                    <span
+                                        className={`
+                                        ml-2 px-2 py-0.5 rounded-full text-xs font-semibold
+                                        ${
+                                            activeTab === tab.id
+                                                ? `bg-${tab.color}-100 text-${tab.color}-700`
+                                                : "bg-gray-100 text-gray-600"
+                                        }
+                                    `}
+                                        style={{
+                                            backgroundColor:
+                                                activeTab === tab.id
+                                                    ? tab.color === "blue"
+                                                        ? "#dbeafe"
+                                                        : tab.color === "green"
+                                                        ? "#dcfce7"
+                                                        : tab.color === "gray"
+                                                        ? "#f3f4f6"
+                                                        : "#fef3c7"
+                                                    : undefined,
+                                            color:
+                                                activeTab === tab.id
+                                                    ? tab.color === "blue"
+                                                        ? "#1e40af"
+                                                        : tab.color === "green"
+                                                        ? "#15803d"
+                                                        : tab.color === "gray"
+                                                        ? "#374151"
+                                                        : "#a16207"
+                                                    : undefined,
+                                        }}
+                                    >
+                                        {tab.count}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Filters */}
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
                             {/* Search */}
-                            <div className="lg:col-span-4">
+                            <div className="lg:col-span-5">
                                 <div className="relative">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                     <input
@@ -279,49 +408,24 @@ export default function AdminEvents() {
                                     />
                                 </div>
                             </div>
-                            {/* Filters */}
-                            <div className="lg:col-span-6 flex items-center gap-2">
-                                <div className="flex items-center gap-2 w-full">
-                                    <Filter className="h-4 w-4 text-gray-400" />
-                                    <select
-                                        value={type}
-                                        onChange={(e) =>
-                                            setType(e.target.value)
-                                        }
-                                        className="w-36 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
-                                    >
-                                        <option value="">All types</option>
-                                        {EVENT_TYPES.map((t) => (
-                                            <option
-                                                key={t.value}
-                                                value={t.value}
-                                            >
-                                                {t.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <label className="flex items-center gap-2 text-sm text-gray-700 whitespace-nowrap">
-                                    <input
-                                        type="checkbox"
-                                        checked={onlyActive}
-                                        onChange={(e) =>
-                                            setOnlyActive(e.target.checked)
-                                        }
-                                        className="h-4 w-4 text-royal-blue border-gray-300 rounded"
-                                    />
-                                    <Eye
-                                        className={`h-4 w-4 ${
-                                            onlyActive
-                                                ? "text-royal-blue"
-                                                : "text-gray-400"
-                                        }`}
-                                    />
-                                    Active only
-                                </label>
+                            {/* Event Type Filter */}
+                            <div className="lg:col-span-4 flex items-center gap-2">
+                                <Filter className="h-4 w-4 text-gray-400" />
+                                <select
+                                    value={type}
+                                    onChange={(e) => setType(e.target.value)}
+                                    className="flex-1 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
+                                >
+                                    <option value="">All types</option>
+                                    {EVENT_TYPES.map((t) => (
+                                        <option key={t.value} value={t.value}>
+                                            {t.label}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             {/* Month Navigation */}
-                            <div className="lg:col-span-2 flex items-center gap-1">
+                            <div className="lg:col-span-3 flex items-center gap-1">
                                 <Button
                                     variant="outline"
                                     className="text-gray-700 px-2 py-2"
@@ -330,7 +434,7 @@ export default function AdminEvents() {
                                 >
                                     <ChevronLeft className="h-4 w-4" />
                                 </Button>
-                                <span className="text-sm font-medium text-gray-700 px-2 min-w-[120px] text-center">
+                                <span className="text-sm font-medium text-gray-700 px-2 min-w-[100px] text-center">
                                     {monthLabel}
                                 </span>
                                 <Button
@@ -366,20 +470,27 @@ export default function AdminEvents() {
                                 </div>
                             ))}
                         </div>
-                    ) : rows.length === 0 ? (
+                    ) : sortedRows.length === 0 ? (
                         <div className="text-center py-12 text-blue-700">
                             <Calendar className="h-12 w-12 mx-auto mb-4 text-royal-blue/40" />
-                            <p>
-                                No events found for {monthLabel.toLowerCase()}.
+                            <p className="text-lg font-medium mb-2">
+                                {activeTab === "all" &&
+                                    `No events found for ${monthLabel.toLowerCase()}`}
+                                {activeTab === "active" && "No active events"}
+                                {activeTab === "inactive" &&
+                                    "No inactive events"}
+                                {activeTab === "featured" &&
+                                    "No featured events"}
                             </p>
-                            <p className="text-sm text-gray-500 mt-1">
-                                Try adjusting your filters or create a new
-                                event.
+                            <p className="text-sm text-gray-600">
+                                {search || type
+                                    ? "Try adjusting your filters"
+                                    : "Create a new event to get started"}
                             </p>
                         </div>
                     ) : (
                         <div className="divide-y divide-blue-100">
-                            {rows.map((event) => (
+                            {sortedRows.map((event) => (
                                 <div key={event.id} className="py-4">
                                     <div className="group flex items-start gap-4 p-3 rounded-lg transition-colors hover:bg-blue-50/50 hover:shadow-sm">
                                         {/* Thumbnail */}
@@ -526,7 +637,7 @@ export default function AdminEvents() {
                     {/* Pagination footer */}
                     <div className="flex items-center justify-between mt-6">
                         <div className="text-sm text-gray-600">
-                            Showing {rows.length} events for{" "}
+                            Showing {sortedRows.length} events for{" "}
                             {monthLabel.toLowerCase()}
                         </div>
                     </div>

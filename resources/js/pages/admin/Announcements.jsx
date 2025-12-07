@@ -44,13 +44,12 @@ const AdminAnnouncements = () => {
         scheduled_publish_at: "",
         scheduled_unpublish_at: "",
     });
-    const [showTrash, setShowTrash] = useState(false);
     const [trashed, setTrashed] = useState([]);
     const [imagePreviewUrl, setImagePreviewUrl] = useState("");
 
     // UI-only controls
     const [query, setQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState("all"); // all|draft|published|archived
+    const [activeTab, setActiveTab] = useState("all"); // all|draft|published|archived|trash
     const [categoryFilter, setCategoryFilter] = useState("all"); // all|General|Academic|Events|Sports|Arts|Announcements|News|Important
     const [featuredOnly, setFeaturedOnly] = useState(false);
     const [sortKey, setSortKey] = useState("newest"); // newest|oldest|title|status
@@ -89,13 +88,27 @@ const AdminAnnouncements = () => {
 
     // Derived list with search/filter/sort (client-side only)
     const normalized = (text) => (text || "").toString().toLowerCase();
+
+    // Calculate status counts
+    const draftCount = items.filter((it) => it.status === "draft").length;
+    const publishedCount = items.filter(
+        (it) => it.status === "published"
+    ).length;
+    const archivedCount = items.filter((it) => it.status === "archived").length;
+
     const filteredSorted = (items || [])
         .filter((it) => {
-            if (statusFilter !== "all" && it.status !== statusFilter)
-                return false;
+            // Filter by active tab
+            if (activeTab !== "all" && it.status !== activeTab) return false;
+
+            // Filter by category
             if (categoryFilter !== "all" && it.category !== categoryFilter)
                 return false;
+
+            // Filter by featured
             if (featuredOnly && !it.is_featured) return false;
+
+            // Filter by search query
             if (!query.trim()) return true;
             const q = normalized(query);
             return (
@@ -105,17 +118,31 @@ const AdminAnnouncements = () => {
             );
         })
         .sort((a, b) => {
+            // When viewing "All", prioritize by status first: published > draft > archived
+            if (activeTab === "all") {
+                const statusPriority = { published: 0, draft: 1, archived: 2 };
+                const aPriority = statusPriority[a.status] ?? 3;
+                const bPriority = statusPriority[b.status] ?? 3;
+
+                if (aPriority !== bPriority) {
+                    return aPriority - bPriority;
+                }
+            }
+
+            // Then sort by selected sort key
             if (sortKey === "title")
                 return (a.title || "").localeCompare(b.title || "");
             if (sortKey === "status")
                 return (a.status || "").localeCompare(b.status || "");
+
+            // Default: sort by date (newest or oldest)
             const aTime = a.published_at
                 ? new Date(a.published_at).getTime()
                 : 0;
             const bTime = b.published_at
                 ? new Date(b.published_at).getTime()
                 : 0;
-            return sortKey === "oldest" ? aTime - bTime : bTime - aTime; // default newest
+            return sortKey === "oldest" ? aTime - bTime : bTime - aTime;
         });
 
     const totalItems = filteredSorted.length;
@@ -322,82 +349,158 @@ const AdminAnnouncements = () => {
     };
 
     return (
-        <div className="space-y-8">
-            <Card className={showTrash ? "border-red-200" : "border-blue-100"}>
-                <CardHeader
-                    className={
-                        showTrash
-                            ? "bg-gradient-to-r from-red-50 to-rose-50"
-                            : "bg-gray-75"
-                    }
-                >
+        <div className="space-y-6">
+            <Card className="border-blue-100">
+                <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
                     <div className="space-y-4">
+                        {/* Title and Create Button */}
                         <div className="flex items-center justify-between">
                             <div>
-                                <CardTitle
-                                    className={
-                                        showTrash
-                                            ? "text-red-700"
-                                            : "text-royal-blue"
-                                    }
-                                >
-                                    {showTrash ? "Trash" : "All Highlights"}
+                                <CardTitle className="text-royal-blue text-2xl">
+                                    School Highlights & Announcements
                                 </CardTitle>
-                                <CardDescription
-                                    className={
-                                        showTrash
-                                            ? "text-red-600"
-                                            : "text-blue-700"
-                                    }
-                                >
-                                    {showTrash
-                                        ? "Soft-deleted announcements. Restore or delete permanently."
-                                        : "Create and manage campus highlights and updates"}
+                                <CardDescription className="text-blue-700 mt-1">
+                                    Manage campus highlights, events, and
+                                    updates
                                 </CardDescription>
                             </div>
-                            <div className="flex items-center gap-2">
+                            {activeTab !== "trash" && (
                                 <Button
-                                    variant="outline"
-                                    className="text-gray-700"
+                                    className="bg-royal-blue hover:bg-blue-700 text-white"
+                                    onClick={openCreate}
+                                >
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Create Announcement
+                                </Button>
+                            )}
+                        </div>
+
+                        {/* Tab Navigation */}
+                        <div className="flex items-center gap-2 border-b border-blue-100 -mb-4">
+                            {[
+                                {
+                                    id: "all",
+                                    label: "All",
+                                    count: items.length,
+                                    color: "blue",
+                                },
+                                {
+                                    id: "draft",
+                                    label: "Draft",
+                                    count: draftCount,
+                                    color: "yellow",
+                                },
+                                {
+                                    id: "published",
+                                    label: "Published",
+                                    count: publishedCount,
+                                    color: "green",
+                                },
+                                {
+                                    id: "archived",
+                                    label: "Archived",
+                                    count: archivedCount,
+                                    color: "gray",
+                                },
+                                {
+                                    id: "trash",
+                                    label: "Trash",
+                                    count: trashed.length,
+                                    color: "red",
+                                },
+                            ].map((tab) => (
+                                <button
+                                    key={tab.id}
                                     onClick={() => {
-                                        setShowTrash((v) => !v);
-                                        if (!showTrash) {
+                                        setActiveTab(tab.id);
+                                        setPage(1);
+                                        if (tab.id === "trash") {
                                             loadTrashed();
                                         }
                                     }}
+                                    className={`
+                                        px-4 py-2.5 font-medium text-sm transition-all relative
+                                        ${
+                                            activeTab === tab.id
+                                                ? `text-${tab.color}-700 border-b-2 border-${tab.color}-500`
+                                                : "text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300"
+                                        }
+                                    `}
+                                    style={{
+                                        color:
+                                            activeTab === tab.id
+                                                ? tab.color === "blue"
+                                                    ? "#1e40af"
+                                                    : tab.color === "yellow"
+                                                    ? "#a16207"
+                                                    : tab.color === "green"
+                                                    ? "#15803d"
+                                                    : tab.color === "gray"
+                                                    ? "#374151"
+                                                    : "#b91c1c"
+                                                : undefined,
+                                        borderBottomColor:
+                                            activeTab === tab.id
+                                                ? tab.color === "blue"
+                                                    ? "#3b82f6"
+                                                    : tab.color === "yellow"
+                                                    ? "#eab308"
+                                                    : tab.color === "green"
+                                                    ? "#22c55e"
+                                                    : tab.color === "gray"
+                                                    ? "#6b7280"
+                                                    : "#ef4444"
+                                                : undefined,
+                                    }}
                                 >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    {showTrash
-                                        ? "Back to Highlights"
-                                        : "View Trash"}
-                                </Button>
-                                {showTrash && (
-                                    <Button
-                                        variant="outline"
-                                        className="text-gray-700"
-                                        onClick={loadTrashed}
+                                    {tab.label}
+                                    <span
+                                        className={`
+                                        ml-2 px-2 py-0.5 rounded-full text-xs font-semibold
+                                        ${
+                                            activeTab === tab.id
+                                                ? `bg-${tab.color}-100 text-${tab.color}-700`
+                                                : "bg-gray-100 text-gray-600"
+                                        }
+                                    `}
+                                        style={{
+                                            backgroundColor:
+                                                activeTab === tab.id
+                                                    ? tab.color === "blue"
+                                                        ? "#dbeafe"
+                                                        : tab.color === "yellow"
+                                                        ? "#fef3c7"
+                                                        : tab.color === "green"
+                                                        ? "#dcfce7"
+                                                        : tab.color === "gray"
+                                                        ? "#f3f4f6"
+                                                        : "#fee2e2"
+                                                    : undefined,
+                                            color:
+                                                activeTab === tab.id
+                                                    ? tab.color === "blue"
+                                                        ? "#1e40af"
+                                                        : tab.color === "yellow"
+                                                        ? "#a16207"
+                                                        : tab.color === "green"
+                                                        ? "#15803d"
+                                                        : tab.color === "gray"
+                                                        ? "#374151"
+                                                        : "#b91c1c"
+                                                    : undefined,
+                                        }}
                                     >
-                                        <RotateCcw className="h-4 w-4 mr-2" />
-                                        Refresh
-                                    </Button>
-                                )}
-                                {!showTrash && (
-                                    <Button
-                                        className="bg-royal-blue hover:bg-blue-700 text-white"
-                                        onClick={openCreate}
-                                    >
-                                        <Plus className="mr-2 h-4 w-4" />
-                                        Create Announcement
-                                    </Button>
-                                )}
-                            </div>
+                                        {tab.count}
+                                    </span>
+                                </button>
+                            ))}
                         </div>
 
-                        {/* Toolbar - Only show for main highlights view */}
-                        {!showTrash && (
-                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sticky top-0">
+                        {/* Filters - Only show for non-trash tabs */}
+                        {activeTab !== "trash" && (
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
                                 {/* Search */}
-                                <div className="lg:col-span-5">
+                                <div className="lg:col-span-6">
                                     <div className="relative">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                         <input
@@ -411,61 +514,33 @@ const AdminAnnouncements = () => {
                                     </div>
                                 </div>
                                 {/* Filters */}
-                                <div className="lg:col-span-7 flex items-center gap-2">
-                                    <div className="flex items-center gap-2 w-full">
-                                        <Filter className="h-4 w-4 text-gray-400" />
-                                        <select
-                                            value={statusFilter}
-                                            onChange={(e) =>
-                                                setStatusFilter(e.target.value)
-                                            }
-                                            className="w-32 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
-                                        >
-                                            <option value="all">
-                                                All statuses
-                                            </option>
-                                            <option value="draft">Draft</option>
-                                            <option value="published">
-                                                Published
-                                            </option>
-                                            <option value="archived">
-                                                Archived
-                                            </option>
-                                        </select>
-                                        <select
-                                            value={categoryFilter}
-                                            onChange={(e) =>
-                                                setCategoryFilter(
-                                                    e.target.value
-                                                )
-                                            }
-                                            className="w-32 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
-                                        >
-                                            <option value="all">
-                                                All categories
-                                            </option>
-                                            <option value="General">
-                                                General
-                                            </option>
-                                            <option value="Academic">
-                                                Academic
-                                            </option>
-                                            <option value="Events">
-                                                Events
-                                            </option>
-                                            <option value="Sports">
-                                                Sports
-                                            </option>
-                                            <option value="Arts">Arts</option>
-                                            <option value="Announcements">
-                                                Announcements
-                                            </option>
-                                            <option value="News">News</option>
-                                            <option value="Important">
-                                                Important
-                                            </option>
-                                        </select>
-                                    </div>
+                                <div className="lg:col-span-6 flex items-center gap-2">
+                                    <Filter className="h-4 w-4 text-gray-400" />
+                                    <select
+                                        value={categoryFilter}
+                                        onChange={(e) =>
+                                            setCategoryFilter(e.target.value)
+                                        }
+                                        className="flex-1 rounded-lg border border-blue-100 py-2 px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-sm"
+                                    >
+                                        <option value="all">
+                                            All categories
+                                        </option>
+                                        <option value="General">General</option>
+                                        <option value="Academic">
+                                            Academic
+                                        </option>
+                                        <option value="Events">Events</option>
+                                        <option value="Sports">Sports</option>
+                                        <option value="Arts">Arts</option>
+                                        <option value="Announcements">
+                                            Announcements
+                                        </option>
+                                        <option value="News">News</option>
+                                        <option value="Important">
+                                            Important
+                                        </option>
+                                    </select>
                                     <label className="flex items-center gap-2 text-sm text-gray-700 whitespace-nowrap">
                                         <input
                                             type="checkbox"
@@ -503,8 +578,8 @@ const AdminAnnouncements = () => {
                         </div>
                     )}
 
-                    {/* Main Content - Toggle between Highlights and Trash */}
-                    {showTrash ? (
+                    {/* Main Content - Toggle between tabs */}
+                    {activeTab === "trash" ? (
                         // Trash View
                         trashed.length === 0 ? (
                             <div className="text-center py-12 text-red-700">
@@ -634,7 +709,7 @@ const AdminAnnouncements = () => {
                             </div>
                         )
                     ) : (
-                        // Highlights View (existing content)
+                        // Regular View (All, Draft, Published, Archived)
                         <>
                             {loading ? (
                                 <div className="space-y-3">
@@ -659,7 +734,23 @@ const AdminAnnouncements = () => {
                             ) : displayedItems.length === 0 ? (
                                 <div className="text-center py-12 text-blue-700">
                                     <Megaphone className="h-12 w-12 mx-auto mb-4 text-royal-blue/40" />
-                                    <p>No announcements match your filters.</p>
+                                    <p className="text-lg font-medium mb-2">
+                                        {activeTab === "all" &&
+                                            "No announcements found"}
+                                        {activeTab === "draft" &&
+                                            "No draft announcements"}
+                                        {activeTab === "published" &&
+                                            "No published announcements"}
+                                        {activeTab === "archived" &&
+                                            "No archived announcements"}
+                                    </p>
+                                    <p className="text-sm text-gray-600">
+                                        {query ||
+                                        categoryFilter !== "all" ||
+                                        featuredOnly
+                                            ? "Try adjusting your filters"
+                                            : "Create your first announcement to get started"}
+                                    </p>
                                 </div>
                             ) : (
                                 <div className="divide-y divide-blue-100">
