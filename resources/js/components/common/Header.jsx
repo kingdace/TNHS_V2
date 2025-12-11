@@ -4,7 +4,16 @@ import { Menu, X, ChevronDown } from "lucide-react";
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [openDropdowns, setOpenDropdowns] = useState([]);
     const location = useLocation();
+
+    const toggleDropdown = (menuName) => {
+        setOpenDropdowns((prev) =>
+            prev.includes(menuName)
+                ? prev.filter((name) => name !== menuName)
+                : [...prev, menuName]
+        );
+    };
 
     const navigation = [
         { name: "Home", href: "/" },
@@ -46,7 +55,7 @@ const Header = () => {
             name: "Faculty and Staff",
             href: "/faculty",
         },
-        { name: "Principal Corner", href: "/faculty/principal" },
+        { name: "Principal's Corner", href: "/faculty/principal" },
         {
             name: "More",
             href: "/more",
@@ -77,11 +86,11 @@ const Header = () => {
     return (
         <header className="bg-royal-blue shadow-lg sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center h-20">
-                    {/* Logo and School Name */}
-                    <div className="flex items-center space-x-1">
+                <div className="flex items-center justify-between h-16 md:h-20">
+                    {/* Logo and School Name - Always on LEFT */}
+                    <div className="flex items-center space-x-2 lg:space-x-3 flex-1">
                         <div className="relative">
-                            <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center shadow-lg overflow-hidden">
+                            <div className="h-10 w-10 md:h-12 md:w-12 bg-white rounded-full flex items-center justify-center shadow-lg overflow-hidden">
                                 <img
                                     src="/images/Logo.jpg"
                                     alt="TNHS Logo"
@@ -89,7 +98,17 @@ const Header = () => {
                                 />
                             </div>
                         </div>
-                        <div className="hidden sm:block">
+                        {/* Mobile: Compact school name */}
+                        <div className="md:hidden">
+                            <h1 className="text-sm font-bold text-white leading-tight">
+                                Taft National High School
+                            </h1>
+                            <p className="text-xs text-blue-100 font-medium">
+                                Nueva Ext., Surigao City
+                            </p>
+                        </div>
+                        {/* Desktop: Full school name */}
+                        <div className="hidden md:block">
                             <h1 className="text-2xl font-bold text-white">
                                 Taft National High School
                             </h1>
@@ -99,7 +118,19 @@ const Header = () => {
                         </div>
                     </div>
 
-                    {/* Desktop Navigation */}
+                    {/* Mobile: Hamburger Menu (Always on RIGHT) */}
+                    <button
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        className="lg:hidden p-2 text-white hover:bg-white/10 rounded-lg transition-all duration-300"
+                    >
+                        {isMenuOpen ? (
+                            <X className="h-6 w-6" />
+                        ) : (
+                            <Menu className="h-6 w-6" />
+                        )}
+                    </button>
+
+                    {/* Desktop Navigation - Hidden on Mobile */}
                     <nav className="hidden lg:flex items-center space-x-1 ml-2">
                         {navigation.map((item) => (
                             <div key={item.name} className="relative group">
@@ -166,76 +197,115 @@ const Header = () => {
                                 )}
                             </div>
                         ))}
-
-                        {/* Mobile Menu Button */}
-                        <button
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="lg:hidden p-2 text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300 ml-4"
-                        >
-                            {isMenuOpen ? (
-                                <X className="h-6 w-6" />
-                            ) : (
-                                <Menu className="h-6 w-6" />
-                            )}
-                        </button>
                     </nav>
                 </div>
 
-                {/* Mobile Navigation */}
+                {/* Mobile Navigation - Sidebar Drawer */}
                 {isMenuOpen && (
-                    <div className="lg:hidden">
-                        <div className="px-2 pt-2 pb-3 space-y-1 bg-blue-800 rounded-xl mt-2 shadow-xl">
-                            {navigation.map((item) => (
-                                <div key={item.name}>
-                                    {item.hasDropdown ? (
-                                        <div>
-                                            {item.name === "Academics" ? (
-                                                <div
-                                                    className={`
-          w-full text-left px-3 py-2 rounded-lg text-base font-medium
-          transition-all duration-300 flex items-center justify-between
-          ${
-              isActive(item.href)
-                  ? "bg-white/20 text-white"
-                  : "text-blue-100 hover:bg-white/10 hover:text-white"
-          }
-        `}
-                                                >
-                                                    <span>{item.name}</span>
-                                                </div>
-                                            ) : (
-                                                // Other dropdowns: Dropdown only (not clickable to main page)
-                                                <div
-                                                    className={`w-full text-left px-3 py-2 rounded-lg text-base font-medium transition-all duration-300 flex items-center justify-between ${
-                                                        isParentActive(
-                                                            item.submenu
+                    <>
+                        {/* Backdrop Overlay */}
+                        <div
+                            className="lg:hidden fixed inset-0 bg-black/50 z-40"
+                            onClick={() => setIsMenuOpen(false)}
+                        ></div>
+
+                        {/* Sidebar Drawer - Slides from RIGHT with consistent royal-blue color */}
+                        <div className="lg:hidden fixed right-0 top-0 bottom-0 w-[60%] max-w-[280px] bg-royal-blue/90 backdrop-blur-lg z-50 shadow-2xl overflow-y-auto border-l border-blue-800">
+                            {/* Close Button at Top - Matches header color */}
+                            <div className="bg-royal-blue/95 p-3 flex justify-end border-b border-blue-700/50">
+                                <button
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="p-2 text-white hover:bg-white/20 rounded-lg transition-all duration-200 shadow-sm"
+                                    aria-label="Close menu"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            {/* Menu Items - White text on royal-blue background */}
+                            <nav className="bg-transparent">
+                                {navigation.map((item) => (
+                                    <div key={item.name}>
+                                        {item.hasDropdown ? (
+                                            <div>
+                                                {/* Parent Menu Item - Clickable */}
+                                                <button
+                                                    onClick={() =>
+                                                        toggleDropdown(
+                                                            item.name
                                                         )
-                                                            ? "bg-white/20 text-white"
-                                                            : "text-blue-100 hover:bg-white/10 hover:text-white"
-                                                    }`}
+                                                    }
+                                                    className="w-full flex items-center justify-between px-4 py-3.5 text-left text-white hover:bg-white/20 transition-colors duration-200 border-b border-blue-700/30"
                                                 >
-                                                    <span>{item.name}</span>
-                                                    {/* <ChevronDown className="h-4 w-4" /> */}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <Link
-                                            to={item.href}
-                                            onClick={() => setIsMenuOpen(false)}
-                                            className={`block px-3 py-2 rounded-lg text-base font-medium transition-all duration-300 ${
-                                                isActive(item.href)
-                                                    ? "bg-white/20 text-white shadow-md backdrop-blur-sm border border-white/20"
-                                                    : "text-blue-100 hover:bg-white/10 hover:text-white"
-                                            }`}
-                                        >
-                                            {item.name}
-                                        </Link>
-                                    )}
-                                </div>
-                            ))}
+                                                    <span className="text-base font-medium">
+                                                        {item.name}
+                                                    </span>
+                                                    <ChevronDown
+                                                        className={`h-5 w-5 text-white transition-transform duration-300 ${
+                                                            openDropdowns.includes(
+                                                                item.name
+                                                            )
+                                                                ? "rotate-180"
+                                                                : ""
+                                                        }`}
+                                                    />
+                                                </button>
+                                                {/* Submenu Items - Collapsible */}
+                                                {openDropdowns.includes(
+                                                    item.name
+                                                ) && (
+                                                    <div className="bg-blue-800/30">
+                                                        {item.submenu.map(
+                                                            (subItem) => (
+                                                                <Link
+                                                                    key={
+                                                                        subItem.name
+                                                                    }
+                                                                    to={
+                                                                        subItem.href
+                                                                    }
+                                                                    onClick={() =>
+                                                                        setIsMenuOpen(
+                                                                            false
+                                                                        )
+                                                                    }
+                                                                    className={`block pl-10 pr-4 py-3 text-sm font-normal transition-all duration-200 border-b border-blue-700/30 border-l-4 ${
+                                                                        isActive(
+                                                                            subItem.href
+                                                                        )
+                                                                            ? "text-white bg-blue-600/50 border-l-white"
+                                                                            : "text-blue-100 hover:bg-white/10 hover:text-white border-l-transparent hover:border-l-blue-400"
+                                                                    }`}
+                                                                >
+                                                                    {
+                                                                        subItem.name
+                                                                    }
+                                                                </Link>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <Link
+                                                to={item.href}
+                                                onClick={() =>
+                                                    setIsMenuOpen(false)
+                                                }
+                                                className={`block px-4 py-3.5 text-base font-medium transition-colors duration-200 border-b border-blue-700/30 ${
+                                                    isActive(item.href)
+                                                        ? "text-white bg-blue-600/50"
+                                                        : "text-white hover:bg-white/20"
+                                                }`}
+                                            >
+                                                {item.name}
+                                            </Link>
+                                        )}
+                                    </div>
+                                ))}
+                            </nav>
                         </div>
-                    </div>
+                    </>
                 )}
             </div>
         </header>

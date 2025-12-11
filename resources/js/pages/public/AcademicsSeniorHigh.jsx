@@ -27,6 +27,11 @@ const AcademicsSeniorHigh = () => {
                 setLoading(true);
                 const response = await seniorHighStrandService.getAll();
 
+                // Check if the service call was successful
+                if (!response.success || !response.data) {
+                    throw new Error(response.error || "Failed to load strands");
+                }
+
                 // Map API response to component format
                 const mappedStrands = response.data.map((strand) => ({
                     id: strand.strand_id,

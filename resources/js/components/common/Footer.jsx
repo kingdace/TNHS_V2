@@ -14,7 +14,7 @@ const Footer = () => {
     return (
         <footer className="bg-royal-blue text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {/* School Info - Takes 2 columns on large screens */}
                     <div className="lg:col-span-2">
                         <div className="flex items-center space-x-3 mb-4">
@@ -41,15 +41,13 @@ const Footer = () => {
                             character development.
                         </p>
 
-                        {/* Mission Statement */}
+                        {/* Core Values */}
                         <div className="mb-4">
                             <h5 className="text-white font-semibold text-sm mb-2">
-                                Our Mission
+                                Core Values
                             </h5>
                             <p className="text-blue-100 text-xs leading-relaxed">
-                                To provide quality, accessible, and relevant
-                                education that develops competent, productive,
-                                and responsible citizens.
+                                Maka-Dios, Maka-tao, Makakalikasan, Makabansa.
                             </p>
                         </div>
 
@@ -91,120 +89,6 @@ const Footer = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Quick Links */}
-                    <div>
-                        <h4 className="text-base font-semibold mb-4 text-white border-b border-blue-600 pb-2">
-                            Quick Links
-                        </h4>
-                        <ul className="space-y-2">
-                            <li>
-                                <Link
-                                    to="/about"
-                                    className="text-blue-100 hover:text-white transition-colors duration-300 text-sm hover:translate-x-1 transform inline-block"
-                                >
-                                    About Us
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/academics"
-                                    className="text-blue-100 hover:text-white transition-colors duration-300 text-sm hover:translate-x-1 transform inline-block"
-                                >
-                                    Academics
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/admissions/requirements"
-                                    className="text-blue-100 hover:text-white transition-colors duration-300 text-sm hover:translate-x-1 transform inline-block"
-                                >
-                                    Admissions
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/announcements"
-                                    className="text-blue-100 hover:text-white transition-colors duration-300 text-sm hover:translate-x-1 transform inline-block"
-                                >
-                                    Announcements
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/events"
-                                    className="text-blue-100 hover:text-white transition-colors duration-300 text-sm hover:translate-x-1 transform inline-block"
-                                >
-                                    Events
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/gallery"
-                                    className="text-blue-100 hover:text-white transition-colors duration-300 text-sm hover:translate-x-1 transform inline-block"
-                                >
-                                    Gallery
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Academic Programs */}
-                    <div>
-                        <h4 className="text-base font-semibold mb-4 text-white border-b border-blue-600 pb-2">
-                            Programs
-                        </h4>
-                        <ul className="space-y-2">
-                            <li>
-                                <Link
-                                    to="/academics/junior-high"
-                                    className="text-blue-100 hover:text-white transition-colors duration-300 text-sm hover:translate-x-1 transform inline-block"
-                                >
-                                    Junior High School
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/academics/senior-high"
-                                    className="text-blue-100 hover:text-white transition-colors duration-300 text-sm hover:translate-x-1 transform inline-block"
-                                >
-                                    Senior High School
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/academics/special-programs"
-                                    className="text-blue-100 hover:text-white transition-colors duration-300 text-sm hover:translate-x-1 transform inline-block"
-                                >
-                                    ALS Program
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/faculty"
-                                    className="text-blue-100 hover:text-white transition-colors duration-300 text-sm hover:translate-x-1 transform inline-block"
-                                >
-                                    Faculty & Staff
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/faculty/principal"
-                                    className="text-blue-100 hover:text-white transition-colors duration-300 text-sm hover:translate-x-1 transform inline-block"
-                                >
-                                    Principal Corner
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/more/resources"
-                                    className="text-blue-100 hover:text-white transition-colors duration-300 text-sm hover:translate-x-1 transform inline-block"
-                                >
-                                    Resources
-                                </Link>
-                            </li>
-                        </ul>
                     </div>
 
                     {/* Contact Information */}

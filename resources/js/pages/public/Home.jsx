@@ -771,7 +771,9 @@ const Home = () => {
                                 size="lg"
                                 className="bg-royal-blue hover:bg-blue-800 text-white font-bold px-8 h-12 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 transform"
                             >
-                                <Link to="/admissions">Enroll Now</Link>
+                                <Link to="/admissions">
+                                    Enrollment Guidelines
+                                </Link>
                             </Button>
                             <Button
                                 asChild
