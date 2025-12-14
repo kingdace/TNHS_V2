@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import NotificationBell from "../NotificationBell";
+import AdminFooter from "../common/AdminFooter";
 import {
     Menu,
     X,
@@ -13,7 +14,6 @@ import {
     Bell,
     Search,
     ChevronDown,
-    User,
     GraduationCap,
     BookOpen,
     School,
@@ -34,7 +34,7 @@ import {
 const AdminLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true); // Collapsed by default
     const location = useLocation();
     const navigate = useNavigate();
     const { user, logout } = useAuth();
@@ -137,6 +137,12 @@ const AdminLayout = () => {
             description: "School contact details",
             href: "/admin/contact-info",
             icon: Phone,
+        },
+        {
+            name: "Theme Settings",
+            description: "Website color themes",
+            href: "/admin/theme-settings",
+            icon: Settings,
         },
     ];
 
@@ -301,7 +307,7 @@ const AdminLayout = () => {
                                 <ChevronDown className="h-4 w-4 text-slate-300" />
                             </button>
 
-                            {/* User dropdown */}
+                            {/* User dropdown - Sign Out only */}
                             {isUserMenuOpen && (
                                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50">
                                     <div className="px-4 py-3 border-b border-gray-100">
@@ -312,23 +318,6 @@ const AdminLayout = () => {
                                             {user?.role || "Administrator"}
                                         </div>
                                     </div>
-                                    <Link
-                                        to="/admin/profile"
-                                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        onClick={() => setIsUserMenuOpen(false)}
-                                    >
-                                        <User className="mr-3 h-4 w-4" />
-                                        Profile
-                                    </Link>
-                                    <Link
-                                        to="/admin/settings"
-                                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        onClick={() => setIsUserMenuOpen(false)}
-                                    >
-                                        <Settings className="mr-3 h-4 w-4" />
-                                        Settings
-                                    </Link>
-                                    <hr className="my-2" />
                                     <button
                                         onClick={handleLogout}
                                         className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
@@ -457,13 +446,10 @@ const AdminLayout = () => {
 
                     {/* Fixed Footer - Only show when not collapsed */}
                     {!isSidebarCollapsed && (
-                        <div className="flex-shrink-0 px-4 py-4 border-t border-gray-100 bg-white">
-                            <div className="text-center">
-                                <p className="text-sm font-medium text-gray-700">
-                                    Taft National High School
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                    © 2025 All rights reserved.
+                        <div className="flex-shrink-0 px-4 py-2 border-t border-blue-100 bg-gradient-to-r from-slate-50 via-blue-50 to-slate-50 shadow-inner">
+                            <div className="text-center space-y-0.5">
+                                <p className="text-xs font-semibold text-blue-900">
+                                    System v1.0.0
                                 </p>
                             </div>
                         </div>
@@ -477,11 +463,14 @@ const AdminLayout = () => {
                     isSidebarCollapsed ? "ml-16" : "ml-72"
                 }`}
             >
-                <div className="flex flex-col flex-1 min-h-screen">
+                <div className="flex flex-col min-h-screen">
                     {/* Page content */}
                     <main className="flex-1 p-6">
                         <Outlet />
                     </main>
+
+                    {/* Admin Footer */}
+                    <AdminFooter />
                 </div>
             </div>
         </div>

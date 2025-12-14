@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [openDropdowns, setOpenDropdowns] = useState([]);
     const location = useLocation();
+    const { theme, loading } = useTheme();
 
     const toggleDropdown = (menuName) => {
         setOpenDropdowns((prev) =>
@@ -84,7 +86,14 @@ const Header = () => {
     };
 
     return (
-        <header className="bg-royal-blue shadow-lg sticky top-0 z-50">
+        <header
+            className="shadow-lg sticky top-0 z-50"
+            style={{
+                background: theme?.colors
+                    ? `linear-gradient(to right, ${theme.colors.gradient_from}, ${theme.colors.gradient_via}, ${theme.colors.gradient_to})`
+                    : "#1e3a8a",
+            }}
+        >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16 md:h-20">
                     {/* Logo and School Name - Always on LEFT */}
@@ -210,9 +219,23 @@ const Header = () => {
                         ></div>
 
                         {/* Sidebar Drawer - Slides from RIGHT with consistent royal-blue color */}
-                        <div className="lg:hidden fixed right-0 top-0 bottom-0 w-[60%] max-w-[280px] bg-royal-blue/90 backdrop-blur-lg z-50 shadow-2xl overflow-y-auto border-l border-blue-800">
+                        <div
+                            className="lg:hidden fixed right-0 top-0 bottom-0 w-[60%] max-w-[280px] backdrop-blur-lg z-50 shadow-2xl overflow-y-auto border-l border-blue-800"
+                            style={{
+                                background: theme?.colors
+                                    ? `linear-gradient(to bottom, ${theme.colors.gradient_from}, ${theme.colors.gradient_via})`
+                                    : "#1e3a8a",
+                            }}
+                        >
                             {/* Close Button at Top - Matches header color */}
-                            <div className="bg-royal-blue/95 p-3 flex justify-end border-b border-blue-700/50">
+                            <div
+                                className="p-3 flex justify-end border-b border-blue-700/50"
+                                style={{
+                                    background: theme?.colors
+                                        ? `${theme.colors.primary}F2`
+                                        : "#1e3a8aF2",
+                                }}
+                            >
                                 <button
                                     onClick={() => setIsMenuOpen(false)}
                                     className="p-2 text-white hover:bg-white/20 rounded-lg transition-all duration-200 shadow-sm"

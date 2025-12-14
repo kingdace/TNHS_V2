@@ -53,6 +53,9 @@ Route::prefix('api')->group(function () {
     Route::get('/guiding-principles/public', [\App\Http\Controllers\Api\GuidingPrincipleController::class, 'public']);
     Route::get('/goal-objectives/public', [\App\Http\Controllers\Api\GoalObjectiveController::class, 'public']);
 
+    // Theme API routes
+    Route::get('/theme/active', [\App\Http\Controllers\Api\ThemeController::class, 'getActiveTheme']);
+
     // Public School Seal API routes
     Route::get('/school-seal-info/public', [\App\Http\Controllers\Api\SchoolSealInfoController::class, 'public']);
     Route::get('/school-seal-info/type/{type}', [\App\Http\Controllers\Api\SchoolSealInfoController::class, 'getByType']);
@@ -176,6 +179,15 @@ Route::prefix('api')->group(function () {
         Route::post('/school-seal-core-values/{schoolSealCoreValue}/toggle-active', [\App\Http\Controllers\Admin\SchoolSealCoreValueController::class, 'toggleActive']);
         Route::post('/quality-policies/{qualityPolicy}/toggle-active', [\App\Http\Controllers\Admin\QualityPolicyController::class, 'toggleActive']);
         Route::post('/privacy-policies/{privacyPolicy}/toggle-active', [\App\Http\Controllers\Admin\PrivacyPolicyController::class, 'toggleActive']);
+
+        // Theme Management Routes
+        Route::prefix('themes')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Api\SiteThemeController::class, 'index']);
+            Route::get('/{id}', [\App\Http\Controllers\Admin\Api\SiteThemeController::class, 'show']);
+            Route::post('/{id}/activate', [\App\Http\Controllers\Admin\Api\SiteThemeController::class, 'activate']);
+            Route::post('/', [\App\Http\Controllers\Admin\Api\SiteThemeController::class, 'store']);
+            Route::put('/{id}', [\App\Http\Controllers\Admin\Api\SiteThemeController::class, 'update']);
+        });
     });
 
     // Search Routes

@@ -9,10 +9,20 @@ import {
     Twitter,
     Youtube,
 } from "lucide-react";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const Footer = () => {
+    const { theme } = useTheme();
+
     return (
-        <footer className="bg-royal-blue text-white">
+        <footer
+            className="text-white"
+            style={{
+                background: theme?.colors
+                    ? `linear-gradient(to right, ${theme.colors.gradient_from}, ${theme.colors.gradient_via}, ${theme.colors.gradient_to})`
+                    : "#1e3a8a",
+            }}
+        >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {/* School Info */}

@@ -3141,4 +3141,46 @@ export const adminService = {
             return [];
         }
     },
+
+    /**
+     * Theme Management
+     */
+    async getThemes() {
+        try {
+            const response = await makeRequest("/api/admin/themes", {
+                method: "GET",
+                headers: getHeaders(),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Error fetching themes:", error);
+            throw error;
+        }
+    },
+
+    async activateTheme(themeId) {
+        try {
+            const response = await makeRequest(
+                `/api/admin/themes/${themeId}/activate`,
+                {
+                    method: "POST",
+                    headers: getHeaders(),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Error activating theme:", error);
+            throw error;
+        }
+    },
 };
