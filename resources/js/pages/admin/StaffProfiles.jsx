@@ -91,6 +91,7 @@ const StaffProfiles = () => {
     const [error, setError] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [activeTab, setActiveTab] = useState("assistant_principal");
+    const [viewMode, setViewMode] = useState("cards"); // "table" or "cards"
     const [showForm, setShowForm] = useState(false);
     const [editingStaff, setEditingStaff] = useState(null);
     const [formData, setFormData] = useState({
@@ -567,6 +568,176 @@ const StaffProfiles = () => {
         return gradients[color] || gradients.blue;
     };
 
+    const getGradeColorClasses = (grade) => {
+        const colors = {
+            7: "from-blue-50 to-blue-100 border-blue-200 text-blue-800",
+            8: "from-green-50 to-green-100 border-green-200 text-green-800",
+            9: "from-purple-50 to-purple-100 border-purple-200 text-purple-800",
+            10: "from-orange-50 to-orange-100 border-orange-200 text-orange-800",
+            11: "from-red-50 to-red-100 border-red-200 text-red-800",
+            12: "from-indigo-50 to-indigo-100 border-indigo-200 text-indigo-800",
+            ALS: "from-yellow-50 to-yellow-100 border-yellow-200 text-yellow-800",
+        };
+        return (
+            colors[grade] ||
+            "from-gray-50 to-gray-100 border-gray-200 text-gray-800"
+        );
+    };
+
+    const renderStaffCard = (item) => {
+        const TypeIcon = getStaffTypeIcon(item.staff_type);
+        return (
+            <div
+                key={item.id}
+                className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden"
+            >
+                <div className="p-6">
+                    <div className="flex items-start space-x-4">
+                        {/* Profile Image */}
+                        <div className="flex-shrink-0">
+                            {item.profile_image_url ? (
+                                <img
+                                    src={item.profile_image_url}
+                                    alt={item.full_name}
+                                    className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                                />
+                            ) : (
+                                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center border-2 border-gray-200">
+                                    <TypeIcon className="h-10 w-10 text-blue-600" />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Staff Info */}
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between mb-2">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <h3 className="text-lg font-bold text-gray-900 truncate">
+                                            {item.full_name}
+                                        </h3>
+                                        {item.is_department_head && (
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                <Crown className="h-3 w-3 mr-1" />
+                                                Head
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-sm font-medium text-blue-600 mb-2">
+                                        {item.position}
+                                    </p>
+                                </div>
+
+                                {/* Active Status */}
+                                <button
+                                    onClick={() => handleToggleActive(item.id)}
+                                    className={`ml-2 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${
+                                        item.is_active
+                                            ? "bg-green-100 text-green-800 hover:bg-green-200"
+                                            : "bg-red-100 text-red-800 hover:bg-red-200"
+                                    }`}
+                                >
+                                    {item.is_active ? (
+                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                    ) : (
+                                        <AlertCircle className="h-3 w-3 mr-1" />
+                                    )}
+                                    {item.is_active ? "Active" : "Inactive"}
+                                </button>
+                            </div>
+
+                            {/* Department */}
+                            {item.department && (
+                                <div className="flex items-center gap-1.5 mb-2">
+                                    <Building2 className="h-4 w-4 text-blue-500" />
+                                    <span className="text-sm text-gray-700">
+                                        <span className="font-medium">
+                                            Dept:
+                                        </span>{" "}
+                                        {item.department}
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Grade Levels */}
+                            {item.grade_levels &&
+                                item.grade_levels.length > 0 && (
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <GraduationCap className="h-4 w-4 text-green-500" />
+                                        <div className="flex flex-wrap gap-1">
+                                            {item.grade_levels.map((grade) => (
+                                                <span
+                                                    key={grade}
+                                                    className={`px-2 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r border ${getGradeColorClasses(
+                                                        grade
+                                                    )}`}
+                                                >
+                                                    Grade {grade}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                            {/* Section */}
+                            {item.section && (
+                                <div className="flex items-center gap-1.5 mb-2">
+                                    <Tag className="h-4 w-4 text-purple-500" />
+                                    <span className="text-sm text-gray-700">
+                                        <span className="font-medium">
+                                            Section:
+                                        </span>{" "}
+                                        {item.section}
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Contact Info */}
+                            {item.contact_info && (
+                                <div className="space-y-1.5 mb-3">
+                                    {item.contact_info.email && (
+                                        <div className="flex items-center gap-1.5">
+                                            <Mail className="h-3.5 w-3.5 text-gray-400" />
+                                            <span className="text-sm text-gray-600">
+                                                {item.contact_info.email}
+                                            </span>
+                                        </div>
+                                    )}
+                                    {item.contact_info.phone && (
+                                        <div className="flex items-center gap-1.5">
+                                            <Phone className="h-3.5 w-3.5 text-gray-400" />
+                                            <span className="text-sm text-gray-600">
+                                                {item.contact_info.phone}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-2 pt-2 border-t border-gray-100">
+                                <button
+                                    onClick={() => handleEdit(item)}
+                                    className="flex-1 inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                                >
+                                    <Edit className="h-3.5 w-3.5 mr-1.5" />
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(item.id)}
+                                    className="flex-1 inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors duration-200"
+                                >
+                                    <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     // Filter staff by active tab and search term
     const filteredStaff = staff.filter((item) => {
         const matchesTab = item.staff_type === activeTab;
@@ -711,6 +882,37 @@ const StaffProfiles = () => {
                             </div>
                         )}
                     </div>
+
+                    {/* View Mode Toggle */}
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-700">
+                            View:
+                        </span>
+                        <div className="flex bg-gray-100 rounded-lg p-1">
+                            <button
+                                onClick={() => setViewMode("cards")}
+                                className={`px-3 py-1 rounded text-sm font-medium transition-colors flex items-center gap-1 ${
+                                    viewMode === "cards"
+                                        ? "bg-white text-blue-600 shadow-sm"
+                                        : "text-gray-600 hover:text-gray-800"
+                                }`}
+                            >
+                                <Users className="h-4 w-4" />
+                                Cards
+                            </button>
+                            <button
+                                onClick={() => setViewMode("table")}
+                                className={`px-3 py-1 rounded text-sm font-medium transition-colors flex items-center gap-1 ${
+                                    viewMode === "table"
+                                        ? "bg-white text-blue-600 shadow-sm"
+                                        : "text-gray-600 hover:text-gray-800"
+                                }`}
+                            >
+                                <Filter className="h-4 w-4" />
+                                Table
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Compact Error Message */}
@@ -721,176 +923,205 @@ const StaffProfiles = () => {
                     </div>
                 )}
 
-                {/* Compact Staff List */}
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gradient-to-r from-gray-100 to-blue-50">
-                            <tr>
-                                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    Staff Member
-                                </th>
-                                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    Position
-                                </th>
-                                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    Department
-                                </th>
-                                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    Status
-                                </th>
-                                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    Actions
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-100">
-                            {filteredStaff.map((item) => {
-                                const TypeIcon = getStaffTypeIcon(
-                                    item.staff_type
-                                );
-                                return (
-                                    <tr
-                                        key={item.id}
-                                        className="hover:bg-blue-50/50 transition-colors duration-150"
-                                    >
-                                        <td className="px-4 py-3">
-                                            <div className="flex items-center">
-                                                <div className="flex-shrink-0 h-8 w-8">
-                                                    {item.profile_image_url ? (
-                                                        <img
-                                                            className="h-8 w-8 rounded-full object-cover border border-gray-200"
-                                                            src={
-                                                                item.profile_image_url
-                                                            }
-                                                            alt={item.full_name}
-                                                            onLoad={() =>
-                                                                console.log(
-                                                                    `✅ Admin image loaded: ${item.full_name} - ${item.profile_image_url}`
-                                                                )
-                                                            }
-                                                            onError={(e) =>
-                                                                console.error(
-                                                                    `❌ Admin image failed: ${item.full_name} - ${item.profile_image_url}`,
-                                                                    e
-                                                                )
-                                                            }
-                                                        />
-                                                    ) : (
-                                                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                                            <TypeIcon className="h-4 w-4 text-blue-600" />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="ml-3">
-                                                    <div className="text-sm font-medium text-gray-900">
-                                                        {item.full_name}
-                                                        {item.is_department_head && (
-                                                            <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                                <Crown className="h-3 w-3 mr-1" />
-                                                                Head
-                                                            </span>
+                {/* Staff Display - Cards or Table */}
+                {viewMode === "cards" ? (
+                    /* Card View */
+                    <div className="p-4">
+                        {filteredStaff.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {filteredStaff.map(renderStaffCard)}
+                            </div>
+                        ) : (
+                            <div className="text-center py-12">
+                                <Building2 className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                                <p className="text-gray-500 text-sm">
+                                    No{" "}
+                                    {updatedTabs
+                                        .find((t) => t.id === activeTab)
+                                        ?.label.toLowerCase()}{" "}
+                                    found.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    /* Table View */
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-gradient-to-r from-gray-100 to-blue-50">
+                                <tr>
+                                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Staff Member
+                                    </th>
+                                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Position
+                                    </th>
+                                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Department
+                                    </th>
+                                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-100">
+                                {filteredStaff.map((item) => {
+                                    const TypeIcon = getStaffTypeIcon(
+                                        item.staff_type
+                                    );
+                                    return (
+                                        <tr
+                                            key={item.id}
+                                            className="hover:bg-blue-50/50 transition-colors duration-150"
+                                        >
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center">
+                                                    <div className="flex-shrink-0 h-8 w-8">
+                                                        {item.profile_image_url ? (
+                                                            <img
+                                                                className="h-8 w-8 rounded-full object-cover border border-gray-200"
+                                                                src={
+                                                                    item.profile_image_url
+                                                                }
+                                                                alt={
+                                                                    item.full_name
+                                                                }
+                                                                onLoad={() =>
+                                                                    console.log(
+                                                                        `✅ Admin image loaded: ${item.full_name} - ${item.profile_image_url}`
+                                                                    )
+                                                                }
+                                                                onError={(e) =>
+                                                                    console.error(
+                                                                        `❌ Admin image failed: ${item.full_name} - ${item.profile_image_url}`,
+                                                                        e
+                                                                    )
+                                                                }
+                                                            />
+                                                        ) : (
+                                                            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                                                <TypeIcon className="h-4 w-4 text-blue-600" />
+                                                            </div>
                                                         )}
                                                     </div>
-                                                    <div className="text-xs text-gray-500">
-                                                        {item.subject_specialization && (
-                                                            <span className="mr-2">
-                                                                📚{" "}
-                                                                {
-                                                                    item.subject_specialization
-                                                                }
-                                                            </span>
-                                                        )}
-                                                        {item.grade_levels &&
-                                                            item.grade_levels
-                                                                .length > 0 && (
-                                                                <span className="mr-2">
-                                                                    🎓 Grades:{" "}
-                                                                    {item.grade_levels.join(
-                                                                        ", "
-                                                                    )}
+                                                    <div className="ml-3">
+                                                        <div className="text-sm font-medium text-gray-900">
+                                                            {item.full_name}
+                                                            {item.is_department_head && (
+                                                                <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                                    <Crown className="h-3 w-3 mr-1" />
+                                                                    Head
                                                                 </span>
                                                             )}
-                                                        <span>
-                                                            Order:{" "}
-                                                            {item.display_order}
-                                                        </span>
+                                                        </div>
+                                                        <div className="text-xs text-gray-500">
+                                                            {item.subject_specialization && (
+                                                                <span className="mr-2">
+                                                                    📚{" "}
+                                                                    {
+                                                                        item.subject_specialization
+                                                                    }
+                                                                </span>
+                                                            )}
+                                                            {item.grade_levels &&
+                                                                item
+                                                                    .grade_levels
+                                                                    .length >
+                                                                    0 && (
+                                                                    <span className="mr-2">
+                                                                        🎓
+                                                                        Grades:{" "}
+                                                                        {item.grade_levels.join(
+                                                                            ", "
+                                                                        )}
+                                                                    </span>
+                                                                )}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-3 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">
-                                                {item.position || "No position"}
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-3 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">
-                                                {item.department ||
-                                                    "No department"}
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-3 whitespace-nowrap">
-                                            <button
-                                                onClick={() =>
-                                                    handleToggleActive(item.id)
-                                                }
-                                                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${
-                                                    item.is_active
-                                                        ? "bg-green-100 text-green-800 hover:bg-green-200"
-                                                        : "bg-red-100 text-red-800 hover:bg-red-200"
-                                                }`}
-                                            >
-                                                {item.is_active ? (
-                                                    <CheckCircle className="h-3 w-3 mr-1" />
-                                                ) : (
-                                                    <AlertCircle className="h-3 w-3 mr-1" />
-                                                )}
-                                                {item.is_active
-                                                    ? "Active"
-                                                    : "Inactive"}
-                                            </button>
-                                        </td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
-                                            <div className="flex space-x-1">
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">
+                                                    {item.position ||
+                                                        "No position"}
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">
+                                                    {item.department ||
+                                                        "No department"}
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap">
                                                 <button
                                                     onClick={() =>
-                                                        handleEdit(item)
+                                                        handleToggleActive(
+                                                            item.id
+                                                        )
                                                     }
-                                                    className="p-1.5 text-blue-600 hover:text-blue-900 hover:bg-blue-100 rounded-lg transition-colors duration-200"
-                                                    title="Edit"
+                                                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${
+                                                        item.is_active
+                                                            ? "bg-green-100 text-green-800 hover:bg-green-200"
+                                                            : "bg-red-100 text-red-800 hover:bg-red-200"
+                                                    }`}
                                                 >
-                                                    <Edit className="h-4 w-4" />
+                                                    {item.is_active ? (
+                                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                                    ) : (
+                                                        <AlertCircle className="h-3 w-3 mr-1" />
+                                                    )}
+                                                    {item.is_active
+                                                        ? "Active"
+                                                        : "Inactive"}
                                                 </button>
-                                                <button
-                                                    onClick={() =>
-                                                        handleDelete(item.id)
-                                                    }
-                                                    className="p-1.5 text-red-600 hover:text-red-900 hover:bg-red-100 rounded-lg transition-colors duration-200"
-                                                    title="Delete"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                                <div className="flex space-x-1">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleEdit(item)
+                                                        }
+                                                        className="p-1.5 text-blue-600 hover:text-blue-900 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                                                        title="Edit"
+                                                    >
+                                                        <Edit className="h-4 w-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                item.id
+                                                            )
+                                                        }
+                                                        className="p-1.5 text-red-600 hover:text-red-900 hover:bg-red-100 rounded-lg transition-colors duration-200"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
 
-                    {filteredStaff.length === 0 && (
-                        <div className="text-center py-8">
-                            <Building2 className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-                            <p className="text-gray-500 text-sm">
-                                No{" "}
-                                {updatedTabs
-                                    .find((t) => t.id === activeTab)
-                                    ?.label.toLowerCase()}{" "}
-                                found.
-                            </p>
-                        </div>
-                    )}
-                </div>
+                        {filteredStaff.length === 0 && (
+                            <div className="text-center py-8">
+                                <Building2 className="h-10 w-10 text-gray-300 mx-auto mb-3" />
+                                <p className="text-gray-500 text-sm">
+                                    No{" "}
+                                    {updatedTabs
+                                        .find((t) => t.id === activeTab)
+                                        ?.label.toLowerCase()}{" "}
+                                    found.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Compact Form Modal */}
@@ -988,6 +1219,28 @@ const StaffProfiles = () => {
                                                     }
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                                     placeholder="e.g., Section A, Section B"
+                                                />
+                                            </div>
+                                            {/* Department */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Department
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={
+                                                        formData.department ||
+                                                        ""
+                                                    }
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            department:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                    placeholder="e.g., Mathematics, Science, English"
                                                 />
                                             </div>
                                         </div>

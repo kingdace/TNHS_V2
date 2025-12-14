@@ -17,6 +17,7 @@ import {
     Mail,
     Phone,
     Award,
+    Building2,
 } from "lucide-react";
 
 const EnhancedStaff = () => {
@@ -96,7 +97,70 @@ const EnhancedStaff = () => {
         if (selectedGrade === "all") {
             return allTeachers;
         }
-        return teachersByGrades[selectedGrade] || [];
+
+        console.log("=== FILTER DEBUG ===");
+        console.log("Selected Grade:", selectedGrade);
+        console.log("Total Teachers:", allTeachers.length);
+
+        // Filter teachers by checking both grade_levels array AND department field
+        const filtered = allTeachers.filter((teacher) => {
+            console.log("\nChecking teacher:", teacher.full_name);
+            console.log("  - grade_levels:", teacher.grade_levels);
+            console.log("  - department:", teacher.department);
+
+            const gradeStr = selectedGrade.toString();
+
+            // Check grade_levels array (check both string and number)
+            if (teacher.grade_levels && Array.isArray(teacher.grade_levels)) {
+                for (let grade of teacher.grade_levels) {
+                    const gradeValue = grade.toString();
+                    console.log(
+                        `    Comparing grade_level "${gradeValue}" with selected "${gradeStr}"`
+                    );
+                    if (
+                        gradeValue === gradeStr ||
+                        gradeValue.toUpperCase() === gradeStr.toUpperCase()
+                    ) {
+                        console.log("    ✅ MATCH in grade_levels!");
+                        return true;
+                    }
+                }
+            }
+
+            // Check department field
+            if (teacher.department) {
+                const dept = teacher.department.toString();
+                const deptUpper = dept.toUpperCase();
+                const gradeUpper = gradeStr.toUpperCase();
+
+                console.log(
+                    `    Checking department "${dept}" for grade "${gradeStr}"`
+                );
+
+                // Check if department contains the grade in any format
+                if (deptUpper.includes(gradeUpper)) {
+                    console.log("    ✅ MATCH in department!");
+                    return true;
+                }
+
+                // Check for "Grade X" format
+                if (
+                    deptUpper.includes(`GRADE ${gradeUpper}`) ||
+                    deptUpper.includes(`GRADE${gradeUpper}`)
+                ) {
+                    console.log("    ✅ MATCH in department (Grade X format)!");
+                    return true;
+                }
+            }
+
+            console.log("    ❌ No match");
+            return false;
+        });
+
+        console.log("\nFiltered teachers count:", filtered.length);
+        console.log("===================\n");
+
+        return filtered;
     };
 
     const renderTeacherCard = (teacher) => (
@@ -112,32 +176,41 @@ const EnhancedStaff = () => {
                             <img
                                 src={teacher.profile_image_url}
                                 alt={teacher.full_name}
-                                className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                                className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
                             />
                         ) : (
-                            <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center border-2 border-gray-200">
-                                <GraduationCap className="h-8 w-8 text-blue-600" />
+                            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center border-2 border-gray-200">
+                                <GraduationCap className="h-10 w-10 text-blue-600" />
                             </div>
                         )}
                     </div>
 
                     {/* Teacher Info */}
                     <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900 truncate">
+                        <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-lg font-bold text-gray-900 truncate">
                                 {teacher.full_name}
                             </h3>
                             {teacher.is_department_head && (
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                     <Crown className="h-3 w-3 mr-1" />
-                                    Dept. Head
+                                    Head
                                 </span>
                             )}
                         </div>
 
-                        <p className="text-sm text-gray-600 mb-2">
+                        <p className="text-sm font-medium text-blue-600 mb-2">
                             {teacher.position}
                         </p>
+
+                        {/* Department */}
+                        <div className="flex items-center gap-1.5 mb-2">
+                            <Building2 className="h-4 w-4 text-blue-500" />
+                            <span className="text-sm text-gray-700">
+                                <span className="font-medium">Dept:</span>{" "}
+                                {teacher.department || "N/A"}
+                            </span>
+                        </div>
 
                         {/* Grade Levels */}
                         {teacher.grade_levels &&
@@ -148,7 +221,7 @@ const EnhancedStaff = () => {
                                         {teacher.grade_levels.map((grade) => (
                                             <span
                                                 key={grade}
-                                                className={`px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${getGradeColorClasses(
+                                                className={`px-2 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r border ${getGradeColorClasses(
                                                     grade
                                                 )}`}
                                             >
@@ -161,35 +234,32 @@ const EnhancedStaff = () => {
 
                         {/* Section */}
                         {teacher.section && (
-                            <div className="flex items-center gap-1 mb-2">
-                                <BookOpen className="h-4 w-4 text-blue-500" />
-                                <span className="text-sm font-medium text-blue-700">
-                                    Section: {teacher.section}
+                            <div className="flex items-center gap-1.5 mb-2">
+                                <BookOpen className="h-4 w-4 text-purple-500" />
+                                <span className="text-sm text-gray-700">
+                                    <span className="font-medium">
+                                        Section:
+                                    </span>{" "}
+                                    {teacher.section}
                                 </span>
                             </div>
                         )}
 
                         {/* Contact Info */}
-                        {teacher.contact_info && (
-                            <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                                {teacher.contact_info.email && (
-                                    <div className="flex items-center gap-1">
-                                        <Mail className="h-3 w-3" />
-                                        <span>
-                                            {teacher.contact_info.email}
-                                        </span>
-                                    </div>
-                                )}
-                                {teacher.contact_info.phone && (
-                                    <div className="flex items-center gap-1">
-                                        <Phone className="h-3 w-3" />
-                                        <span>
-                                            {teacher.contact_info.phone}
-                                        </span>
-                                    </div>
-                                )}
+                        <div className="space-y-1.5">
+                            <div className="flex items-center gap-1.5">
+                                <Mail className="h-3.5 w-3.5 text-gray-400" />
+                                <span className="text-sm text-gray-600">
+                                    {teacher.contact_info?.email || "N/A"}
+                                </span>
                             </div>
-                        )}
+                            <div className="flex items-center gap-1.5">
+                                <Phone className="h-3.5 w-3.5 text-gray-400" />
+                                <span className="text-sm text-gray-600">
+                                    {teacher.contact_info?.phone || "N/A"}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -319,6 +389,17 @@ const EnhancedStaff = () => {
                         </p>
                     </div>
                 </div>
+
+                {/* Grade Levels Text */}
+                <div className="mb-6">
+                    <p className="text-gray-700 text-sm">
+                        <span className="font-semibold">
+                            {sortedGrades.length}
+                        </span>{" "}
+                        Grade Levels
+                    </p>
+                </div>
+
                 {/* Statistics Cards */}
                 {!loading && allTeachers.length > 0 && (
                     <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -369,13 +450,9 @@ const EnhancedStaff = () => {
                         </div>
                     </div>
                 )}
-                <span className="font-semibold">{sortedGrades.length}</span>{" "}
-                Grade Levels
-            </div>
 
-            {/* Controls */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                {/* View Controls */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         {/* View Mode Toggle */}
                         <div className="flex items-center gap-2">
@@ -408,7 +485,7 @@ const EnhancedStaff = () => {
                             </div>
                         </div>
 
-                        {/* Grade Filter (for "all" view) */}
+                        {/* Grade Filter */}
                         {viewMode === "all" && (
                             <div className="flex items-center gap-2">
                                 <Filter className="h-4 w-4 text-gray-500" />
@@ -435,10 +512,8 @@ const EnhancedStaff = () => {
                         )}
                     </div>
                 </div>
-            </div>
 
-            {/* Content */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+                {/* Teachers Display */}
                 {viewMode === "grades" ? (
                     // Grade-organized view
                     <div>

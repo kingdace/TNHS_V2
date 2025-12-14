@@ -264,13 +264,6 @@ const AcademicsSpecialPrograms = () => {
                     </div>
                 </div>
 
-                {/* ENROLL NOW Button */}
-                <div className="text-center mt-8">
-                    <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 hover:scale-105 transform shadow-lg text-lg">
-                        ENROLL NOW!
-                    </Button>
-                </div>
-
                 {/* Contact Section */}
                 <div className="text-center mt-8">
                     <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
