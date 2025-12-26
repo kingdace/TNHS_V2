@@ -252,6 +252,7 @@ Route::middleware(['auth', 'admin.auth'])->group(function () {
         Route::get('gallery/comments', [\App\Http\Controllers\Api\GalleryCommentController::class, 'adminIndex']);
         Route::delete('gallery/comments/{id}', [\App\Http\Controllers\Api\GalleryCommentController::class, 'destroy']);
         Route::post('gallery/comments/{id}/toggle-flag', [\App\Http\Controllers\Api\GalleryCommentController::class, 'toggleFlag']);
+        Route::post('gallery/{imageId}/comments/reply', [\App\Http\Controllers\Admin\AdminGalleryCommentController::class, 'reply']);
 
         // Image Upload
         Route::post('upload-image', [ImageUploadController::class, 'upload']);

@@ -30,6 +30,7 @@ import {
     Download,
 } from "lucide-react";
 import { adminService } from "../../services/adminService";
+import AdminCommentSection from "../../components/gallery/AdminCommentSection";
 
 const Gallery = () => {
     const [images, setImages] = useState([]);
@@ -1109,87 +1110,151 @@ const Gallery = () => {
                 </div>
             )}
 
-            {/* Image Preview Modal */}
+            {/* Image Preview Modal - Modern Design */}
             {selectedImage && (
-                <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-xl max-w-4xl max-h-[90vh] overflow-hidden">
-                        <div className="relative">
-                            <img
-                                src={selectedImage.image_url}
-                                alt={
-                                    selectedImage.alt_text ||
-                                    selectedImage.title
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4"
+                    onClick={() => setSelectedImage(null)}
+                >
+                    {/* Modal Card */}
+                    <div
+                        className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl border-4 border-transparent bg-gradient-to-br from-blue-50 via-white to-purple-50 relative"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Close Button - Inside Modal */}
+                        <button
+                            onClick={() => setSelectedImage(null)}
+                            className="absolute top-4 right-4 z-20 p-2 bg-gradient-to-br from-red-500 to-pink-500 text-white rounded-full shadow-lg hover:from-red-600 hover:to-pink-600 transition-all hover:scale-110"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
+                        {/* Scrollable Content */}
+                        <div className="overflow-y-auto max-h-[90vh] custom-scrollbar">
+                            <style>{`
+                                .custom-scrollbar::-webkit-scrollbar {
+                                    width: 8px;
                                 }
-                                className="w-full max-h-[60vh] object-cover"
-                            />
-                            <button
-                                onClick={() => setSelectedImage(null)}
-                                className="absolute top-4 right-4 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-75 transition-colors"
-                            >
-                                <X className="w-6 h-6" />
-                            </button>
-                        </div>
-                        <div className="p-6">
-                            <div className="flex items-center gap-2 mb-4">
-                                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                                    {selectedImage.category_label}
-                                </span>
-                                {selectedImage.is_featured && (
-                                    <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
-                                        <Star className="w-4 h-4 inline mr-1" />
-                                        Featured
-                                    </span>
-                                )}
+                                .custom-scrollbar::-webkit-scrollbar-track {
+                                    background: #E5E7EB;
+                                    border-radius: 10px;
+                                }
+                                .custom-scrollbar::-webkit-scrollbar-thumb {
+                                    background: #9CA3AF;
+                                    border-radius: 10px;
+                                }
+                                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                                    background: #6B7280;
+                                }
+                            `}</style>
+
+                            {/* Image Container */}
+                            <div className="bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-8 relative">
+                                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
+                                <img
+                                    src={selectedImage.image_url}
+                                    alt={
+                                        selectedImage.alt_text ||
+                                        selectedImage.title
+                                    }
+                                    className="max-w-full max-h-[60vh] object-contain rounded-lg shadow-xl relative z-10"
+                                />
                             </div>
-                            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                                {selectedImage.title}
-                            </h2>
-                            {selectedImage.description && (
-                                <p className="text-gray-600 mb-4">
-                                    {selectedImage.description}
-                                </p>
-                            )}
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-6 text-sm text-gray-500">
-                                    <span className="flex items-center gap-1">
-                                        <Eye className="w-4 h-4" />
-                                        {selectedImage.view_count} views
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <Heart className="w-4 h-4" />
-                                        {selectedImage.like_count} likes
-                                    </span>
-                                    {selectedImage.event_date && (
-                                        <span className="flex items-center gap-1">
-                                            <Calendar className="w-4 h-4" />
-                                            {new Date(
-                                                selectedImage.event_date
-                                            ).toLocaleDateString()}
-                                        </span>
-                                    )}
-                                    {selectedImage.photographer && (
-                                        <span className="flex items-center gap-1">
-                                            <User className="w-4 h-4" />
-                                            {selectedImage.photographer}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                            {selectedImage.tags &&
-                                selectedImage.tags.length > 0 && (
-                                    <div className="flex flex-wrap gap-2">
-                                        {selectedImage.tags.map(
-                                            (tag, index) => (
-                                                <span
-                                                    key={index}
-                                                    className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm"
-                                                >
-                                                    #{tag}
-                                                </span>
-                                            )
+
+                            {/* Details Section */}
+                            <div className="p-6">
+                                {/* Header */}
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span className="px-4 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full text-xs font-bold uppercase shadow-md">
+                                                {selectedImage.category_label}
+                                            </span>
+                                            {selectedImage.is_featured && (
+                                                <div className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full">
+                                                    <Star className="w-4 h-4 text-white fill-current" />
+                                                    <span className="text-xs font-bold text-white">
+                                                        Featured
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
+                                            {selectedImage.title}
+                                        </h2>
+                                        {selectedImage.description && (
+                                            <p className="text-gray-600 leading-relaxed text-lg">
+                                                {selectedImage.description}
+                                            </p>
                                         )}
                                     </div>
-                                )}
+                                </div>
+
+                                {/* Stats Row */}
+                                <div className="flex items-center gap-6 py-4 px-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200 mb-4">
+                                    {/* Views */}
+                                    <div className="flex items-center gap-2 text-blue-600 font-medium">
+                                        <Eye className="w-5 h-5" />
+                                        <span className="font-medium">
+                                            {selectedImage.view_count}
+                                        </span>
+                                    </div>
+
+                                    {/* Likes */}
+                                    <div className="flex items-center gap-2 text-red-600 font-medium">
+                                        <Heart className="w-5 h-5" />
+                                        <span className="font-medium">
+                                            {selectedImage.like_count}
+                                        </span>
+                                    </div>
+
+                                    {/* Date */}
+                                    {selectedImage.event_date && (
+                                        <div className="flex items-center gap-2 text-purple-600 font-medium">
+                                            <Calendar className="w-5 h-5" />
+                                            <span className="text-sm">
+                                                {new Date(
+                                                    selectedImage.event_date
+                                                ).toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    {/* Photographer */}
+                                    {selectedImage.photographer && (
+                                        <div className="flex items-center gap-2 text-green-600 font-medium ml-auto">
+                                            <User className="w-5 h-5" />
+                                            <span className="text-sm">
+                                                {selectedImage.photographer}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Tags */}
+                                {selectedImage.tags &&
+                                    selectedImage.tags.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mb-4">
+                                            {selectedImage.tags.map(
+                                                (tag, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="px-3 py-1.5 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-full text-sm font-medium border border-indigo-200"
+                                                    >
+                                                        #{tag}
+                                                    </span>
+                                                )
+                                            )}
+                                        </div>
+                                    )}
+                            </div>
+
+                            {/* Comment Section */}
+                            <div className="border-t border-gray-200">
+                                <AdminCommentSection
+                                    imageId={selectedImage.id}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

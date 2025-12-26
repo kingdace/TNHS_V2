@@ -156,10 +156,48 @@ export const toggleCommentFlag = async (commentId) => {
     }
 };
 
+/**
+ * Post an admin reply to a comment
+ * @param {number} imageId
+ * @param {string} commentText
+ * @param {number|null} parentId - Optional parent comment ID for threaded replies
+ * @returns {Promise}
+ */
+export const postAdminReply = async (imageId, commentText, parentId = null) => {
+    try {
+        // Get CSRF token
+        const csrfResponse = await fetch("/api/csrf-token");
+        const { csrf_token } = await csrfResponse.json();
+
+        const response = await fetch(
+            `/api/admin/gallery/${imageId}/comments/reply`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "X-CSRF-TOKEN": csrf_token,
+                },
+                body: JSON.stringify({
+                    comment_text: commentText,
+                    parent_id: parentId,
+                }),
+            }
+        );
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error posting admin reply:", error);
+        return { success: false, message: "Failed to post reply" };
+    }
+};
+
 export default {
     getComments,
     postComment,
     deleteComment,
     getAdminComments,
     toggleCommentFlag,
+    postAdminReply,
 };

@@ -11,11 +11,14 @@ class GalleryComment extends Model
 
     protected $fillable = [
         'gallery_image_id',
+        'user_id',
         'guest_id',
         'comment_text',
+        'parent_id',
         'browser_fingerprint',
         'ip_address',
         'is_flagged',
+        'is_admin',
     ];
 
     protected $casts = [
