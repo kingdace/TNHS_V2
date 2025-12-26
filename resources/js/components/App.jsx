@@ -53,6 +53,7 @@ import AdministrativeStaff from "../pages/public/faculty/AdministrativeStaff";
 import SupportStaff from "../pages/public/faculty/SupportStaff";
 
 // More Pages
+import More from "../pages/public/More";
 import MoreResources from "../pages/public/MoreResources";
 import MoreDownloads from "../pages/public/MoreDownloads";
 import TestDynamic from "../pages/public/TestDynamic";
@@ -246,6 +247,7 @@ function App() {
                                 />
 
                                 {/* More Routes */}
+                                <Route path="more" element={<More />} />
                                 <Route
                                     path="more/resources"
                                     element={<MoreResources />}

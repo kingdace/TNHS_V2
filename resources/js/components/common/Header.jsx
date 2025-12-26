@@ -51,6 +51,19 @@ const Header = () => {
                 { name: "School Seal", href: "/about/school-seal" },
                 { name: "Privacy Policy", href: "/about/privacy-policy" },
                 { name: "Quality Policy", href: "/about/quality-policy" },
+                {
+                    name: "More",
+                    hasNestedDropdown: true,
+                    submenu: [
+                        {
+                            name: "Enrollment Guidelines & Requirements",
+                            href: "/admissions/requirements",
+                        },
+                        { name: "Contact Us", href: "/contact" },
+                        { name: "Resources", href: "/more/resources" },
+                        { name: "Media Gallery", href: "/gallery" },
+                    ],
+                },
             ],
         },
         {
@@ -58,20 +71,6 @@ const Header = () => {
             href: "/faculty",
         },
         { name: "Principal's Corner", href: "/faculty/principal" },
-        {
-            name: "More",
-            href: "/more",
-            hasDropdown: true,
-            submenu: [
-                {
-                    name: "Enrollment Guidelines & Requirements",
-                    href: "/admissions/requirements",
-                },
-                { name: "Contact Us", href: "/contact" },
-                { name: "Resources", href: "/more/resources" },
-                { name: "Media Gallery", href: "/gallery" },
-            ],
-        },
     ];
 
     const isActive = (path) => {
@@ -193,15 +192,46 @@ const Header = () => {
                                 {/* Dropdown Menu */}
                                 {item.hasDropdown && (
                                     <div className="absolute top-full left-0 mt-1 w-[170px] bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                                        {item.submenu.map((subItem) => (
-                                            <Link
-                                                key={subItem.name}
-                                                to={subItem.href}
-                                                className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
-                                            >
-                                                {subItem.name}
-                                            </Link>
-                                        ))}
+                                        {item.submenu.map((subItem) =>
+                                            subItem.hasNestedDropdown ? (
+                                                <div
+                                                    key={subItem.name}
+                                                    className="relative group/nested"
+                                                >
+                                                    <div className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 cursor-pointer">
+                                                        {subItem.name}
+                                                    </div>
+                                                    {/* Nested Dropdown for "More" */}
+                                                    <div className="absolute left-full top-0 ml-1 w-[200px] bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 opacity-0 invisible group-hover/nested:opacity-100 group-hover/nested:visible transition-all duration-300">
+                                                        {subItem.submenu.map(
+                                                            (nestedItem) => (
+                                                                <Link
+                                                                    key={
+                                                                        nestedItem.name
+                                                                    }
+                                                                    to={
+                                                                        nestedItem.href
+                                                                    }
+                                                                    className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                                                                >
+                                                                    {
+                                                                        nestedItem.name
+                                                                    }
+                                                                </Link>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <Link
+                                                    key={subItem.name}
+                                                    to={subItem.href}
+                                                    className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                                                >
+                                                    {subItem.name}
+                                                </Link>
+                                            )
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -279,32 +309,100 @@ const Header = () => {
                                                 ) && (
                                                     <div className="bg-blue-800/30">
                                                         {item.submenu.map(
-                                                            (subItem) => (
-                                                                <Link
-                                                                    key={
-                                                                        subItem.name
-                                                                    }
-                                                                    to={
-                                                                        subItem.href
-                                                                    }
-                                                                    onClick={() =>
-                                                                        setIsMenuOpen(
-                                                                            false
-                                                                        )
-                                                                    }
-                                                                    className={`block pl-10 pr-4 py-3 text-sm font-normal transition-all duration-200 border-b border-blue-700/30 border-l-4 ${
-                                                                        isActive(
+                                                            (subItem) =>
+                                                                subItem.hasNestedDropdown ? (
+                                                                    <div
+                                                                        key={
+                                                                            subItem.name
+                                                                        }
+                                                                    >
+                                                                        <button
+                                                                            onClick={() =>
+                                                                                toggleDropdown(
+                                                                                    `${item.name}-${subItem.name}`
+                                                                                )
+                                                                            }
+                                                                            className="w-full flex items-center justify-between pl-10 pr-4 py-3 text-sm font-normal text-blue-100 hover:bg-white/10 hover:text-white transition-all duration-200 border-b border-blue-700/30 border-l-4 border-l-transparent hover:border-l-blue-400"
+                                                                        >
+                                                                            <span>
+                                                                                {
+                                                                                    subItem.name
+                                                                                }
+                                                                            </span>
+                                                                            <ChevronDown
+                                                                                className={`h-4 w-4 transition-transform duration-300 ${
+                                                                                    openDropdowns.includes(
+                                                                                        `${item.name}-${subItem.name}`
+                                                                                    )
+                                                                                        ? "rotate-180"
+                                                                                        : ""
+                                                                                }`}
+                                                                            />
+                                                                        </button>
+                                                                        {/* Nested submenu */}
+                                                                        {openDropdowns.includes(
+                                                                            `${item.name}-${subItem.name}`
+                                                                        ) && (
+                                                                            <div className="bg-blue-900/40">
+                                                                                {subItem.submenu.map(
+                                                                                    (
+                                                                                        nestedItem
+                                                                                    ) => (
+                                                                                        <Link
+                                                                                            key={
+                                                                                                nestedItem.name
+                                                                                            }
+                                                                                            to={
+                                                                                                nestedItem.href
+                                                                                            }
+                                                                                            onClick={() =>
+                                                                                                setIsMenuOpen(
+                                                                                                    false
+                                                                                                )
+                                                                                            }
+                                                                                            className={`block pl-16 pr-4 py-3 text-xs font-normal transition-all duration-200 border-b border-blue-700/30 border-l-4 ${
+                                                                                                isActive(
+                                                                                                    nestedItem.href
+                                                                                                )
+                                                                                                    ? "text-white bg-blue-600/50 border-l-white"
+                                                                                                    : "text-blue-100 hover:bg-white/10 hover:text-white border-l-transparent hover:border-l-blue-400"
+                                                                                            }`}
+                                                                                        >
+                                                                                            {
+                                                                                                nestedItem.name
+                                                                                            }
+                                                                                        </Link>
+                                                                                    )
+                                                                                )}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                ) : (
+                                                                    <Link
+                                                                        key={
+                                                                            subItem.name
+                                                                        }
+                                                                        to={
                                                                             subItem.href
-                                                                        )
-                                                                            ? "text-white bg-blue-600/50 border-l-white"
-                                                                            : "text-blue-100 hover:bg-white/10 hover:text-white border-l-transparent hover:border-l-blue-400"
-                                                                    }`}
-                                                                >
-                                                                    {
-                                                                        subItem.name
-                                                                    }
-                                                                </Link>
-                                                            )
+                                                                        }
+                                                                        onClick={() =>
+                                                                            setIsMenuOpen(
+                                                                                false
+                                                                            )
+                                                                        }
+                                                                        className={`block pl-10 pr-4 py-3 text-sm font-normal transition-all duration-200 border-b border-blue-700/30 border-l-4 ${
+                                                                            isActive(
+                                                                                subItem.href
+                                                                            )
+                                                                                ? "text-white bg-blue-600/50 border-l-white"
+                                                                                : "text-blue-100 hover:bg-white/10 hover:text-white border-l-transparent hover:border-l-blue-400"
+                                                                        }`}
+                                                                    >
+                                                                        {
+                                                                            subItem.name
+                                                                        }
+                                                                    </Link>
+                                                                )
                                                         )}
                                                     </div>
                                                 )}

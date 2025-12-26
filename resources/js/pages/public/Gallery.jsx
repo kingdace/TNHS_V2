@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { galleryService } from "../../services/galleryService";
 import CompactPageHeader from "../../components/ui/CompactPageHeader";
+import CommentSection from "../../components/gallery/CommentSection";
 
 const Gallery = () => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -78,8 +79,32 @@ const Gallery = () => {
 
     const [likedImages, setLikedImages] = useState(new Set());
     const [likingImages, setLikingImages] = useState(new Set());
+    const [viewedImages, setViewedImages] = useState(new Set());
+
+    // Load viewed and liked images from localStorage on mount
+    useEffect(() => {
+        try {
+            const storedViews = localStorage.getItem("tnhs_viewed_images");
+            if (storedViews) {
+                setViewedImages(new Set(JSON.parse(storedViews)));
+            }
+
+            const storedLikes = localStorage.getItem("tnhs_liked_images");
+            if (storedLikes) {
+                setLikedImages(new Set(JSON.parse(storedLikes)));
+            }
+        } catch (error) {
+            console.error("Failed to load from localStorage:", error);
+        }
+    }, []);
 
     const handleLike = async (image) => {
+        // Check if already liked (prevent duplicate likes)
+        if (likedImages.has(image.id)) {
+            console.log("Image already liked by this browser");
+            return;
+        }
+
         // Prevent double-clicking
         if (likingImages.has(image.id)) return;
 
@@ -93,7 +118,24 @@ const Gallery = () => {
                     : img
             );
             setAllImages(updatedImages);
-            setLikedImages((prev) => new Set([...prev, image.id]));
+
+            // Add to liked images
+            const newLikedImages = new Set(likedImages);
+            newLikedImages.add(image.id);
+            setLikedImages(newLikedImages);
+
+            // Persist to localStorage
+            try {
+                localStorage.setItem(
+                    "tnhs_liked_images",
+                    JSON.stringify(Array.from(newLikedImages))
+                );
+            } catch (storageError) {
+                console.warn(
+                    "Failed to save likes to localStorage:",
+                    storageError
+                );
+            }
 
             const response = await galleryService.incrementLike(image.id);
 
@@ -113,11 +155,24 @@ const Gallery = () => {
                         : img
                 );
                 setAllImages(revertedImages);
-                setLikedImages((prev) => {
-                    const newSet = new Set(prev);
-                    newSet.delete(image.id);
-                    return newSet;
-                });
+
+                // Remove from liked images
+                const revertedLikes = new Set(likedImages);
+                revertedLikes.delete(image.id);
+                setLikedImages(revertedLikes);
+
+                // Update localStorage
+                try {
+                    localStorage.setItem(
+                        "tnhs_liked_images",
+                        JSON.stringify(Array.from(revertedLikes))
+                    );
+                } catch (storageError) {
+                    console.warn(
+                        "Failed to update localStorage:",
+                        storageError
+                    );
+                }
             }
         } catch (error) {
             console.error("Failed to like image:", error);
@@ -128,11 +183,21 @@ const Gallery = () => {
                     : img
             );
             setAllImages(revertedImages);
-            setLikedImages((prev) => {
-                const newSet = new Set(prev);
-                newSet.delete(image.id);
-                return newSet;
-            });
+
+            // Remove from liked images
+            const revertedLikes = new Set(likedImages);
+            revertedLikes.delete(image.id);
+            setLikedImages(revertedLikes);
+
+            // Update localStorage
+            try {
+                localStorage.setItem(
+                    "tnhs_liked_images",
+                    JSON.stringify(Array.from(revertedLikes))
+                );
+            } catch (storageError) {
+                console.warn("Failed to update localStorage:", storageError);
+            }
         } finally {
             setLikingImages((prev) => {
                 const newSet = new Set(prev);
@@ -144,17 +209,49 @@ const Gallery = () => {
 
     const handleImageView = async (image) => {
         try {
-            // Increment view count when image is opened
-            await galleryService.getById(image.id);
+            // Check if this image has already been viewed by this browser
+            const hasBeenViewed = viewedImages.has(image.id);
 
-            // Update local state
-            const updatedImages = allImages.map((img) =>
-                img.id === image.id
-                    ? { ...img, view_count: img.view_count + 1 }
-                    : img
-            );
-            setAllImages(updatedImages);
-            setSelectedImage({ ...image, view_count: image.view_count + 1 });
+            // Only increment view count if this is the first time viewing
+            if (!hasBeenViewed) {
+                // Call API to increment view count
+                await galleryService.getById(image.id);
+
+                // Update local state with incremented view count
+                const updatedImages = allImages.map((img) =>
+                    img.id === image.id
+                        ? { ...img, view_count: img.view_count + 1 }
+                        : img
+                );
+                setAllImages(updatedImages);
+
+                // Mark this image as viewed
+                const newViewedImages = new Set(viewedImages);
+                newViewedImages.add(image.id);
+                setViewedImages(newViewedImages);
+
+                // Persist to localStorage
+                try {
+                    localStorage.setItem(
+                        "tnhs_viewed_images",
+                        JSON.stringify(Array.from(newViewedImages))
+                    );
+                } catch (storageError) {
+                    console.warn(
+                        "Failed to save to localStorage:",
+                        storageError
+                    );
+                }
+
+                // Set selected image with incremented count
+                setSelectedImage({
+                    ...image,
+                    view_count: image.view_count + 1,
+                });
+            } else {
+                // Image already viewed, just open it without incrementing
+                setSelectedImage(image);
+            }
         } catch (error) {
             console.error("Failed to track view:", error);
             setSelectedImage(image);
@@ -628,67 +725,92 @@ const Gallery = () => {
                             </div>
                         )}
 
-                        {/* Image Modal */}
+                        {/* Image Modal - Modern Centered Design */}
                         {selectedImage && (
-                            <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-                                <div className="bg-white rounded-xl max-w-4xl max-h-[90vh] overflow-hidden">
-                                    <div className="relative">
-                                        <img
-                                            src={selectedImage.image_url}
-                                            alt={
-                                                selectedImage.alt_text ||
-                                                selectedImage.title
-                                            }
-                                            className="w-full max-h-[60vh] object-cover"
-                                        />
-                                        <button
-                                            onClick={() =>
-                                                setSelectedImage(null)
-                                            }
-                                            className="absolute top-4 right-4 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-75 transition-colors"
-                                        >
-                                            <X className="w-6 h-6" />
-                                        </button>
-                                    </div>
+                            <div
+                                className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4"
+                                onClick={() => setSelectedImage(null)}
+                            >
+                                {/* Modal Card */}
+                                <div
+                                    className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl border-4 border-transparent bg-gradient-to-br from-blue-50 via-white to-purple-50 relative"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    {/* Close Button - Inside Modal */}
+                                    <button
+                                        onClick={() => setSelectedImage(null)}
+                                        className="absolute top-4 right-4 z-20 p-2 bg-gradient-to-br from-red-500 to-pink-500 text-white rounded-full shadow-lg hover:from-red-600 hover:to-pink-600 transition-all hover:scale-110"
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </button>
 
-                                    <div className="p-6">
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <div
-                                                className={`p-2 rounded bg-gradient-to-r ${getCategoryColor(
-                                                    selectedImage.category
-                                                )}`}
-                                            >
-                                                {React.createElement(
-                                                    getCategoryIcon(
-                                                        selectedImage.category
-                                                    ),
-                                                    {
-                                                        className:
-                                                            "w-5 h-5 text-white",
-                                                    }
-                                                )}
-                                            </div>
-                                            <span className="text-sm font-medium text-gray-500 uppercase">
-                                                {selectedImage.category.replace(
-                                                    "-",
-                                                    " "
-                                                )}
-                                            </span>
-                                            {selectedImage.featured && (
-                                                <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                                            )}
+                                    {/* Scrollable Content */}
+                                    <div className="overflow-y-auto max-h-[90vh] custom-scrollbar">
+                                        <style>{`
+                                            .custom-scrollbar::-webkit-scrollbar {
+                                                width: 8px;
+                                            }
+                                            .custom-scrollbar::-webkit-scrollbar-track {
+                                                background: #E5E7EB;
+                                                border-radius: 10px;
+                                            }
+                                            .custom-scrollbar::-webkit-scrollbar-thumb {
+                                                background: #9CA3AF;
+                                                border-radius: 10px;
+                                            }
+                                            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                                                background: #6B7280;
+                                            }
+                                        `}</style>
+
+                                        {/* Image Container */}
+                                        <div className="bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-8 relative">
+                                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
+                                            <img
+                                                src={selectedImage.image_url}
+                                                alt={
+                                                    selectedImage.alt_text ||
+                                                    selectedImage.title
+                                                }
+                                                className="max-w-full max-h-[60vh] object-contain rounded-lg shadow-xl relative z-10"
+                                            />
                                         </div>
 
-                                        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                                            {selectedImage.title}
-                                        </h2>
+                                        {/* Details Section */}
+                                        <div className="p-6">
+                                            {/* Header */}
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-3">
+                                                        <span className="px-4 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full text-xs font-bold uppercase shadow-md">
+                                                            {selectedImage.category?.replace(
+                                                                "-",
+                                                                " "
+                                                            ) || "Gallery"}
+                                                        </span>
+                                                        {selectedImage.featured && (
+                                                            <div className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full">
+                                                                <Star className="w-4 h-4 text-white fill-current" />
+                                                                <span className="text-xs font-bold text-white">
+                                                                    Featured
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
+                                                        {selectedImage.title}
+                                                    </h2>
+                                                    <p className="text-gray-600 leading-relaxed text-lg">
+                                                        {
+                                                            selectedImage.description
+                                                        }
+                                                    </p>
+                                                </div>
+                                            </div>
 
-                                        <p className="text-gray-600 mb-4">
-                                            {selectedImage.description}
-                                        </p>
-
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="flex items-center gap-6 text-sm text-gray-500">
+                                            {/* Stats Row */}
+                                            <div className="flex items-center gap-6 py-4 px-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200">
+                                                {/* Like Button */}
                                                 <button
                                                     onClick={() =>
                                                         handleLike(
@@ -698,22 +820,16 @@ const Gallery = () => {
                                                     disabled={likingImages.has(
                                                         selectedImage.id
                                                     )}
-                                                    className={`flex items-center gap-1 transition-all duration-200 ${
+                                                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all font-medium ${
                                                         likedImages.has(
                                                             selectedImage.id
                                                         )
-                                                            ? "text-red-500 scale-110"
-                                                            : "text-gray-500 hover:text-red-500 hover:scale-105"
-                                                    } ${
-                                                        likingImages.has(
-                                                            selectedImage.id
-                                                        )
-                                                            ? "animate-pulse"
-                                                            : ""
+                                                            ? "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-md scale-105"
+                                                            : "text-gray-700 hover:bg-red-50 hover:text-red-600"
                                                     }`}
                                                 >
                                                     <Heart
-                                                        className={`w-4 h-4 ${
+                                                        className={`w-5 h-5 ${
                                                             likedImages.has(
                                                                 selectedImage.id
                                                             )
@@ -721,56 +837,85 @@ const Gallery = () => {
                                                                 : ""
                                                         }`}
                                                     />
-                                                    {selectedImage.like_count}{" "}
-                                                    likes
+                                                    <span>
+                                                        {
+                                                            selectedImage.like_count
+                                                        }
+                                                    </span>
                                                 </button>
-                                                <span className="flex items-center gap-1">
-                                                    <Eye className="w-4 h-4" />
-                                                    {
-                                                        selectedImage.view_count
-                                                    }{" "}
-                                                    views
-                                                </span>
-                                                <span>
-                                                    {
-                                                        selectedImage.formatted_date
-                                                    }
-                                                </span>
+
+                                                {/* Views */}
+                                                <div className="flex items-center gap-2 text-blue-600 font-medium">
+                                                    <Eye className="w-5 h-5" />
+                                                    <span className="font-medium">
+                                                        {
+                                                            selectedImage.view_count
+                                                        }
+                                                    </span>
+                                                </div>
+
+                                                {/* Date */}
+                                                <div className="flex items-center gap-2 text-purple-600 font-medium">
+                                                    <Calendar className="w-5 h-5" />
+                                                    <span className="text-sm">
+                                                        {new Date(
+                                                            selectedImage.created_at
+                                                        ).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+
+                                                {/* Actions */}
+                                                <div className="ml-auto flex items-center gap-2">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleShare(
+                                                                selectedImage
+                                                            )
+                                                        }
+                                                        className="p-2.5 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-lg shadow-md hover:from-blue-600 hover:to-cyan-600 transition-all hover:scale-110"
+                                                        title="Share"
+                                                    >
+                                                        <Share2 className="w-5 h-5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDownload(
+                                                                selectedImage
+                                                            )
+                                                        }
+                                                        className="p-2.5 bg-gradient-to-br from-green-500 to-emerald-500 text-white rounded-lg shadow-md hover:from-green-600 hover:to-emerald-600 transition-all hover:scale-110"
+                                                        title="Download"
+                                                    >
+                                                        <Download className="w-5 h-5" />
+                                                    </button>
+                                                </div>
                                             </div>
 
-                                            <div className="flex gap-2">
-                                                <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
-                                                    <Share2 className="w-5 h-5" />
-                                                </button>
-                                                <button
-                                                    onClick={() =>
-                                                        handleDownload(
-                                                            selectedImage
-                                                        )
-                                                    }
-                                                    className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors"
-                                                    title="Download Image"
-                                                >
-                                                    <Download className="w-5 h-5" />
-                                                </button>
-                                            </div>
+                                            {/* Tags */}
+                                            {selectedImage.tags &&
+                                                selectedImage.tags.length >
+                                                    0 && (
+                                                    <div className="flex flex-wrap gap-2 mt-4">
+                                                        {selectedImage.tags.map(
+                                                            (tag, index) => (
+                                                                <span
+                                                                    key={index}
+                                                                    className="px-3 py-1.5 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-full text-sm font-medium border border-indigo-200"
+                                                                >
+                                                                    #{tag}
+                                                                </span>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                )}
                                         </div>
 
-                                        {selectedImage.tags &&
-                                            selectedImage.tags.length > 0 && (
-                                                <div className="flex flex-wrap gap-2">
-                                                    {selectedImage.tags.map(
-                                                        (tag, index) => (
-                                                            <span
-                                                                key={index}
-                                                                className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm"
-                                                            >
-                                                                #{tag}
-                                                            </span>
-                                                        )
-                                                    )}
-                                                </div>
-                                            )}
+                                        {/* Comment Section */}
+                                        <div className="border-t border-gray-200">
+                                            <CommentSection
+                                                imageId={selectedImage.id}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>

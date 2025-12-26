@@ -664,6 +664,16 @@ const Home = () => {
                                                     </div>
                                                 </div>
                                             ))}
+                                        <div className="text-center mt-6">
+                                            <Button
+                                                asChild
+                                                className="bg-royal-blue hover:bg-blue-700 text-white px-6 py-2 h-auto rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+                                            >
+                                                <Link to="/announcements">
+                                                    View More Announcements
+                                                </Link>
+                                            </Button>
+                                        </div>
                                     </div>
                                 ) : (
                                     <div className="text-center py-8">

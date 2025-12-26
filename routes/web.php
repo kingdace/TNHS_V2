@@ -116,6 +116,12 @@ Route::prefix('api')->group(function () {
         Route::post('/cleanup', [\App\Http\Controllers\Api\NotificationController::class, 'cleanup']);
     });
 
+    // Gallery Comments routes (public)
+    Route::prefix('gallery')->group(function () {
+        Route::get('/{imageId}/comments', [\App\Http\Controllers\Api\GalleryCommentController::class, 'index']);
+        Route::post('/{imageId}/comments', [\App\Http\Controllers\Api\GalleryCommentController::class, 'store']);
+    });
+
     // Admin API routes - protected with admin authentication middleware
     Route::prefix('admin')->as('admin.')->middleware(['auth', 'admin.auth'])->group(function () {
         Route::apiResource('hero-carousel', AdminHeroCarouselController::class);
@@ -241,6 +247,11 @@ Route::middleware(['auth', 'admin.auth'])->group(function () {
         Route::apiResource('staff-profiles', \App\Http\Controllers\Admin\StaffProfileController::class);
         Route::post('staff-profiles/{staffProfile}/toggle-active', [\App\Http\Controllers\Admin\StaffProfileController::class, 'toggleActive']);
         Route::post('staff-profiles/reorder', [\App\Http\Controllers\Admin\StaffProfileController::class, 'reorder']);
+
+        // Gallery Comments Management
+        Route::get('gallery/comments', [\App\Http\Controllers\Api\GalleryCommentController::class, 'adminIndex']);
+        Route::delete('gallery/comments/{id}', [\App\Http\Controllers\Api\GalleryCommentController::class, 'destroy']);
+        Route::post('gallery/comments/{id}/toggle-flag', [\App\Http\Controllers\Api\GalleryCommentController::class, 'toggleFlag']);
 
         // Image Upload
         Route::post('upload-image', [ImageUploadController::class, 'upload']);
