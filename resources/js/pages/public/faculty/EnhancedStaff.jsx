@@ -25,7 +25,7 @@ const EnhancedStaff = () => {
     const [allTeachers, setAllTeachers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [viewMode, setViewMode] = useState("grades"); // "grades" or "all"
+    const [viewMode, setViewMode] = useState("all"); // "grades" or "all"
     const [selectedGrade, setSelectedGrade] = useState("all");
     const [expandedGrades, setExpandedGrades] = useState(
         new Set(["7", "8", "9", "10", "11", "12", "ALS"])

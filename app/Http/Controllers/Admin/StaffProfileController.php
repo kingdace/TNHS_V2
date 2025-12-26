@@ -76,7 +76,10 @@ class StaffProfileController extends Controller
                 'staff_type' => ['required', Rule::in(['principal', 'assistant_principal', 'teacher', 'admin', 'support'])],
                 'full_name' => 'required|string|max:255',
                 'position' => 'nullable|string|max:255',
+                'section' => 'nullable|string|max:255',
                 'department' => 'nullable|string|max:255',
+                'grade_levels' => 'nullable|string', // JSON string from frontend
+                'subject_specialization' => 'nullable|string|max:255',
                 'education' => 'nullable|string',
                 'experience' => 'nullable|string',
                 'achievements' => 'nullable|string',
@@ -89,6 +92,11 @@ class StaffProfileController extends Controller
             // Parse contact_info JSON if provided
             if (isset($validated['contact_info'])) {
                 $validated['contact_info'] = json_decode($validated['contact_info'], true);
+            }
+
+            // Parse grade_levels JSON if provided
+            if (isset($validated['grade_levels'])) {
+                $validated['grade_levels'] = json_decode($validated['grade_levels'], true);
             }
 
             // Handle image upload
@@ -198,7 +206,10 @@ class StaffProfileController extends Controller
                 'staff_type' => ['sometimes', Rule::in(['principal', 'assistant_principal', 'teacher', 'admin', 'support'])],
                 'full_name' => 'sometimes|required|string|max:255',
                 'position' => 'nullable|string|max:255',
+                'section' => 'nullable|string|max:255',
                 'department' => 'nullable|string|max:255',
+                'grade_levels' => 'nullable|string', // JSON string from frontend
+                'subject_specialization' => 'nullable|string|max:255',
                 'education' => 'nullable|string',
                 'experience' => 'nullable|string',
                 'achievements' => 'nullable|string',
@@ -211,6 +222,11 @@ class StaffProfileController extends Controller
             // Parse contact_info JSON if provided
             if (isset($validated['contact_info'])) {
                 $validated['contact_info'] = json_decode($validated['contact_info'], true);
+            }
+
+            // Parse grade_levels JSON if provided
+            if (isset($validated['grade_levels'])) {
+                $validated['grade_levels'] = json_decode($validated['grade_levels'], true);
             }
 
             // Handle image upload for updates

@@ -201,6 +201,9 @@ const StaffProfiles = () => {
                             : [],
                     };
                     formDataToSend.append(key, JSON.stringify(contactInfo));
+                } else if (key === "grade_levels") {
+                    // Handle grade_levels as JSON array
+                    formDataToSend.append(key, JSON.stringify(value || []));
                 } else if (
                     key !== "profile_image" &&
                     key !== "specializations"
@@ -288,6 +291,9 @@ const StaffProfiles = () => {
                             : [],
                     };
                     formDataToSend.append(key, JSON.stringify(contactInfo));
+                } else if (key === "grade_levels") {
+                    // Handle grade_levels as JSON array
+                    formDataToSend.append(key, JSON.stringify(value || []));
                 } else if (
                     key !== "profile_image" &&
                     key !== "specializations"
