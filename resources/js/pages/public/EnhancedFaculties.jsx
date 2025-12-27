@@ -10,8 +10,10 @@ import {
     Briefcase,
     Wrench,
     Loader2,
-    ArrowRight,
-    Star,
+    Heart,
+    BookOpen,
+    Award,
+    TrendingUp,
 } from "lucide-react";
 
 const EnhancedFaculties = () => {
@@ -46,7 +48,6 @@ const EnhancedFaculties = () => {
             name: "Assistant Principals",
             description: "Supporting leadership and student welfare",
             icon: Shield,
-            color: "blue",
             href: "/faculty/assistant-principal",
             count: staffStats.by_type?.assistant_principal || 0,
             features: [
@@ -54,15 +55,15 @@ const EnhancedFaculties = () => {
                 "Curriculum Development",
                 "Teacher Supervision",
             ],
-            gradient: "from-blue-500 to-indigo-600",
-            bgGradient: "from-blue-50 to-indigo-50",
+            color: "from-green-500 to-green-600",
+            bgColor: "bg-green-50",
+            iconColor: "text-green-600",
         },
         {
             id: "teacher",
             name: "Teaching Staff",
             description: "Our dedicated educators organized by grade levels",
             icon: GraduationCap,
-            color: "green",
             href: "/faculty/teaching-staff",
             count: staffStats.by_type?.teacher || 0,
             features: [
@@ -70,15 +71,15 @@ const EnhancedFaculties = () => {
                 "Subject Specializations",
                 "Department Heads",
             ],
-            gradient: "from-green-500 to-emerald-600",
-            bgGradient: "from-green-50 to-emerald-50",
+            color: "from-blue-500 to-blue-600",
+            bgColor: "bg-blue-50",
+            iconColor: "text-blue-600",
         },
         {
             id: "admin",
             name: "Administrative Staff",
             description: "Supporting school operations and student services",
             icon: Briefcase,
-            color: "purple",
             href: "/faculty/administrative-staff",
             count: staffStats.by_type?.admin || 0,
             features: [
@@ -87,15 +88,15 @@ const EnhancedFaculties = () => {
                 "Librarians",
                 "School Nurse",
             ],
-            gradient: "from-purple-500 to-violet-600",
-            bgGradient: "from-purple-50 to-violet-50",
+            color: "from-amber-500 to-orange-600",
+            bgColor: "bg-amber-50",
+            iconColor: "text-amber-600",
         },
         {
             id: "support",
             name: "Support Staff",
             description: "Essential services and maintenance",
             icon: Wrench,
-            color: "orange",
             href: "/faculty/support-staff",
             count: staffStats.by_type?.support || 0,
             features: [
@@ -104,14 +105,15 @@ const EnhancedFaculties = () => {
                 "Health Services",
                 "Food Services",
             ],
-            gradient: "from-orange-500 to-red-500",
-            bgGradient: "from-orange-50 to-red-50",
+            color: "from-rose-500 to-rose-600",
+            bgColor: "bg-rose-50",
+            iconColor: "text-rose-600",
         },
     ];
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
                 <div className="text-center">
                     <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
                     <p className="text-gray-600 font-medium">
@@ -124,7 +126,7 @@ const EnhancedFaculties = () => {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                         {error}
@@ -144,245 +146,226 @@ const EnhancedFaculties = () => {
     const departmentHeads = staffStats.department_heads || 0;
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Breadcrumb */}
-            <div className="bg-white border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center space-x-2 py-4 text-sm">
-                        <Link
-                            to="/"
-                            className="text-blue-600 hover:text-blue-800 flex items-center"
-                        >
-                            <Home className="h-4 w-4 mr-1" />
-                            Home
-                        </Link>
-                        <ChevronRight className="h-4 w-4 text-gray-400" />
-                        <span className="text-gray-700">Faculty</span>
-                    </div>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+            {/* Hero Section - Copied from About page */}
+            <section className="relative bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 text-white py-20 overflow-hidden">
+                {/* Decorative Background Elements */}
+                <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-300 rounded-full blur-3xl"></div>
                 </div>
-            </div>
 
-            {/* Hero Section - Compact */}
-            <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 text-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="text-center">
-                        <div className="flex justify-center mb-4">
-                            <div className="bg-white bg-opacity-20 rounded-full p-3">
-                                <Users className="h-8 w-8" />
+                        {/* School Logo */}
+                        <div className="mb-6 flex justify-center">
+                            <div className="h-24 w-24 bg-white rounded-full flex items-center justify-center shadow-2xl">
+                                <img
+                                    src="/images/Logo.jpg"
+                                    alt="TNHS Logo"
+                                    className="h-full w-full object-cover rounded-full"
+                                />
                             </div>
                         </div>
-                        <h1 className="text-3xl font-bold mb-4">Our Faculty</h1>
-                        <p className="text-lg text-blue-100 max-w-3xl mx-auto mb-6">
-                            Meet our dedicated team of educators and staff who
-                            make Taft NHS a place of excellence in education.
-                        </p>
 
-                        {/* Stats - Compact */}
-                        <div className="flex justify-center gap-8 text-sm">
-                            <div className="text-center">
-                                <div className="text-2xl font-bold">
+                        <h1 className="text-5xl md:text-6xl font-bold mb-4 tracking-tight">
+                            Our Faculty
+                        </h1>
+                        <div className="w-24 h-1 bg-yellow-400 mx-auto mb-6 rounded-full"></div>
+                        <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+                            Taft National High School
+                        </p>
+                        <p className="text-lg text-blue-200 mt-2">
+                            Meet our dedicated team of educators and staff
+                        </p>
+                    </div>
+                </div>
+
+                {/* Bottom Wave */}
+                <div className="absolute bottom-0 left-0 right-0">
+                    <svg
+                        viewBox="0 0 1440 120"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-full h-12"
+                    >
+                        <path
+                            d="M0 0L60 10C120 20 240 40 360 46.7C480 53 600 47 720 43.3C840 40 960 40 1080 46.7C1200 53 1320 67 1380 73.3L1440 80V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V0Z"
+                            fill="rgb(249, 250, 251)"
+                        />
+                    </svg>
+                </div>
+            </section>
+
+            {/* Stats Section */}
+            <section className="py-12 -mt-1">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 border border-gray-100">
+                        <div className="flex items-center justify-center mb-6">
+                            <Users className="h-8 w-8 text-blue-600 mr-3" />
+                            <h2 className="text-3xl font-bold text-gray-900">
+                                Faculty at a Glance
+                            </h2>
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+                            <div className="text-center p-4 bg-blue-50 rounded-xl">
+                                <div className="text-4xl font-bold text-blue-600 mb-2">
                                     {totalStaff}
                                 </div>
-                                <div className="text-blue-200">Total Staff</div>
+                                <div className="text-sm text-gray-600 font-semibold">
+                                    Total Staff
+                                </div>
                             </div>
-                            <div className="text-center">
-                                <div className="text-2xl font-bold">
+                            <div className="text-center p-4 bg-green-50 rounded-xl">
+                                <div className="text-4xl font-bold text-green-600 mb-2">
                                     {staffStats.by_type?.teacher || 0}
                                 </div>
-                                <div className="text-blue-200">Teachers</div>
+                                <div className="text-sm text-gray-600 font-semibold">
+                                    Teachers
+                                </div>
                             </div>
-                            <div className="text-center">
-                                <div className="text-2xl font-bold">
+                            <div className="text-center p-4 bg-amber-50 rounded-xl">
+                                <div className="text-4xl font-bold text-amber-600 mb-2">
                                     {departmentHeads}
                                 </div>
-                                <div className="text-blue-200">Dept. Heads</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Mission Statement */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                    <div className="grid lg:grid-cols-2 gap-0">
-                        {/* Left Column - Mission Statement */}
-                        <div className="relative bg-gradient-to-br from-purple-50 to-indigo-50 p-8 border-r border-gray-200">
-                            <div className="absolute top-4 left-4 w-2 h-16 bg-gradient-to-b from-purple-500 to-indigo-500 rounded-full"></div>
-                            <div className="pl-6">
-                                <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-                                    DEDICATED TO EDUCATIONAL EXCELLENCE
-                                </h2>
-                                <p className="text-gray-700 text-lg leading-relaxed">
-                                    Our faculty represents the heart of Taft
-                                    National High School. From experienced
-                                    department heads to passionate new
-                                    educators, each member of our team brings
-                                    unique expertise and dedication to student
-                                    success.
-                                </p>
+                                <div className="text-sm text-gray-600 font-semibold">
+                                    Dept. Heads
+                                </div>
                             </div>
                         </div>
 
-                        {/* Right Column - Call to Action */}
-                        <div className="relative bg-gradient-to-br from-orange-50 to-yellow-50 p-8">
-                            <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-orange-400 to-yellow-400 rounded-full opacity-20"></div>
-                            <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text text-transparent mb-4">
-                                INTERESTED IN JOINING OUR TEAM?
-                            </h3>
-                            <p className="text-gray-700 mb-4">
-                                We're always looking for passionate educators
-                                and dedicated professionals to join our mission
-                                of excellence in education.
-                            </p>
-                            <Link
-                                to="/contact"
-                                className="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium transition-colors duration-200"
-                            >
-                                Learn More About Opportunities
-                                <ArrowRight className="h-4 w-4 ml-1" />
-                            </Link>
-                        </div>
+                        <p className="text-lg text-gray-600 text-center max-w-4xl mx-auto leading-relaxed">
+                            Our faculty represents the heart of Taft National
+                            High School. From experienced department heads to
+                            passionate educators, each member of our team brings
+                            unique expertise and dedication to student success.
+                        </p>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            {/* Faculty Categories */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-                <div className="text-center mb-12">
-                    <h2 className="text-4xl font-bold text-gray-900 mb-4">
-                        Faculty & Staff Directory
-                    </h2>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Explore our dedicated team organized by roles and
-                        responsibilities
-                    </p>
-                </div>
+            {/* Faculty Categories Section */}
+            <section className="py-12 pb-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                            Faculty & Staff Directory
+                        </h2>
+                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                            Click on any section below to explore our dedicated
+                            team
+                        </p>
+                    </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-                    {facultyCategories.map((category) => {
-                        const Icon = category.icon;
-                        return (
-                            <Link
-                                key={category.id}
-                                to={category.href}
-                                className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden border border-gray-100"
-                            >
-                                {/* Header with gradient */}
-                                <div
-                                    className={`bg-gradient-to-r ${category.gradient} p-6 text-white relative overflow-hidden`}
+                    {/* Cards Grid - Using About page design */}
+                    <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6 mb-12">
+                        {facultyCategories.map((category, index) => {
+                            const Icon = category.icon;
+                            return (
+                                <Link
+                                    key={index}
+                                    to={category.href}
+                                    className="group relative bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-200 hover:-translate-y-1"
                                 >
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-                                    <div className="relative z-10">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <Icon className="h-8 w-8" />
-                                            <div className="bg-white bg-opacity-20 rounded-full px-3 py-1">
-                                                <span className="text-sm font-bold">
+                                    {/* Gradient Background on Hover */}
+                                    <div
+                                        className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
+                                    ></div>
+
+                                    <div className="relative p-6">
+                                        {/* Icon and Count */}
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div
+                                                className={`${category.bgColor} w-16 h-16 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                                            >
+                                                <Icon
+                                                    className={`h-8 w-8 ${category.iconColor}`}
+                                                />
+                                            </div>
+                                            <div
+                                                className={`${category.bgColor} px-4 py-2 rounded-lg`}
+                                            >
+                                                <span
+                                                    className={`text-2xl font-bold ${category.iconColor}`}
+                                                >
                                                     {category.count}
                                                 </span>
                                             </div>
                                         </div>
-                                        <h3 className="text-xl font-bold mb-2">
+
+                                        {/* Content */}
+                                        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-royal-blue transition-colors duration-300">
                                             {category.name}
                                         </h3>
-                                        <p className="text-sm opacity-90">
+                                        <p className="text-gray-600 text-sm leading-relaxed mb-4">
                                             {category.description}
                                         </p>
-                                    </div>
-                                </div>
 
-                                {/* Content */}
-                                <div className="p-6">
-                                    <div className="space-y-2 mb-4">
-                                        {category.features.map(
-                                            (feature, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="flex items-center text-sm text-gray-600"
-                                                >
-                                                    <Star className="h-3 w-3 text-gray-400 mr-2 flex-shrink-0" />
-                                                    {feature}
-                                                </div>
-                                            )
-                                        )}
+                                        {/* Features */}
+                                        <div className="space-y-2 mb-4">
+                                            {category.features.map(
+                                                (feature, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className="flex items-center text-sm text-gray-600"
+                                                    >
+                                                        <div
+                                                            className={`w-1.5 h-1.5 rounded-full ${category.bgColor} mr-2`}
+                                                        ></div>
+                                                        {feature}
+                                                    </div>
+                                                )
+                                            )}
+                                        </div>
+
+                                        {/* Arrow */}
+                                        <div className="flex items-center text-royal-blue font-semibold text-sm">
+                                            <span className="mr-2">
+                                                View Details
+                                            </span>
+                                            <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                                        </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium text-gray-500">
-                                            View Details
-                                        </span>
-                                        <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-200" />
-                                    </div>
-                                </div>
-                            </Link>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* Quick Stats Section */}
-            <div className="bg-white border-t border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                    <div className="text-center mb-8">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                            Faculty at a Glance
-                        </h2>
-                        <p className="text-gray-600">
-                            Our diverse team of educational professionals
-                        </p>
+                                    {/* Corner Accent */}
+                                    <div className="absolute top-0 right-0 w-20 h-20 transform translate-x-10 -translate-y-10 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
+                                </Link>
+                            );
+                        })}
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {/* CTA Card - Similar to About page */}
+                    <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-xl p-8 md:p-12 text-white">
                         <div className="text-center">
-                            <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                                <GraduationCap className="h-8 w-8 text-blue-600" />
-                            </div>
-                            <div className="text-2xl font-bold text-gray-900">
-                                {staffStats.by_type?.teacher || 0}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                                Teachers
-                            </div>
-                        </div>
-
-                        <div className="text-center">
-                            <div className="bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                                <Shield className="h-8 w-8 text-purple-600" />
-                            </div>
-                            <div className="text-2xl font-bold text-gray-900">
-                                {staffStats.by_type?.assistant_principal || 0}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                                Assistant Principals
-                            </div>
-                        </div>
-
-                        <div className="text-center">
-                            <div className="bg-orange-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                                <Briefcase className="h-8 w-8 text-orange-600" />
-                            </div>
-                            <div className="text-2xl font-bold text-gray-900">
-                                {staffStats.by_type?.admin || 0}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                                Administrative
-                            </div>
-                        </div>
-
-                        <div className="text-center">
-                            <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                                <Wrench className="h-8 w-8 text-green-600" />
-                            </div>
-                            <div className="text-2xl font-bold text-gray-900">
-                                {staffStats.by_type?.support || 0}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                                Support Staff
+                            <Heart className="h-12 w-12 mx-auto mb-4 text-yellow-300" />
+                            <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                                Interested in Joining Our Team?
+                            </h3>
+                            <p className="text-blue-100 text-lg mb-6 max-w-2xl mx-auto">
+                                We're always looking for passionate educators
+                                and dedicated professionals to join our mission
+                                of excellence in education.
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                <Link
+                                    to="/contact"
+                                    className="inline-flex items-center justify-center px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-all duration-300 shadow-lg hover:shadow-xl"
+                                >
+                                    Contact Us
+                                    <ChevronRight className="ml-2 h-5 w-5" />
+                                </Link>
+                                <Link
+                                    to="/admissions/requirements"
+                                    className="inline-flex items-center justify-center px-8 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition-all duration-300"
+                                >
+                                    Learn More
+                                </Link>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
     );
 };

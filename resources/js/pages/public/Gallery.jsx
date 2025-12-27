@@ -10,7 +10,6 @@ import {
     Star,
     Eye,
     Download,
-    Share2,
     X,
     Grid3X3,
     List,
@@ -866,17 +865,6 @@ const Gallery = () => {
 
                                                 {/* Actions */}
                                                 <div className="ml-auto flex items-center gap-2">
-                                                    <button
-                                                        onClick={() =>
-                                                            handleShare(
-                                                                selectedImage
-                                                            )
-                                                        }
-                                                        className="p-2.5 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-lg shadow-md hover:from-blue-600 hover:to-cyan-600 transition-all hover:scale-110"
-                                                        title="Share"
-                                                    >
-                                                        <Share2 className="w-5 h-5" />
-                                                    </button>
                                                     <button
                                                         onClick={() =>
                                                             handleDownload(

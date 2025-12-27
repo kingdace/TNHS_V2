@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronRight } from "lucide-react";
 import { useTheme } from "../../contexts/ThemeContext";
 
 const Header = () => {
@@ -198,8 +198,11 @@ const Header = () => {
                                                     key={subItem.name}
                                                     className="relative group/nested"
                                                 >
-                                                    <div className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 cursor-pointer">
-                                                        {subItem.name}
+                                                    <div className="flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 cursor-pointer">
+                                                        <span>
+                                                            {subItem.name}
+                                                        </span>
+                                                        <ChevronRight className="h-4 w-4 text-gray-400" />
                                                     </div>
                                                     {/* Nested Dropdown for "More" */}
                                                     <div className="absolute left-full top-0 ml-1 w-[200px] bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 opacity-0 invisible group-hover/nested:opacity-100 group-hover/nested:visible transition-all duration-300">
